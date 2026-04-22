@@ -7,8 +7,34 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Request failed");
+
+  const contentType = res.headers.get("content-type") || "";
+  let data: any = null;
+
+  if (contentType.includes("application/json")) {
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
+  } else {
+    try {
+      data = await res.text();
+    } catch {
+      data = null;
+    }
+  }
+
+  if (!res.ok) {
+    const message =
+      typeof data === "object" && data && "error" in data
+        ? String((data as any).error)
+        : typeof data === "string" && data.trim()
+          ? data
+          : `Request failed (${res.status})`;
+    throw new Error(message);
+  }
+
   return data as T;
 }
 

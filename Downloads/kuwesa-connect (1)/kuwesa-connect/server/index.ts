@@ -60,6 +60,19 @@ app.use("/api/payments", paymentsRouter);
 
 app.use("/uploads", express.static(path.join(process.cwd(), "public", "uploads")));
 
+app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (!err) return next();
+  console.error(err);
+
+  if (req.path.startsWith("/api")) {
+    return res.status(500).json({
+      error: err instanceof Error ? err.message : "Internal Server Error",
+    });
+  }
+
+  return next(err);
+});
+
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(process.cwd(), "dist")));
   app.get(/.*/, (_req, res) => {
