@@ -14,9 +14,9 @@ const CATEGORIES = [
 ];
 
 const STATS = [
-  { value: "10,000+", label: "Active Jobs", icon: Briefcase },
-  { value: "500+", label: "Companies", icon: Users },
-  { value: "150+", label: "Countries", icon: Globe },
+  { value: "100+", label: "Active Jobs", icon: Briefcase },
+  { value: "50+", label: "Companies", icon: Users },
+  { value: "30+", label: "Countries", icon: Globe },
   { value: "Daily", label: "New Listings", icon: TrendingUp },
 ];
 
@@ -89,11 +89,6 @@ export default function Home() {
         <div className="absolute inset-0 opacity-40" style={{backgroundImage: "radial-gradient(circle, #cbd5e1 1px, transparent 1px)", backgroundSize: "28px 28px"}} />
 
         <div className="relative max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
-
-          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-600 text-xs font-semibold px-4 py-1.5 rounded-full mb-8 tracking-wide">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
-            10,000+ live jobs updated daily
-          </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.05] tracking-tight text-gray-900 mb-6">
             Find Your<br />
