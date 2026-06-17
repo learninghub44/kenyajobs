@@ -8,53 +8,58 @@ import JobSkeleton from "@/components/JobSkeleton";
 export default function Home() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sources, setSources] = useState({ loaded: 0, total: 5 });
+
+  // Merge new jobs into state without duplicates
+  const mergeJobs = (prev, incoming) => {
+    const ids = new Set(prev.map(j => j.id));
+    return [...prev, ...incoming.filter(j => !ids.has(j.id))].slice(0, 60);
+  };
 
   useEffect(() => {
-    // Load Kenya jobs + Remotive first (fast) — show immediately
-    Promise.allSettled([
-      fetch("/api/kenya-jobs").then(r => r.json()).catch(() => []),
-      fetch("/api/remote-jobs").then(r => r.json()).catch(() => []),
-    ]).then(([kenya, remote]) => {
-      const initial = [
-        ...(kenya.value || []).slice(0, 10),
-        ...(remote.value || []).slice(0, 10),
-      ];
-      if (initial.length > 0) {
-        setJobs(initial);
-        setLoading(false);
+    // Each source streams in independently — show as soon as it arrives
+    const fetchSource = async (url, sliceCount, sourceLabel) => {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`${sourceLabel}: HTTP ${res.status}`);
+        const data = await res.json();
+        const items = Array.isArray(data) ? data.slice(0, sliceCount) : [];
+        if (items.length > 0) {
+          setJobs(prev => mergeJobs(prev, items));
+          setLoading(false);
+        }
+      } catch (e) {
+        console.warn(`Failed to load ${sourceLabel}:`, e.message);
+      } finally {
+        setSources(prev => ({ ...prev, loaded: prev.loaded + 1 }));
       }
-    });
+    };
 
-    // Then merge in the rest
-    Promise.allSettled([
-      fetch("/api/entry-level-jobs").then(r => r.json()).catch(() => []),
-      fetch("/api/graduate-jobs").then(r => r.json()).catch(() => []),
-      fetch("/api/wfh-jobs").then(r => r.json()).catch(() => []),
-    ]).then(results => {
-      const extra = results
-        .filter(r => r.status === "fulfilled" && Array.isArray(r.value))
-        .flatMap(r => r.value.slice(0, 5));
+    // Fire all in parallel — each updates UI the moment it resolves
+    fetchSource("/api/kenya-jobs", 20, "Kenya Jobs");
+    fetchSource("/api/remote-jobs", 15, "Remote Jobs");
+    fetchSource("/api/entry-level-jobs", 8, "Entry Level");
+    fetchSource("/api/graduate-jobs", 8, "Graduate");
+    fetchSource("/api/wfh-jobs", 8, "Work From Home");
 
-      setJobs(prev => {
-        const ids = new Set(prev.map(j => j.id));
-        const merged = [...prev, ...extra.filter(j => !ids.has(j.id))];
-        return merged.slice(0, 40);
-      });
-      setLoading(false);
-    });
+    // Safety: turn off spinner after 12s even if some sources stall
+    const timeout = setTimeout(() => setLoading(false), 12000);
+    return () => clearTimeout(timeout);
   }, []);
+
+  const allLoaded = sources.loaded >= sources.total;
 
   return (
     <>
       <Head>
-        <title>Remote Jobs | Entry Level | Graduate Jobs — JobsWorldwide</title>
-        <meta name="description" content="Find the latest remote jobs, entry level, graduate and work from home jobs worldwide. Updated daily." />
+        <title>Kenya Jobs | Remote | Entry Level | Graduate — JobsWorldwide</title>
+        <meta name="description" content="Find the latest Kenya jobs, remote jobs, entry level, graduate and work from home jobs. Updated daily." />
       </Head>
 
       {/* Hero */}
       <section className="bg-blue-600 text-white py-16 px-4 text-center">
         <h1 className="text-3xl md:text-5xl font-bold mb-3">Find Your Next Job, Anywhere in the World</h1>
-        <p className="text-blue-100 mb-8 text-lg">Remote · Entry Level · Graduate · Work From Home — Updated Daily</p>
+        <p className="text-blue-100 mb-8 text-lg">Kenya · Remote · Entry Level · Graduate · Work From Home — Updated Daily</p>
         <SearchBar placeholder="Search jobs e.g. accountant, developer, nurse..." />
       </section>
 
@@ -70,7 +75,17 @@ export default function Home() {
 
       {/* Jobs */}
       <section className="max-w-6xl mx-auto px-4 pb-16">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">Latest Jobs</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-800">Latest Jobs</h2>
+          {!allLoaded && jobs.length > 0 && (
+            <span className="text-xs text-blue-500 animate-pulse">
+              Loading more sources… ({sources.loaded}/{sources.total})
+            </span>
+          )}
+          {jobs.length > 0 && (
+            <span className="text-xs text-gray-400">{jobs.length} jobs found</span>
+          )}
+        </div>
 
         {loading && jobs.length === 0 && <JobSkeleton count={9} />}
 
@@ -86,6 +101,13 @@ export default function Home() {
                 )}
               </>
             ))}
+          </div>
+        )}
+
+        {!loading && jobs.length === 0 && (
+          <div className="text-center py-16 text-gray-400">
+            <p className="text-lg font-medium">No jobs found right now.</p>
+            <p className="text-sm mt-1">Please check back shortly — sources update every 30 minutes.</p>
           </div>
         )}
       </section>

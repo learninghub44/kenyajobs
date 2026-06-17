@@ -1,10 +1,14 @@
-// Providers: JSearch (if key exists) + The Muse (free) + Arbeitnow (free)
+// Providers: The Muse (free) + Remotive (free) + JSearch (if key set)
+import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+
 export default async function handler(req, res) {
   const { page = 1 } = req.query;
 
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate");
+
   const sources = [
     // 1. The Muse — free, no key, has entry level filter
-    fetch(`https://www.themuse.com/api/public/jobs?level=Entry+Level&page=${page}&descending=true`)
+    fetchWithTimeout(`https://www.themuse.com/api/public/jobs?level=Entry+Level&page=${page}&descending=true`)
       .then(r => r.json())
       .then(d => (d.results || []).map(j => ({
         id: `muse-${j.id}`,
@@ -16,10 +20,11 @@ export default async function handler(req, res) {
         url: j.refs?.landing_page,
         description: j.contents,
         source: "The Muse",
-      }))),
+      })))
+      .catch(err => { console.error("TheMuse error:", err.message); return []; }),
 
     // 2. Remotive — software-dev as entry-level proxy
-    fetch("https://remotive.com/api/remote-jobs?category=software-dev&limit=15")
+    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=software-dev&limit=15")
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `remotive-${j.id}`,
@@ -31,11 +36,12 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.description,
         source: "Remotive",
-      }))),
+      })))
+      .catch(err => { console.error("Remotive entry error:", err.message); return []; }),
 
     // 3. JSearch via RapidAPI (only if key set)
     ...(process.env.RAPIDAPI_KEY ? [
-      fetch(`https://jsearch.p.rapidapi.com/search?query=entry+level+jobs&page=${page}&num_pages=1`, {
+      fetchWithTimeout(`https://jsearch.p.rapidapi.com/search?query=entry+level+jobs&page=${page}&num_pages=1`, {
         headers: {
           "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
           "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
@@ -53,6 +59,7 @@ export default async function handler(req, res) {
           description: j.job_description,
           source: "JSearch",
         })))
+        .catch(err => { console.error("JSearch error:", err.message); return []; })
     ] : []),
   ];
 

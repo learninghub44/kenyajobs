@@ -1,10 +1,12 @@
 // Providers: Adzuna (if key) + Remotive customer-support + Jobicy (free)
+import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+
 export default async function handler(req, res) {
   const { page = 1 } = req.query;
 
   const sources = [
     // 1. Remotive — customer support / writing as WFH proxy
-    fetch("https://remotive.com/api/remote-jobs?category=customer-support&limit=15")
+    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=customer-support&limit=15")
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `remotive-wfh-${j.id}`,
@@ -19,7 +21,7 @@ export default async function handler(req, res) {
       }))),
 
     // 2. Jobicy — remote general
-    fetch("https://jobicy.com/api/v2/remote-jobs?count=15&geo=worldwide")
+    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=15&geo=worldwide")
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `jobicy-wfh-${j.id}`,
@@ -35,7 +37,7 @@ export default async function handler(req, res) {
 
     // 3. Adzuna (only if keys set)
     ...(process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY ? [
-      fetch(`https://api.adzuna.com/v1/api/jobs/gb/search/${page}?app_id=${process.env.ADZUNA_APP_ID}&app_key=${process.env.ADZUNA_APP_KEY}&results_per_page=20&what=work+from+home`)
+      fetchWithTimeout(`https://api.adzuna.com/v1/api/jobs/gb/search/${page}?app_id=${process.env.ADZUNA_APP_ID}&app_key=${process.env.ADZUNA_APP_KEY}&results_per_page=20&what=work+from+home`)
         .then(r => r.json())
         .then(d => (d.results || []).map(j => ({
           id: `adzuna-${j.id}`,

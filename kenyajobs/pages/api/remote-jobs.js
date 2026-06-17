@@ -1,12 +1,18 @@
 // Providers: Remotive + Jobicy + Arbeitnow (all free, no key)
+import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+
 export default async function handler(req, res) {
   const { category = "", limit = 30 } = req.query;
 
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate");
+
   const results = await Promise.allSettled([
     // 1. Remotive
-    fetch(category
-      ? `https://remotive.com/api/remote-jobs?category=${category}&limit=20`
-      : `https://remotive.com/api/remote-jobs?limit=20`)
+    fetchWithTimeout(
+      category
+        ? `https://remotive.com/api/remote-jobs?category=${category}&limit=20`
+        : `https://remotive.com/api/remote-jobs?limit=20`
+    )
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `remotive-${j.id}`,
@@ -18,10 +24,11 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.description,
         source: "Remotive",
-      }))),
+      })))
+      .catch(err => { console.error("Remotive error:", err.message); return []; }),
 
     // 2. Jobicy (free, no key)
-    fetch("https://jobicy.com/api/v2/remote-jobs?count=20&geo=worldwide&industry=&tag=")
+    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=20&geo=worldwide&industry=&tag=")
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `jobicy-${j.id}`,
@@ -33,10 +40,11 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.jobDescription,
         source: "Jobicy",
-      }))),
+      })))
+      .catch(err => { console.error("Jobicy error:", err.message); return []; }),
 
     // 3. Arbeitnow (free, no key)
-    fetch("https://www.arbeitnow.com/api/job-board-api")
+    fetchWithTimeout("https://www.arbeitnow.com/api/job-board-api")
       .then(r => r.json())
       .then(d => (d.data || []).slice(0, 20).map(j => ({
         id: `arbeitnow-${j.slug}`,
@@ -48,7 +56,8 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.description,
         source: "Arbeitnow",
-      }))),
+      })))
+      .catch(err => { console.error("Arbeitnow error:", err.message); return []; }),
   ]);
 
   const jobs = results

@@ -1,10 +1,12 @@
 // Providers: JSearch (if key) + The Muse (free) + Jobicy (free)
+import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+
 export default async function handler(req, res) {
   const { page = 1 } = req.query;
 
   const sources = [
     // 1. The Muse — internship/associate level
-    fetch(`https://www.themuse.com/api/public/jobs?level=Internship&page=${page}&descending=true`)
+    fetchWithTimeout(`https://www.themuse.com/api/public/jobs?level=Internship&page=${page}&descending=true`)
       .then(r => r.json())
       .then(d => (d.results || []).map(j => ({
         id: `muse-intern-${j.id}`,
@@ -19,7 +21,7 @@ export default async function handler(req, res) {
       }))),
 
     // 2. Jobicy — marketing/business as graduate proxy
-    fetch("https://jobicy.com/api/v2/remote-jobs?count=15&industry=marketing")
+    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=15&industry=marketing")
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `jobicy-grad-${j.id}`,
@@ -35,7 +37,7 @@ export default async function handler(req, res) {
 
     // 3. JSearch — graduate trainee (only if key set)
     ...(process.env.RAPIDAPI_KEY ? [
-      fetch(`https://jsearch.p.rapidapi.com/search?query=graduate+trainee+program&page=${page}&num_pages=1`, {
+      fetchWithTimeout(`https://jsearch.p.rapidapi.com/search?query=graduate+trainee+program&page=${page}&num_pages=1`, {
         headers: {
           "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
           "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
