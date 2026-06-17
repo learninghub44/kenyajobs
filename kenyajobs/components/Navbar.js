@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { Search, Menu, X, ChevronDown } from "lucide-react";
 
@@ -12,7 +13,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0">
-            <img src="/logo-nav.svg" alt="JobsWorldwide" className="h-11 w-auto" />
+            <Image src="/logo-nav.svg" alt="JobsWorldwide" width={260} height={44} className="h-11 w-auto" priority />
           </Link>
 
           {/* Desktop Nav */}

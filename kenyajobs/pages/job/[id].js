@@ -198,7 +198,7 @@ export default function JobDetail() {
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                   <p className="font-bold text-lg">Ready to apply?</p>
-                  <p className="text-blue-100 text-sm">You'll be directed to {source} to complete your application.</p>
+                  <p className="text-blue-100 text-sm">You&apos;ll be directed to {source} to complete your application.</p>
                 </div>
                 <a href={applyUrl} target="_blank" rel="noopener noreferrer"
                   className="flex-shrink-0 bg-white text-blue-700 font-bold px-7 py-3 rounded-xl hover:bg-blue-50 transition-colors text-sm whitespace-nowrap">

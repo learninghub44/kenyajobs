@@ -125,7 +125,7 @@ export default function Home() {
               />
             </div>
             <button
-              onClick={() => {}}
+              onClick={() => document.getElementById("jobs-section")?.scrollIntoView({ behavior: "smooth" })}
               className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl transition-colors text-sm whitespace-nowrap shadow-lg shadow-blue-900/40">
               Search Jobs
             </button>
@@ -181,7 +181,7 @@ export default function Home() {
       </section>
 
       {/* ─── JOBS SECTION ─── */}
-      <section className="max-w-7xl mx-auto px-4 py-10">
+      <section id="jobs-section" className="max-w-7xl mx-auto px-4 py-10">
         {/* Section header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>

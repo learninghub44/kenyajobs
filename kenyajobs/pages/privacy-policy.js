@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">1. About This Policy</h2>
-            <p>This Privacy Policy explains how JobsWorldwide ("we", "our", or "us"), accessible at <strong>jobsworldwide.online</strong>, collects, uses, and protects information when you use our website. By using our site, you agree to the practices described in this policy.</p>
+            <p>This Privacy Policy explains how JobsWorldwide (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;), accessible at <strong>jobsworldwide.online</strong>, collects, uses, and protects information when you use our website. By using our site, you agree to the practices described in this policy.</p>
           </div>
 
           <div>
@@ -46,7 +46,7 @@ export default function PrivacyPolicy() {
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">4. Third-Party Job Links</h2>
-            <p>JobsWorldwide is a job aggregator. All job listings link directly to third-party employer websites, job boards, or recruitment platforms (such as BrighterMonday Kenya, MyJobMag, Remotive, Jobicy, and others). When you click "Apply Now", you leave our site and are subject to that third party's own privacy policy. We are not responsible for the privacy practices or content of those external websites.</p>
+            <p>JobsWorldwide is a job aggregator. All job listings link directly to third-party employer websites, job boards, or recruitment platforms (such as BrighterMonday Kenya, MyJobMag, Remotive, Jobicy, and others). When you click &quot;Apply Now&quot;, you leave our site and are subject to that third party&apos;s own privacy policy. We are not responsible for the privacy practices or content of those external websites.</p>
           </div>
 
           <div>
@@ -65,13 +65,13 @@ export default function PrivacyPolicy() {
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2">8. Children's Privacy</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">8. Children&apos;s Privacy</h2>
             <p>JobsWorldwide is not directed at children under the age of 13. We do not knowingly collect personal information from children. If you believe a child has submitted personal information to us, please contact us and we will delete it promptly.</p>
           </div>
 
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">9. Changes to This Policy</h2>
-            <p>We may update this Privacy Policy from time to time to reflect changes in our practices or for legal reasons. Any updates will be posted on this page with a revised "Last updated" date. We encourage you to review this page periodically.</p>
+            <p>We may update this Privacy Policy from time to time to reflect changes in our practices or for legal reasons. Any updates will be posted on this page with a revised &quot;Last updated&quot; date. We encourage you to review this page periodically.</p>
           </div>
 
           <div>

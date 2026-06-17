@@ -16,7 +16,6 @@ export default function WorkFromHome() {
   const perPage = 20;
 
   useEffect(() => {
-    setLoading(true);
     // Try Adzuna first, fall back to Remotive customer-service category
     fetch("/api/wfh-jobs")
       .then((r) => r.json())

@@ -97,7 +97,7 @@ export default function About() {
               <Mail size={18} />
               <h2 className="text-lg font-bold">Contact Us</h2>
             </div>
-            <p className="text-blue-100 text-sm mb-5">Have a question, suggestion, or want to advertise with us? We'd love to hear from you.</p>
+            <p className="text-blue-100 text-sm mb-5">Have a question, suggestion, or want to advertise with us? We&apos;d love to hear from you.</p>
             <a
               href="mailto:hello@jobsworldwide.online"
               className="inline-flex items-center gap-2 bg-white text-blue-600 font-semibold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors text-sm"

@@ -16,7 +16,6 @@ export default function GraduateJobs() {
   const perPage = 20;
 
   useEffect(() => {
-    setLoading(true);
     // Try JSearch first, fall back to Remotive if empty
     fetch("/api/graduate-jobs")
       .then((r) => r.json())

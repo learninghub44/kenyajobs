@@ -16,7 +16,6 @@ export default function RemoteJobs() {
   const perPage = 20;
 
   useEffect(() => {
-    setLoading(true);
     fetch("/api/remote-jobs")
       .then((r) => r.json())
       .then((data) => {
@@ -35,7 +34,9 @@ export default function RemoteJobs() {
       setFiltered(jobs);
     } else {
       setFiltered(jobs.filter((j) =>
-        String(j.category || "").toLowerCase().includes(filter.toLowerCase())
+        String(j.title || "").toLowerCase().includes(filter.toLowerCase()) ||
+        String(j.description || "").toLowerCase().includes(filter.toLowerCase()) ||
+        String(j.type || "").toLowerCase().includes(filter.toLowerCase())
       ));
     }
   }
