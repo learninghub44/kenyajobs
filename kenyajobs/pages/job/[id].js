@@ -19,6 +19,7 @@ export default function JobDetail() {
       try {
         setLoading(true);
         const results = await Promise.allSettled([
+          fetch("/api/africa-jobs").then(r => r.json()).catch(() => []),
           fetch("/api/remote-jobs").then(r => r.json()).catch(() => []),
           fetch("/api/entry-level-jobs").then(r => r.json()).catch(() => []),
           fetch("/api/graduate-jobs").then(r => r.json()).catch(() => []),
@@ -81,7 +82,7 @@ export default function JobDetail() {
   const applyUrl = job.url || job.job_apply_link || job.redirect_url || "#";
   const datePosted = job.date || job.publication_date || job.job_posted_at_datetime_utc || job.created || "";
   const formattedDate = datePosted
-    ? new Date(datePosted).toLocaleDateString("en-KE", { day: "numeric", month: "long", year: "numeric" })
+    ? new Date(datePosted).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
     : "Recently";
   const source = job.source || "";
 
