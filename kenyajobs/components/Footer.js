@@ -59,7 +59,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <a href="mailto:hello@jobsworldwide.com" className="flex items-center gap-2 hover:text-white transition-colors">
+              <a href="mailto:hello@jobsworldwide.online" className="flex items-center gap-2 hover:text-white transition-colors">
                 <Mail size={14} /> Contact Us
               </a>
             </li>

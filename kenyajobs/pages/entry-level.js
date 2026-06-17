@@ -1,32 +1,11 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import JobCard from "@/components/JobCard";
+import JobSkeleton from "@/components/JobSkeleton";
 import CategoryTabs from "@/components/CategoryTabs";
 
 const filters = ["All", "Tech", "Banking", "Sales", "Admin"];
 
-function Skeletons() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[...Array(9)].map((_, i) => (
-        <div key={i} className="bg-white border border-gray-200 rounded-2xl p-5 animate-pulse">
-          <div className="flex gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-gray-200" />
-            <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4" />
-              <div className="h-3 bg-gray-100 rounded w-1/2" />
-            </div>
-          </div>
-          <div className="flex gap-2 mt-3">
-            <div className="h-6 bg-gray-100 rounded-lg w-20" />
-            <div className="h-6 bg-gray-100 rounded-lg w-16" />
-          </div>
-          <div className="h-9 bg-gray-200 rounded-xl mt-4" />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default function EntryLevel() {
   const [jobs, setJobs] = useState([]);
@@ -94,7 +73,7 @@ export default function EntryLevel() {
           ))}
         </div>
 
-        {loading && <Skeletons />}
+        {loading && <JobSkeleton count={9} />}
 
         {!loading && paginated.length === 0 && (
           <div className="text-center py-20 text-gray-500">No jobs found.</div>
