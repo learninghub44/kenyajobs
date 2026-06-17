@@ -11,11 +11,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-black text-sm">J</span>
-            </div>
-            <span className="text-gray-900 font-bold text-lg tracking-tight">Jobs<span className="text-blue-600">Worldwide</span></span>
+          <Link href="/" className="flex items-center flex-shrink-0">
+            <img src="/logo-nav.svg" alt="JobsWorldwide" className="h-10 w-auto" />
           </Link>
 
           {/* Desktop Nav */}
