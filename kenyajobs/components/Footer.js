@@ -1,74 +1,65 @@
 import Link from "next/link";
-import { Globe, Mail, Laptop, Briefcase, GraduationCap, Home, Info, ShieldCheck } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-950 text-gray-400 mt-16">
-      <div className="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+    <footer className="bg-gray-900 text-gray-400">
+      <div className="max-w-7xl mx-auto px-4 pt-14 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
 
-        {/* Brand */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="bg-blue-600 text-white rounded-lg p-1.5">
-              <Globe size={16} strokeWidth={2.5} />
+          {/* Brand */}
+          <div className="md:col-span-1">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-black text-sm">K</span>
+              </div>
+              <span className="text-white font-bold text-lg">Kenya<span className="text-blue-400">Jobs</span></span>
             </div>
-            <span className="text-white text-lg font-bold">Jobs<span className="text-blue-400">Worldwide</span></span>
-          </div>
-          <p className="text-sm leading-relaxed">Your source for remote, entry level, graduate and work-from-home jobs. Updated daily.</p>
-        </div>
-
-        {/* Job Categories */}
-        <div>
-          <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Job Categories</h3>
-          <ul className="space-y-2.5 text-sm">
-            <li>
-              <Link href="/remote-jobs" className="flex items-center gap-2 hover:text-white transition-colors">
-                <Laptop size={14} /> Remote Jobs
-              </Link>
-            </li>
-            <li>
-              <Link href="/entry-level" className="flex items-center gap-2 hover:text-white transition-colors">
-                <Briefcase size={14} /> Entry Level Jobs
-              </Link>
-            </li>
-            <li>
-              <Link href="/graduate-jobs" className="flex items-center gap-2 hover:text-white transition-colors">
-                <GraduationCap size={14} /> Graduate Jobs
-              </Link>
-            </li>
-            <li>
-              <Link href="/work-from-home" className="flex items-center gap-2 hover:text-white transition-colors">
-                <Home size={14} /> Work From Home
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Quick Links */}
-        <div>
-          <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Company</h3>
-          <ul className="space-y-2.5 text-sm">
-            <li>
-              <Link href="/about" className="flex items-center gap-2 hover:text-white transition-colors">
-                <Info size={14} /> About Us
-              </Link>
-            </li>
-            <li>
-              <Link href="/privacy-policy" className="flex items-center gap-2 hover:text-white transition-colors">
-                <ShieldCheck size={14} /> Privacy Policy
-              </Link>
-            </li>
-            <li>
-              <a href="mailto:hello@jobsworldwide.online" className="flex items-center gap-2 hover:text-white transition-colors">
-                <Mail size={14} /> Contact Us
+            <p className="text-sm leading-relaxed mb-5">Your #1 source for jobs in Kenya and across Africa. Remote, entry level, graduate and work-from-home opportunities updated daily.</p>
+            <div className="space-y-2 text-sm">
+              <a href="mailto:hello@kenyajobs.co.ke" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Mail size={13} /> hello@kenyajobs.co.ke
               </a>
-            </li>
-          </ul>
-        </div>
-      </div>
+            </div>
+          </div>
 
-      <div className="border-t border-gray-800 text-center py-5 text-xs text-gray-600">
-        © {new Date().getFullYear()} JobsWorldwide — All rights reserved.
+          {/* Job Categories */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm">Job Categories</h3>
+            <ul className="space-y-2.5 text-sm">
+              {[["Remote Jobs", "/remote-jobs"], ["Entry Level", "/entry-level"], ["Graduate Jobs", "/graduate-jobs"], ["Work From Home", "/work-from-home"]].map(([l, h]) => (
+                <li key={h}><Link href={h} className="hover:text-white transition-colors">{l}</Link></li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Popular Roles */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm">Popular Searches</h3>
+            <ul className="space-y-2.5 text-sm">
+              {["Software Engineer", "Accountant", "Nurse", "Teacher", "Sales Manager", "Customer Service"].map(r => (
+                <li key={r}><span className="hover:text-white transition-colors cursor-pointer">{r}</span></li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm">Company</h3>
+            <ul className="space-y-2.5 text-sm">
+              {[["About Us", "/about"], ["Privacy Policy", "/privacy-policy"]].map(([l, h]) => (
+                <li key={h}><Link href={h} className="hover:text-white transition-colors">{l}</Link></li>
+              ))}
+              <li><a href="mailto:hello@kenyajobs.co.ke" className="hover:text-white transition-colors">Post a Job</a></li>
+              <li><a href="mailto:hello@kenyajobs.co.ke" className="hover:text-white transition-colors">Contact Us</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
+          <p>© {new Date().getFullYear()} KenyaJobs. All rights reserved.</p>
+          <p>Built for job seekers across Africa 🌍</p>
+        </div>
       </div>
     </footer>
   );
