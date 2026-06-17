@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import DOMPurify from "dompurify";
 import { MapPin, Briefcase, Calendar, ArrowUpRight, Building2, Clock, Share2, Bookmark, ChevronRight } from "lucide-react";
 
 function timeAgo(dateStr) {
@@ -111,6 +112,9 @@ export default function JobDetail() {
   const location = job.location || job.candidate_required_location || job.job_city || "Africa";
   const jobType = job.type || job.job_type || job.employment_type || "Full-time";
   const description = job.description || job.job_description || "No description available.";
+  const sanitizedDescription = typeof window !== "undefined"
+    ? DOMPurify.sanitize(description, { ALLOWED_TAGS: ["p", "br", "ul", "ol", "li", "strong", "em", "b", "i", "h3", "h4", "a"], ALLOWED_ATTR: ["href", "target", "rel"] })
+    : "";
   const applyUrl = job.url || job.job_apply_link || job.redirect_url || "#";
   const source = job.source || "Source";
   const posted = timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc);
@@ -191,7 +195,7 @@ export default function JobDetail() {
                   Job Description
                 </h2>
                 <div className="text-gray-600 leading-relaxed prose prose-sm max-w-none prose-headings:text-gray-800 prose-a:text-blue-600"
-                  dangerouslySetInnerHTML={{ __html: description }} />
+                  dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
               </div>
 
               {/* Bottom apply */}

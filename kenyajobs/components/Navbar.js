@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { Search, Menu, X, ChevronDown } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,6 +27,9 @@ export default function Navbar() {
 
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
+            <Link href="/search" className="text-gray-500 hover:text-blue-600 transition-colors p-2 rounded-lg hover:bg-blue-50" aria-label="Search jobs">
+              <Search size={18} />
+            </Link>
             <Link href="/about" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">About</Link>
             <a href="mailto:hello@jobsworldwide.online"
               className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
@@ -46,6 +49,7 @@ export default function Navbar() {
         <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 flex flex-col gap-1">
           {[
             ["Home", "/"],
+            ["Search Jobs", "/search"],
             ["Remote Jobs", "/remote-jobs"],
             ["Entry Level", "/entry-level"],
             ["Graduate Jobs", "/graduate-jobs"],
