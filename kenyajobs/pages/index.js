@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
-import { Search, MapPin, TrendingUp, Users, Briefcase, Globe, ChevronRight, Star, Wifi, GraduationCap, Home, Rocket } from "lucide-react";
+import { Search, MapPin, TrendingUp, Users, Briefcase, Globe, ChevronRight, Star, Wifi, GraduationCap, Home as HomeIcon, Rocket } from "lucide-react";
 
 const CATEGORIES = [
   { label: "All Jobs", value: "" },
@@ -245,7 +245,7 @@ export default function Home() {
               { title: "Remote Jobs", desc: "Work from anywhere in the world", href: "/remote-jobs", color: "from-blue-500 to-blue-600", icon: Wifi },
               { title: "Entry Level", desc: "Start your career journey today", href: "/entry-level", color: "from-green-500 to-emerald-600", icon: Rocket },
               { title: "Graduate Jobs", desc: "Opportunities for fresh graduates", href: "/graduate-jobs", color: "from-purple-500 to-violet-600", icon: GraduationCap },
-              { title: "Work From Home", desc: "Skip the commute, work remotely", href: "/work-from-home", color: "from-orange-500 to-amber-600", icon: Home },
+              { title: "Work From Home", desc: "Skip the commute, work remotely", href: "/work-from-home", color: "from-orange-500 to-amber-600", icon: HomeIcon },
             ].map(({ title, desc, href, color, icon: Icon }) => (
               <Link key={href} href={href}
                 className={`group bg-gradient-to-br ${color} text-white rounded-2xl p-6 hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5`}>
