@@ -16,9 +16,11 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchSource = async (url, sliceCount, sourceLabel) => {
       try {
-        const res = await fetch(url);
+        const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) throw new Error(`${sourceLabel}: HTTP ${res.status}`);
         const data = await res.json();
         const items = Array.isArray(data) ? data.slice(0, sliceCount) : [];
@@ -27,7 +29,7 @@ export default function Home() {
           setLoading(false);
         }
       } catch (e) {
-        console.warn(`Failed to load ${sourceLabel}:`, e.message);
+        if (e.name !== "AbortError") console.warn(`Failed to load ${sourceLabel}:`, e.message);
       } finally {
         setSources(prev => ({ ...prev, loaded: prev.loaded + 1 }));
       }
@@ -39,8 +41,11 @@ export default function Home() {
     fetchSource("/api/graduate-jobs", 8, "Graduate");
     fetchSource("/api/wfh-jobs", 8, "Work From Home");
 
-    const timeout = setTimeout(() => setLoading(false), 12000);
-    return () => clearTimeout(timeout);
+    const timeout = setTimeout(() => setLoading(false), 7000);
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
   }, []);
 
   const allLoaded = sources.loaded >= sources.total;

@@ -4,7 +4,7 @@ import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 export default async function handler(req, res) {
   const { category = "", limit = 30 } = req.query;
 
-  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate");
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
 
   const results = await Promise.allSettled([
     // 1. Remotive
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       .catch(err => { console.error("Remotive error:", err.message); return []; }),
 
     // 2. Jobicy (free, no key)
-    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=20&geo=worldwide&industry=&tag=")
+    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=20&geo=worldwide&industry=&tag=", {}, 5000)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `jobicy-${j.id}`,
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       .catch(err => { console.error("Jobicy error:", err.message); return []; }),
 
     // 3. Arbeitnow (free, no key)
-    fetchWithTimeout("https://www.arbeitnow.com/api/job-board-api")
+    fetchWithTimeout("https://www.arbeitnow.com/api/job-board-api", {}, 5000)
       .then(r => r.json())
       .then(d => (d.data || []).slice(0, 20).map(j => ({
         id: `arbeitnow-${j.slug}`,

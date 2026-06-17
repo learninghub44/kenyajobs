@@ -4,11 +4,11 @@ import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 export default async function handler(req, res) {
   const { page = 1 } = req.query;
 
-  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate");
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
 
   const sources = [
     // 1. The Muse — free, no key, has entry level filter
-    fetchWithTimeout(`https://www.themuse.com/api/public/jobs?level=Entry+Level&page=${page}&descending=true`)
+    fetchWithTimeout(`https://www.themuse.com/api/public/jobs?level=Entry+Level&page=${page}&descending=true`, {}, 5000)
       .then(r => r.json())
       .then(d => (d.results || []).map(j => ({
         id: `muse-${j.id}`,
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       .catch(err => { console.error("TheMuse error:", err.message); return []; }),
 
     // 2. Remotive — software-dev as entry-level proxy
-    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=software-dev&limit=15")
+    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=software-dev&limit=15", {}, 5000)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `remotive-${j.id}`,

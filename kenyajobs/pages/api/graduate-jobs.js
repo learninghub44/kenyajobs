@@ -2,11 +2,12 @@
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 
 export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
   const { page = 1 } = req.query;
 
   const sources = [
     // 1. The Muse — internship/associate level
-    fetchWithTimeout(`https://www.themuse.com/api/public/jobs?level=Internship&page=${page}&descending=true`)
+    fetchWithTimeout(`https://www.themuse.com/api/public/jobs?level=Internship&page=${page}&descending=true`, {}, 5000)
       .then(r => r.json())
       .then(d => (d.results || []).map(j => ({
         id: `muse-intern-${j.id}`,
@@ -21,7 +22,7 @@ export default async function handler(req, res) {
       }))),
 
     // 2. Jobicy — marketing/business as graduate proxy
-    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=15&industry=marketing")
+    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=15&industry=marketing", {}, 5000)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `jobicy-grad-${j.id}`,
