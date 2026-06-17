@@ -1,5 +1,5 @@
 // Africa & global job sources
-// RSS feeds from major African job boards + Jobicy geo filters
+// RSS feeds from major African job boards + Jobicy geo filters + Himalayas + ReliefWeb
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 
 const RSS_FEEDS = [
@@ -93,6 +93,104 @@ async function fetchJobicy() {
   return results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
 }
 
+// Himalayas — free public API, no auth, filter by African countries
+async function fetchHimalayas() {
+  const countries = ["Kenya", "Nigeria", "Ghana", "South Africa", "Uganda", "Tanzania", "Rwanda", "Ethiopia"];
+  const results = await Promise.allSettled(
+    countries.map(country =>
+      fetchWithTimeout(
+        `https://himalayas.app/jobs/api/search?country=${encodeURIComponent(country)}&limit=20`,
+        {}, 8000
+      )
+        .then(r => r.ok ? r.json() : { jobs: [] })
+        .then(d => (d.jobs || []).map(j => ({
+          id: `himalayas-${j.id || j.slug}`,
+          title: j.title,
+          company: j.company?.name || j.companyName || "Company",
+          location: j.locationRestrictions?.join(", ") || country,
+          type: j.employmentType || "Full-time",
+          date: j.pubDate || j.createdAt || new Date().toISOString(),
+          url: j.applicationLink || j.url || `https://himalayas.app/jobs/${j.slug}`,
+          description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 300),
+          source: "Himalayas",
+        })))
+        .catch(() => [])
+    )
+  );
+  return results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
+}
+
+// ReliefWeb — UN OCHA API, free, no key needed, great Africa/NGO coverage
+async function fetchReliefWeb() {
+  const countries = ["Kenya", "Nigeria", "Uganda", "Tanzania", "Ethiopia", "Rwanda", "Ghana", "South Africa", "Somalia", "Sudan"];
+
+  const results = await Promise.allSettled(
+    countries.map(country =>
+      fetchWithTimeout(
+        "https://api.reliefweb.int/v1/jobs?appname=kenyajobs&profile=list&slim=1&limit=20&sort[]=date:desc" +
+        `&filter[field]=country.name&filter[value]=${encodeURIComponent(country)}`,
+        {}, 8000
+      )
+        .then(r => r.ok ? r.json() : { data: [] })
+        .then(d => (d.data || []).map(j => {
+          const f = j.fields || {};
+          return {
+            id: `reliefweb-${j.id}`,
+            title: f.title || "Job",
+            company: f.source?.[0]?.name || f.organization || "NGO",
+            location: f.country?.[0]?.name || country,
+            type: f["job-type"]?.[0]?.name || "Full-time",
+            date: f.date?.created || new Date().toISOString(),
+            url: f.url || `https://reliefweb.int/job/${j.id}`,
+            description: (f.body || "").replace(/<[^>]*>/g, "").slice(0, 300),
+            source: "ReliefWeb",
+          };
+        }))
+        .catch(() => [])
+    )
+  );
+  return results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
+}
+
+// rss2json.com — proxy for RSS feeds that block direct server requests
+async function fetchViaRss2Json() {
+  const feeds = [
+    { url: "https://www.brightermonday.co.ke/listings.rss",  source: "BrighterMonday KE" },
+    { url: "https://www.myjobmag.co.ke/rss-jobs.xml",        source: "MyJobMag KE" },
+    { url: "https://www.jobwebkenya.com/feed/",              source: "Jobweb KE" },
+    { url: "https://kenyajob.com/feed/",                     source: "KenyaJob" },
+    { url: "https://www.fuzu.com/feed",                      source: "Fuzu" },
+    { url: "https://www.myjobmag.com/rss-jobs.xml",          source: "MyJobMag NG" },
+    { url: "https://www.myjobmag.co.za/rss-jobs.xml",        source: "MyJobMag SA" },
+  ];
+
+  const results = await Promise.allSettled(
+    feeds.map(({ url, source }) =>
+      fetchWithTimeout(
+        `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=20`,
+        {}, 8000
+      )
+        .then(r => r.ok ? r.json() : { items: [] })
+        .then(d => {
+          if (d.status !== "ok") return [];
+          return (d.items || []).map(j => ({
+            id: `rss2json-${source.toLowerCase().replace(/\s+/g, "-")}-${Buffer.from(j.link || j.guid || j.title).toString("base64").slice(0, 20)}`,
+            title: j.title,
+            company: j.author || source,
+            location: "Africa",
+            type: "Full-time",
+            date: j.pubDate ? new Date(j.pubDate).toISOString() : new Date().toISOString(),
+            url: j.link || j.guid,
+            description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 300),
+            source,
+          })).filter(j => j.title && j.url);
+        })
+        .catch(() => [])
+    )
+  );
+  return results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
+}
+
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate");
 
@@ -102,8 +200,11 @@ export default async function handler(req, res) {
     "Accept-Language": "en-US,en;q=0.9",
   };
 
-  const [jobicyResult, ...rssResults] = await Promise.allSettled([
+  const [jobicyResult, himalayasResult, reliefWebResult, rss2jsonResult, ...rssResults] = await Promise.allSettled([
     fetchJobicy(),
+    fetchHimalayas(),
+    fetchReliefWeb(),
+    fetchViaRss2Json(),
     ...RSS_FEEDS.map(({ url, source }) =>
       fetchWithTimeout(url, { headers }, 7000)
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
@@ -114,6 +215,9 @@ export default async function handler(req, res) {
 
   const jobs = [
     ...(jobicyResult.status === "fulfilled" ? jobicyResult.value : []),
+    ...(himalayasResult.status === "fulfilled" ? himalayasResult.value : []),
+    ...(reliefWebResult.status === "fulfilled" ? reliefWebResult.value : []),
+    ...(rss2jsonResult.status === "fulfilled" ? rss2jsonResult.value : []),
     ...rssResults.filter(r => r.status === "fulfilled").flatMap(r => r.value),
   ].filter(j => j.title && j.url);
 
@@ -126,6 +230,6 @@ export default async function handler(req, res) {
   });
 
   unique.sort((a, b) => new Date(b.date) - new Date(a.date));
-  console.log(`Africa jobs: ${unique.length} from ${RSS_FEEDS.length + 1} sources`);
+  console.log(`Africa jobs: ${unique.length} total (Jobicy + Himalayas + ReliefWeb + rss2json + direct RSS)`);
   res.status(200).json(unique);
 }
