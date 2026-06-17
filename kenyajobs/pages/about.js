@@ -7,7 +7,7 @@ export default function About() {
     <>
       <Head>
         <title>About JobsWorldwide | Global Job Board</title>
-        <meta name="description" content="JobsWorldwide aggregates jobs from top global and Kenyan sources — remote, entry level, graduate and work from home." />
+        <meta name="description" content="JobsWorldwide aggregates jobs from top global and African sources — remote, entry level, graduate and work from home." />
       </Head>
 
       <div className="max-w-3xl mx-auto px-4 py-16">
@@ -30,7 +30,7 @@ export default function About() {
               <h2 className="text-lg font-bold text-gray-900">Who We Are</h2>
             </div>
             <p className="text-gray-600 leading-relaxed">
-              JobsWorldwide is a free job aggregator that pulls real, live listings from trusted global and Kenyan job boards every day. We surface remote, entry level, graduate and work-from-home opportunities so you can find and apply in one place — no account needed.
+              JobsWorldwide is a free job aggregator that pulls real, live listings from trusted global and African and global job boards every day. We surface remote, entry level, graduate and work-from-home opportunities so you can find and apply in one place — no account needed.
             </p>
           </div>
 
@@ -68,7 +68,7 @@ export default function About() {
             </div>
             <div className="space-y-3">
               {[
-                { step: "1", text: "We pull jobs from 7+ global and Kenyan sources every time you visit" },
+                { step: "1", text: "We pull jobs from 7+ global and African sources every time you visit" },
                 { step: "2", text: "Browse or search by role, company, or keyword" },
                 { step: "3", text: "Click Apply — you go directly to the employer's application page" },
               ].map(({ step, text }) => (

@@ -10,12 +10,8 @@ export default function JobCard({ job }) {
   const source = job.source || "";
 
   const formattedDate = datePosted
-    ? new Date(datePosted).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })
+    ? new Date(datePosted).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
     : "Recently";
-
-  const isKenya = source.toLowerCase().includes("kenya") ||
-    location.toLowerCase().includes("kenya") ||
-    location.toLowerCase().includes("nairobi");
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-300 hover:shadow-md transition-all duration-200 flex flex-col justify-between">
@@ -28,9 +24,6 @@ export default function JobCard({ job }) {
             <h3 className="text-base font-semibold text-gray-900 leading-snug line-clamp-2">{title}</h3>
             <p className="text-sm text-blue-600 font-medium mt-0.5 truncate">{company}</p>
           </div>
-          {isKenya && (
-            <span className="flex-shrink-0 text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-lg font-medium">🇰🇪 KE</span>
-          )}
         </div>
 
         <div className="flex flex-wrap gap-2 mt-3">

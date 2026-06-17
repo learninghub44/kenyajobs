@@ -10,14 +10,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [sources, setSources] = useState({ loaded: 0, total: 5 });
 
-  // Merge new jobs into state without duplicates
   const mergeJobs = (prev, incoming) => {
     const ids = new Set(prev.map(j => j.id));
     return [...prev, ...incoming.filter(j => !ids.has(j.id))].slice(0, 60);
   };
 
   useEffect(() => {
-    // Each source streams in independently — show as soon as it arrives
     const fetchSource = async (url, sliceCount, sourceLabel) => {
       try {
         const res = await fetch(url);
@@ -35,14 +33,12 @@ export default function Home() {
       }
     };
 
-    // Fire all in parallel — each updates UI the moment it resolves
-    fetchSource("/api/kenya-jobs", 20, "Kenya Jobs");
+    fetchSource("/api/africa-jobs", 20, "Africa Jobs");
     fetchSource("/api/remote-jobs", 15, "Remote Jobs");
     fetchSource("/api/entry-level-jobs", 8, "Entry Level");
     fetchSource("/api/graduate-jobs", 8, "Graduate");
     fetchSource("/api/wfh-jobs", 8, "Work From Home");
 
-    // Safety: turn off spinner after 12s even if some sources stall
     const timeout = setTimeout(() => setLoading(false), 12000);
     return () => clearTimeout(timeout);
   }, []);
@@ -52,14 +48,14 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Kenya Jobs | Remote | Entry Level | Graduate — JobsWorldwide</title>
-        <meta name="description" content="Find the latest Kenya jobs, remote jobs, entry level, graduate and work from home jobs. Updated daily." />
+        <title>Jobs in Africa & Worldwide | Remote | Entry Level | Graduate — JobsWorldwide</title>
+        <meta name="description" content="Find the latest jobs in Africa and worldwide — remote, entry level, graduate and work from home. Updated daily." />
       </Head>
 
       {/* Hero */}
       <section className="bg-blue-600 text-white py-16 px-4 text-center">
         <h1 className="text-3xl md:text-5xl font-bold mb-3">Find Your Next Job, Anywhere in the World</h1>
-        <p className="text-blue-100 mb-8 text-lg">Kenya · Remote · Entry Level · Graduate · Work From Home — Updated Daily</p>
+        <p className="text-blue-100 mb-8 text-lg">Africa · Remote · Entry Level · Graduate · Work From Home — Updated Daily</p>
         <SearchBar placeholder="Search jobs e.g. accountant, developer, nurse..." />
       </section>
 
@@ -79,7 +75,7 @@ export default function Home() {
           <h2 className="text-xl font-bold text-gray-800">Latest Jobs</h2>
           {!allLoaded && jobs.length > 0 && (
             <span className="text-xs text-blue-500 animate-pulse">
-              Loading more sources… ({sources.loaded}/{sources.total})
+              Loading more… ({sources.loaded}/{sources.total})
             </span>
           )}
           {jobs.length > 0 && (
@@ -107,7 +103,7 @@ export default function Home() {
         {!loading && jobs.length === 0 && (
           <div className="text-center py-16 text-gray-400">
             <p className="text-lg font-medium">No jobs found right now.</p>
-            <p className="text-sm mt-1">Please check back shortly — sources update every 30 minutes.</p>
+            <p className="text-sm mt-1">Sources update every 30 minutes — please check back shortly.</p>
           </div>
         )}
       </section>

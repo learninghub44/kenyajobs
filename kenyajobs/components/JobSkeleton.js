@@ -1,6 +1,6 @@
 const messages = [
   "Scanning job boards worldwide...",
-  "Pulling fresh listings from Kenya...",
+  "Pulling fresh listings from Africa....",
   "Checking remote opportunities...",
   "Almost there, sorting by latest...",
 ];

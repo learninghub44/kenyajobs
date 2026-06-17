@@ -1,13 +1,17 @@
-// Search: JSearch (if key) + The Muse + Remotive
+// Search: The Muse + Remotive + Jobicy + JSearch (if key)
+import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+
 export default async function handler(req, res) {
   const { query = "" } = req.query;
   if (!query.trim()) return res.status(200).json([]);
+
+  res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate");
 
   const q = encodeURIComponent(query.trim());
 
   const sources = [
     // 1. The Muse (free)
-    fetch(`https://www.themuse.com/api/public/jobs?descending=true&page=1`)
+    fetchWithTimeout(`https://www.themuse.com/api/public/jobs?descending=true&page=1`)
       .then(r => r.json())
       .then(d => (d.results || [])
         .filter(j => j.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -22,10 +26,11 @@ export default async function handler(req, res) {
           url: j.refs?.landing_page,
           description: j.contents,
           source: "The Muse",
-        }))),
+        })))
+      .catch(() => []),
 
     // 2. Remotive (free)
-    fetch(`https://remotive.com/api/remote-jobs?search=${q}&limit=20`)
+    fetchWithTimeout(`https://remotive.com/api/remote-jobs?search=${q}&limit=20`)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `remotive-${j.id}`,
@@ -37,11 +42,28 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.description,
         source: "Remotive",
-      }))),
+      })))
+      .catch(() => []),
 
-    // 3. JSearch (only if key set)
+    // 3. Jobicy search
+    fetchWithTimeout(`https://jobicy.com/api/v2/remote-jobs?count=15&tag=${q}`)
+      .then(r => r.json())
+      .then(d => (d.jobs || []).map(j => ({
+        id: `jobicy-s-${j.id}`,
+        title: j.jobTitle,
+        company: j.companyName,
+        location: j.jobGeo || "Remote",
+        type: j.jobType || "Full-time",
+        date: j.pubDate,
+        url: j.url,
+        description: (j.jobDescription || "").replace(/<[^>]*>/g, "").slice(0, 300),
+        source: "Jobicy",
+      })))
+      .catch(() => []),
+
+    // 4. JSearch (only if key set)
     ...(process.env.RAPIDAPI_KEY ? [
-      fetch(`https://jsearch.p.rapidapi.com/search?query=${q}&page=1&num_pages=1`, {
+      fetchWithTimeout(`https://jsearch.p.rapidapi.com/search?query=${q}&page=1&num_pages=1`, {
         headers: {
           "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
           "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
@@ -59,6 +81,7 @@ export default async function handler(req, res) {
           description: j.job_description,
           source: "JSearch",
         })))
+        .catch(() => [])
     ] : []),
   ];
 
