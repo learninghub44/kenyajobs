@@ -38,11 +38,11 @@ function companyColor(name) {
 }
 
 export default function JobCard({ job }) {
-  const title = job.title || job.job_title || "Job Title";
-  const company = job.company || job.company_name || job.employer_name || "Company";
-  const location = job.location || job.candidate_required_location || job.job_city || "Africa";
-  const jobType = job.type || job.job_type || job.employment_type || "Full-time";
-  const source = job.source || "";
+  const title = String(job.title || job.job_title || "Job Title");
+  const company = String(job.company || job.company_name || job.employer_name || "Company");
+  const location = String(job.location || job.candidate_required_location || job.job_city || "Worldwide");
+  const jobType = String(job.type || job.job_type || job.employment_type || "Full-time");
+  const source = String(job.source || "");
   const jobId = job.id || job.job_id || encodeURIComponent(title);
   const posted = timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc);
   const isRemote = location.toLowerCase().includes("remote") || jobType.toLowerCase().includes("remote");

@@ -40,7 +40,7 @@ export default function GraduateJobs() {
       setFiltered(jobs);
     } else {
       setFiltered(jobs.filter((j) =>
-        (j.job_title || j.title || "").toLowerCase().includes(filter.toLowerCase())
+        String(j.job_title || j.title || "").toLowerCase().includes(filter.toLowerCase())
       ));
     }
   }

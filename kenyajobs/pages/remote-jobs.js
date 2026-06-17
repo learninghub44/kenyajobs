@@ -35,7 +35,7 @@ export default function RemoteJobs() {
       setFiltered(jobs);
     } else {
       setFiltered(jobs.filter((j) =>
-        (j.category || "").toLowerCase().includes(filter.toLowerCase())
+        String(j.category || "").toLowerCase().includes(filter.toLowerCase())
       ));
     }
   }

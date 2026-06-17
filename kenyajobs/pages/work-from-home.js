@@ -40,8 +40,8 @@ export default function WorkFromHome() {
       setFiltered(jobs);
     } else {
       setFiltered(jobs.filter((j) =>
-        (j.title || j.job_title || "").toLowerCase().includes(filter.toLowerCase()) ||
-        (j.description || j.job_description || "").toLowerCase().includes(filter.toLowerCase())
+        String(j.title || j.job_title || "").toLowerCase().includes(filter.toLowerCase()) ||
+        String(j.description || j.job_description || "").toLowerCase().includes(filter.toLowerCase())
       ));
     }
   }

@@ -65,15 +65,17 @@ export default function Home() {
 
   const filtered = jobs.filter(j => {
     const q = search.toLowerCase();
-    const matchSearch = !q ||
-      (j.title || "").toLowerCase().includes(q) ||
-      (j.company || "").toLowerCase().includes(q) ||
-      (j.location || "").toLowerCase().includes(q);
+    const t = String(j.title || "").toLowerCase();
+    const c = String(j.company || "").toLowerCase();
+    const l = String(j.location || "").toLowerCase();
+    const tp = String(j.type || "").toLowerCase();
+    const src = String(j.source || "").toLowerCase();
+    const matchSearch = !q || t.includes(q) || c.includes(q) || l.includes(q);
     const matchTab = !activeTab ||
-      (activeTab === "remote" && ((j.location || "").toLowerCase().includes("remote") || (j.type || "").toLowerCase().includes("remote"))) ||
-      (activeTab === "entry" && (j.source || "entry")) ||
-      (activeTab === "graduate" && (j.source || "").toLowerCase().includes("graduate")) ||
-      (activeTab === "wfh" && ((j.location || "").toLowerCase().includes("home") || (j.type || "").toLowerCase().includes("home")));
+      (activeTab === "remote" && (l.includes("remote") || tp.includes("remote"))) ||
+      (activeTab === "entry" && src.includes("entry")) ||
+      (activeTab === "graduate" && src.includes("graduate")) ||
+      (activeTab === "wfh" && (l.includes("home") || tp.includes("home")));
     return matchSearch && matchTab;
   });
 
