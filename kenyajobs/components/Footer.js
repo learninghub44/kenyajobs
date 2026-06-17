@@ -11,14 +11,14 @@ export default function Footer() {
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-black text-sm">K</span>
+                <span className="text-white font-black text-sm">J</span>
               </div>
-              <span className="text-white font-bold text-lg">Kenya<span className="text-blue-400">Jobs</span></span>
+              <span className="text-white font-bold text-lg">Jobs<span className="text-blue-400">Worldwide</span></span>
             </div>
             <p className="text-sm leading-relaxed mb-5">Your #1 source for jobs in Kenya and across Africa. Remote, entry level, graduate and work-from-home opportunities updated daily.</p>
             <div className="space-y-2 text-sm">
-              <a href="mailto:hello@kenyajobs.co.ke" className="flex items-center gap-2 hover:text-white transition-colors">
-                <Mail size={13} /> hello@kenyajobs.co.ke
+              <a href="mailto:hello@jobsworldwide.online" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Mail size={13} /> hello@jobsworldwide.online
               </a>
             </div>
           </div>
@@ -50,14 +50,14 @@ export default function Footer() {
               {[["About Us", "/about"], ["Privacy Policy", "/privacy-policy"]].map(([l, h]) => (
                 <li key={h}><Link href={h} className="hover:text-white transition-colors">{l}</Link></li>
               ))}
-              <li><a href="mailto:hello@kenyajobs.co.ke" className="hover:text-white transition-colors">Post a Job</a></li>
-              <li><a href="mailto:hello@kenyajobs.co.ke" className="hover:text-white transition-colors">Contact Us</a></li>
+              <li><a href="mailto:hello@jobsworldwide.online" className="hover:text-white transition-colors">Post a Job</a></li>
+              <li><a href="mailto:hello@jobsworldwide.online" className="hover:text-white transition-colors">Contact Us</a></li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
-          <p>© {new Date().getFullYear()} KenyaJobs. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} JobsWorldwide. All rights reserved.</p>
           <p>Built for job seekers across Africa 🌍</p>
         </div>
       </div>

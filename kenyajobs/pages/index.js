@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
-import { Search, MapPin, TrendingUp, Users, Briefcase, Globe, ChevronRight, Star } from "lucide-react";
+import { Search, MapPin, TrendingUp, Users, Briefcase, Globe, ChevronRight, Star, Wifi, GraduationCap, Home, Rocket } from "lucide-react";
 
 const CATEGORIES = [
   { label: "All Jobs", value: "" },
@@ -80,7 +80,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>KenyaJobs — Find Jobs in Kenya & Africa | Remote · Entry Level · Graduate</title>
+        <title>JobsWorldwide — Find Jobs in Kenya & Africa | Remote · Entry Level · Graduate</title>
         <meta name="description" content="Find the latest jobs in Kenya and across Africa. Remote, entry level, graduate and work from home opportunities updated daily." />
       </Head>
 
@@ -93,11 +93,6 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 py-20 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white text-sm font-medium px-4 py-2 rounded-full mb-6">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            Updated daily — fresh jobs every morning
-          </div>
-
           <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 tracking-tight">
             Find Your Dream Job<br />
             <span className="text-blue-200">in Kenya & Africa</span>
@@ -167,7 +162,7 @@ export default function Home() {
             <h2 className="text-2xl font-bold mb-1">Are You Hiring?</h2>
             <p className="text-blue-200 text-sm max-w-md">Reach thousands of qualified candidates across Kenya and Africa. Post your job today and get applications fast.</p>
           </div>
-          <a href="mailto:hello@kenyajobs.co.ke"
+          <a href="mailto:hello@jobsworldwide.online"
             className="relative flex-shrink-0 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors text-sm whitespace-nowrap">
             Post a Job →
           </a>
@@ -247,14 +242,16 @@ export default function Home() {
           <p className="text-gray-500 text-sm mb-8">Find the right opportunity for your stage of career</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { title: "Remote Jobs", desc: "Work from anywhere in the world", href: "/remote-jobs", color: "from-blue-500 to-blue-600", emoji: "🌍" },
-              { title: "Entry Level", desc: "Start your career journey today", href: "/entry-level", color: "from-green-500 to-emerald-600", emoji: "🚀" },
-              { title: "Graduate Jobs", desc: "Opportunities for fresh graduates", href: "/graduate-jobs", color: "from-purple-500 to-violet-600", emoji: "🎓" },
-              { title: "Work From Home", desc: "Skip the commute, work remotely", href: "/work-from-home", color: "from-orange-500 to-amber-600", emoji: "🏠" },
-            ].map(({ title, desc, href, color, emoji }) => (
+              { title: "Remote Jobs", desc: "Work from anywhere in the world", href: "/remote-jobs", color: "from-blue-500 to-blue-600", icon: Wifi },
+              { title: "Entry Level", desc: "Start your career journey today", href: "/entry-level", color: "from-green-500 to-emerald-600", icon: Rocket },
+              { title: "Graduate Jobs", desc: "Opportunities for fresh graduates", href: "/graduate-jobs", color: "from-purple-500 to-violet-600", icon: GraduationCap },
+              { title: "Work From Home", desc: "Skip the commute, work remotely", href: "/work-from-home", color: "from-orange-500 to-amber-600", icon: Home },
+            ].map(({ title, desc, href, color, icon: Icon }) => (
               <Link key={href} href={href}
                 className={`group bg-gradient-to-br ${color} text-white rounded-2xl p-6 hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5`}>
-                <div className="text-3xl mb-3">{emoji}</div>
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4">
+                  <Icon size={20} className="text-white" />
+                </div>
                 <h3 className="font-bold text-lg mb-1">{title}</h3>
                 <p className="text-white/80 text-sm mb-4">{desc}</p>
                 <span className="flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all">

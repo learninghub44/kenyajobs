@@ -119,7 +119,7 @@ export default function JobDetail() {
   return (
     <>
       <Head>
-        <title>{title} at {company} | KenyaJobs</title>
+        <title>{title} at {company} | JobsWorldwide</title>
         <meta name="description" content={`Apply for ${title} at ${company}. ${location}.`} />
       </Head>
 

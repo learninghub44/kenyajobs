@@ -13,9 +13,9 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-black text-sm">K</span>
+              <span className="text-white font-black text-sm">J</span>
             </div>
-            <span className="text-gray-900 font-bold text-lg tracking-tight">Kenya<span className="text-blue-600">Jobs</span></span>
+            <span className="text-gray-900 font-bold text-lg tracking-tight">Jobs<span className="text-blue-600">Worldwide</span></span>
           </Link>
 
           {/* Desktop Nav */}
@@ -30,7 +30,7 @@ export default function Navbar() {
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
             <Link href="/about" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">About</Link>
-            <a href="mailto:hello@kenyajobs.co.ke"
+            <a href="mailto:hello@jobsworldwide.online"
               className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
               Post a Job
             </a>
@@ -59,7 +59,7 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
-          <a href="mailto:hello@kenyajobs.co.ke"
+          <a href="mailto:hello@jobsworldwide.online"
             className="mt-2 bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg text-center">
             Post a Job
           </a>
