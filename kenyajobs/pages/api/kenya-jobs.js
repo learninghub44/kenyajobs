@@ -1,59 +1,93 @@
-// Kenya-specific job sources: MyJobMag + BrighterMonday RSS + Fuzu
-export default async function handler(req, res) {
-  const { page = 1 } = req.query;
+// Kenya job sources using RSS feeds parsed server-side
+// Sources: BrighterMonday KE, MyJobMag KE, Fuzu KE, Nation Jobs KE
 
-  const sources = await Promise.allSettled([
+const RSS_FEEDS = [
+  {
+    url: "https://www.brightermonday.co.ke/listings.rss",
+    source: "BrighterMonday Kenya",
+  },
+  {
+    url: "https://www.myjobmag.co.ke/rss-jobs.xml",
+    source: "MyJobMag Kenya",
+  },
+  {
+    url: "https://vacancykenya.co.ke/feed/",
+    source: "Vacancy Kenya",
+  },
+  {
+    url: "https://kenyajob.com/feed/",
+    source: "KenyaJob",
+  },
+];
 
-    // 1. MyJobMag Kenya — has a public JSON feed
-    fetch("https://www.myjobmag.co.ke/feed/json")
-      .then(r => r.json())
-      .then(d => (Array.isArray(d) ? d : d.jobs || d.data || []).slice(0, 20).map(j => ({
-        id: `myjobmag-${j.id || j.job_id || Math.random()}`,
-        title: j.title || j.job_title || j.position,
-        company: j.company || j.company_name || j.employer,
-        location: j.location || j.city || "Kenya",
-        type: j.type || j.job_type || "Full-time",
-        date: j.date || j.published_at || j.created_at,
-        url: j.url || j.link || j.apply_url,
-        description: j.description || j.summary || "",
-        source: "MyJobMag Kenya",
-      }))),
+// Lightweight XML parser — no dependencies needed
+function parseRSS(xml, source) {
+  const items = [];
+  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+  let match;
 
-    // 2. BrighterMonday Kenya RSS (converted to JSON via rss2json)
-    fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.brightermonday.co.ke%2Fblog%2Ffeed%2F&api_key=public&count=20")
-      .then(r => r.json())
-      .then(d => (d.items || []).map(j => ({
-        id: `bm-${encodeURIComponent(j.guid || j.link)}`,
-        title: j.title,
-        company: j.author || "BrighterMonday Kenya",
-        location: "Kenya",
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const block = match[1];
+
+    const get = (tag) => {
+      const m = block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
+      return m ? (m[1] || m[2] || "").trim() : "";
+    };
+
+    const title = get("title");
+    const link = get("link") || get("guid");
+    const pubDate = get("pubDate");
+    const description = get("description");
+    const company = get("author") || get("dc:creator") || source;
+    const location = get("location") || "Kenya";
+
+    if (title && link) {
+      items.push({
+        id: `ke-${source.toLowerCase().replace(/\s+/g, "-")}-${encodeURIComponent(link).slice(0, 40)}`,
+        title,
+        company,
+        location,
         type: "Full-time",
-        date: j.pubDate,
-        url: j.link,
-        description: j.description || j.content || "",
-        source: "BrighterMonday Kenya",
-      }))),
+        date: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+        url: link,
+        description: description.replace(/<[^>]*>/g, "").slice(0, 300),
+        source,
+      });
+    }
+  }
 
-    // 3. Fuzu Kenya — public job board API
-    fetch("https://www.fuzu.com/api/v1/jobs?country=KE&per_page=20&page=" + page)
-      .then(r => r.json())
-      .then(d => (d.jobs || d.data || []).map(j => ({
-        id: `fuzu-${j.id}`,
-        title: j.title || j.position,
-        company: j.company?.name || j.employer || "Company",
-        location: j.location || j.city || "Kenya",
-        type: j.employment_type || j.type || "Full-time",
-        date: j.published_at || j.created_at,
-        url: j.url || `https://www.fuzu.com/kenya/jobs/${j.slug || j.id}`,
-        description: j.description || j.summary || "",
-        source: "Fuzu Kenya",
-      }))),
-  ]);
+  return items;
+}
 
-  const jobs = sources
-    .filter(r => r.status === "fulfilled" && Array.isArray(r.value))
+export default async function handler(req, res) {
+  // Add cache header — 30 min cache to avoid hammering RSS feeds
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate");
+
+  const results = await Promise.allSettled(
+    RSS_FEEDS.map(({ url, source }) =>
+      fetch(url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; JobsWorldwide/1.0)",
+          "Accept": "application/rss+xml, application/xml, text/xml",
+        },
+      })
+        .then(r => {
+          if (!r.ok) throw new Error(`${source}: HTTP ${r.status}`);
+          return r.text();
+        })
+        .then(xml => parseRSS(xml, source))
+        .catch(err => {
+          console.error(`Kenya jobs error [${source}]:`, err.message);
+          return [];
+        })
+    )
+  );
+
+  const jobs = results
+    .filter(r => r.status === "fulfilled")
     .flatMap(r => r.value)
-    .filter(j => j.title && j.url); // only valid jobs
+    .filter(j => j.title && j.url);
 
+  console.log(`Kenya jobs loaded: ${jobs.length} total`);
   res.status(200).json(jobs);
 }
