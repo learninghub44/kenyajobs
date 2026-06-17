@@ -1,42 +1,74 @@
-// components/Footer.js
 import Link from "next/link";
+import { Globe, Mail, Laptop, Briefcase, GraduationCap, Home, Info, ShieldCheck } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-400 mt-16">
-      <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="bg-gray-950 text-gray-400 mt-16">
+      <div className="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
 
         {/* Brand */}
         <div>
-          <h2 className="text-white text-xl font-bold mb-2">KenyaJobs.co.ke</h2>
-          <p className="text-sm">Your #1 source for remote, entry level, graduate and work-from-home jobs in Kenya.</p>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="bg-blue-600 text-white rounded-lg p-1.5">
+              <Globe size={16} strokeWidth={2.5} />
+            </div>
+            <span className="text-white text-lg font-bold">Jobs<span className="text-blue-400">Worldwide</span></span>
+          </div>
+          <p className="text-sm leading-relaxed">Your source for remote, entry level, graduate and work-from-home jobs. Updated daily.</p>
         </div>
 
         {/* Job Categories */}
         <div>
-          <h3 className="text-white font-semibold mb-3">Job Categories</h3>
-          <ul className="space-y-2 text-sm">
-            <li><Link href="/remote-jobs" className="hover:text-white">Remote Jobs</Link></li>
-            <li><Link href="/entry-level" className="hover:text-white">Entry Level Jobs</Link></li>
-            <li><Link href="/graduate-jobs" className="hover:text-white">Graduate Jobs</Link></li>
-            <li><Link href="/work-from-home" className="hover:text-white">Work From Home</Link></li>
+          <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Job Categories</h3>
+          <ul className="space-y-2.5 text-sm">
+            <li>
+              <Link href="/remote-jobs" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Laptop size={14} /> Remote Jobs
+              </Link>
+            </li>
+            <li>
+              <Link href="/entry-level" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Briefcase size={14} /> Entry Level Jobs
+              </Link>
+            </li>
+            <li>
+              <Link href="/graduate-jobs" className="flex items-center gap-2 hover:text-white transition-colors">
+                <GraduationCap size={14} /> Graduate Jobs
+              </Link>
+            </li>
+            <li>
+              <Link href="/work-from-home" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Home size={14} /> Work From Home
+              </Link>
+            </li>
           </ul>
         </div>
 
-        {/* Links */}
+        {/* Quick Links */}
         <div>
-          <h3 className="text-white font-semibold mb-3">Quick Links</h3>
-          <ul className="space-y-2 text-sm">
-            <li><Link href="/about" className="hover:text-white">About Us</Link></li>
-            <li><Link href="/privacy-policy" className="hover:text-white">Privacy Policy</Link></li>
-            <li><a href="mailto:hello@kenyajobs.co.ke" className="hover:text-white">Contact Us</a></li>
+          <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Company</h3>
+          <ul className="space-y-2.5 text-sm">
+            <li>
+              <Link href="/about" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Info size={14} /> About Us
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacy-policy" className="flex items-center gap-2 hover:text-white transition-colors">
+                <ShieldCheck size={14} /> Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <a href="mailto:hello@jobsworldwide.com" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Mail size={14} /> Contact Us
+              </a>
+            </li>
           </ul>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-gray-800 text-center py-4 text-xs text-gray-500">
-        © {new Date().getFullYear()} KenyaJobs.co.ke — All rights reserved.
+      <div className="border-t border-gray-800 text-center py-5 text-xs text-gray-600">
+        © {new Date().getFullYear()} JobsWorldwide — All rights reserved.
       </div>
     </footer>
   );

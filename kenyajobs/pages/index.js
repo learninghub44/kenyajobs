@@ -40,14 +40,14 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Remote Jobs Kenya 2026 | Entry Level | Graduate Jobs</title>
-        <meta name="description" content="Find the latest remote jobs, entry level jobs, graduate jobs and work from home jobs in Kenya 2026." />
+        <title>Remote Jobs | Entry Level | Graduate Jobs — JobsWorldwide</title>
+        <meta name="description" content="Find the latest remote jobs, entry level, graduate and work from home jobs worldwide. Updated daily." />
       </Head>
 
       {/* Hero Section */}
       <section className="bg-blue-600 text-white py-16 px-4 text-center">
-        <h1 className="text-3xl md:text-5xl font-bold mb-3">Find Your Dream Job in Kenya</h1>
-        <p className="text-blue-100 mb-8 text-lg">Remote, Entry Level, Graduate & Work From Home Jobs — Updated Daily</p>
+        <h1 className="text-3xl md:text-5xl font-bold mb-3">Find Your Next Job, Anywhere in the World</h1>
+        <p className="text-blue-100 mb-8 text-lg">Remote · Entry Level · Graduate · Work From Home — Updated Daily</p>
         <SearchBar placeholder="Search jobs e.g. accountant, developer, nurse..." />
       </section>
 
@@ -65,14 +65,14 @@ export default function Home() {
 
       {/* Jobs Grid */}
       <section className="max-w-6xl mx-auto px-4 pb-16">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">Latest Jobs in Kenya</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-6">Latest Jobs</h2>
 
         {loading && (
-          <div className="text-center py-20 text-gray-500 text-lg">⏳ Loading jobs...</div>
+          <div className="text-center py-20 text-gray-500 text-lg">Loading jobs...</div>
         )}
 
         {error && (
-          <div className="text-center py-20 text-red-500 text-lg">❌ Something went wrong. Please refresh.</div>
+          <div className="text-center py-20 text-red-500 text-lg">Something went wrong. Please refresh the page.</div>
         )}
 
         {!loading && !error && jobs.length === 0 && (
