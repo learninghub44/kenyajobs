@@ -24,6 +24,8 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.description,
         source: "Remotive",
+        salary: j.salary || undefined,
+        companyLogo: j.company_logo_url || j.company_logo || undefined,
       })))
       .catch(err => { console.error("Remotive error:", err.message); return []; }),
 
@@ -40,6 +42,10 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.jobDescription,
         source: "Jobicy",
+        companyLogo: j.companyLogo || undefined,
+        annualSalaryMin: j.annualSalaryMin || undefined,
+        annualSalaryMax: j.annualSalaryMax || undefined,
+        salaryCurrency: j.salaryCurrency || undefined,
       })))
       .catch(err => { console.error("Jobicy error:", err.message); return []; }),
 
@@ -56,6 +62,7 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.description,
         source: "Arbeitnow",
+        companyLogo: j.company_logo || undefined,
       })))
       .catch(err => { console.error("Arbeitnow error:", err.message); return []; }),
   ]);

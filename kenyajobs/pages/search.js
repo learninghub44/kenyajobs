@@ -5,6 +5,7 @@ import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import SearchBar from "@/components/SearchBar";
 import { searchJobs } from "@/utils/api";
+import { mergeManualJobs } from "@/utils/mergeJobs";
 import { Search as SearchIcon } from "lucide-react";
 
 export default function SearchResults() {
@@ -21,9 +22,14 @@ export default function SearchResults() {
     let cancelled = false;
     async function runSearch() {
       setLoading(true);
-      const data = await searchJobs(query);
+      const [liveData, manualData] = await Promise.all([
+        searchJobs(query),
+        fetch(`/api/manual-jobs?search=${encodeURIComponent(query)}`).then((r) => r.json()).catch(() => []),
+      ]);
       if (cancelled) return;
-      setJobs(Array.isArray(data) ? data : []);
+      const liveJobs = Array.isArray(liveData) ? liveData : [];
+      const manualJobs = Array.isArray(manualData) ? manualData : [];
+      setJobs(mergeManualJobs(liveJobs, manualJobs));
       setLoading(false);
     }
     runSearch();

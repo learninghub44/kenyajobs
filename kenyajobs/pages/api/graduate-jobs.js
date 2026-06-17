@@ -34,6 +34,10 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.jobDescription,
         source: "Jobicy",
+        companyLogo: j.companyLogo || undefined,
+        annualSalaryMin: j.annualSalaryMin || undefined,
+        annualSalaryMax: j.annualSalaryMax || undefined,
+        salaryCurrency: j.salaryCurrency || undefined,
       }))),
 
     // 3. JSearch — graduate trainee (only if key set)
@@ -55,6 +59,11 @@ export default async function handler(req, res) {
           url: j.job_apply_link,
           description: j.job_description,
           source: "JSearch",
+          companyLogo: j.employer_logo || undefined,
+          companyWebsite: j.employer_website || undefined,
+          job_min_salary: j.job_min_salary || undefined,
+          job_max_salary: j.job_max_salary || undefined,
+          job_salary_currency: j.job_salary_currency || undefined,
         })))
     ] : []),
   ];

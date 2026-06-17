@@ -36,6 +36,8 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.description,
         source: "Remotive",
+        salary: j.salary || undefined,
+        companyLogo: j.company_logo_url || j.company_logo || undefined,
       })))
       .catch(err => { console.error("Remotive entry error:", err.message); return []; }),
 
@@ -58,6 +60,11 @@ export default async function handler(req, res) {
           url: j.job_apply_link,
           description: j.job_description,
           source: "JSearch",
+          companyLogo: j.employer_logo || undefined,
+          companyWebsite: j.employer_website || undefined,
+          job_min_salary: j.job_min_salary || undefined,
+          job_max_salary: j.job_max_salary || undefined,
+          job_salary_currency: j.job_salary_currency || undefined,
         })))
         .catch(err => { console.error("JSearch error:", err.message); return []; })
     ] : []),

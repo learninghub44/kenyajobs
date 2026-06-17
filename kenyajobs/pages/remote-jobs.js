@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import CategoryTabs from "@/components/CategoryTabs";
+import AdSlot from "@/components/AdSlot";
+import { mergeManualJobs } from "@/utils/mergeJobs";
 
 const filters = ["All", "Software Development", "Customer Service", "Marketing", "Design"];
 
@@ -16,12 +18,16 @@ export default function RemoteJobs() {
   const perPage = 20;
 
   useEffect(() => {
-    fetch("/api/remote-jobs")
-      .then((r) => r.json())
-      .then((data) => {
-        const jobs = Array.isArray(data) ? data : [];
-        setJobs(jobs);
-        setFiltered(jobs);
+    Promise.allSettled([
+      fetch("/api/remote-jobs").then((r) => r.json()),
+      fetch("/api/manual-jobs?category=remote").then((r) => r.json()),
+    ])
+      .then(([live, manual]) => {
+        const liveJobs = live.status === "fulfilled" && Array.isArray(live.value) ? live.value : [];
+        const manualJobs = manual.status === "fulfilled" && Array.isArray(manual.value) ? manual.value : [];
+        const merged = mergeManualJobs(liveJobs, manualJobs);
+        setJobs(merged);
+        setFiltered(merged);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -76,6 +82,12 @@ export default function RemoteJobs() {
         {!loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginated.map((job, i) => <JobCard key={job.id || i} job={job} />)}
+          </div>
+        )}
+
+        {!loading && paginated.length > 0 && (
+          <div className="mt-6">
+            <AdSlot placement="listing-grid" adSlot="0000000000" />
           </div>
         )}
 

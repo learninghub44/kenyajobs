@@ -19,6 +19,8 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.description,
         source: "Remotive",
+        salary: j.salary || undefined,
+        companyLogo: j.company_logo_url || j.company_logo || undefined,
       }))),
 
     // 2. Jobicy — remote general
@@ -34,6 +36,10 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.jobDescription,
         source: "Jobicy",
+        companyLogo: j.companyLogo || undefined,
+        annualSalaryMin: j.annualSalaryMin || undefined,
+        annualSalaryMax: j.annualSalaryMax || undefined,
+        salaryCurrency: j.salaryCurrency || undefined,
       }))),
 
     // 3. Adzuna (only if keys set)
@@ -50,6 +56,8 @@ export default async function handler(req, res) {
           url: j.redirect_url,
           description: j.description,
           source: "Adzuna",
+          salary_min: j.salary_min || undefined,
+          salary_max: j.salary_max || undefined,
         })))
     ] : []),
   ];

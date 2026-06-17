@@ -71,6 +71,8 @@ async function fetchRemotive() {
       url: j.url,
       description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 300),
       source: "Remotive",
+      salary: j.salary || undefined,
+      companyLogo: j.company_logo_url || j.company_logo || undefined,
     }));
   } catch { return []; }
 }
@@ -112,6 +114,10 @@ async function fetchJobicy() {
           url: j.url,
           description: (j.jobDescription || "").replace(/<[^>]*>/g, "").slice(0, 300),
           source: "Jobicy",
+          companyLogo: j.companyLogo || undefined,
+          annualSalaryMin: j.annualSalaryMin || undefined,
+          annualSalaryMax: j.annualSalaryMax || undefined,
+          salaryCurrency: j.salaryCurrency || undefined,
         })))
         .catch(() => [])
     )
@@ -135,6 +141,7 @@ async function fetchArbeitnow() {
       url: j.url,
       description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 300),
       source: "Arbeitnow",
+      companyLogo: j.company_logo || undefined,
     }));
   } catch { return []; }
 }
@@ -199,6 +206,7 @@ async function fetchHimalayas() {
       url: j.applicationLink || `https://himalayas.app/jobs/${j.slug}`,
       description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 300),
       source: "Himalayas",
+      companyLogo: j.company?.logo || undefined,
     }));
   } catch { return []; }
 }

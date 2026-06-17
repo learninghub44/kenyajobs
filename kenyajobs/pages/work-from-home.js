@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import CategoryTabs from "@/components/CategoryTabs";
+import AdSlot from "@/components/AdSlot";
+import { mergeManualJobs } from "@/utils/mergeJobs";
 
 const filters = ["All", "Data Entry", "Virtual Assistant", "Customer Service", "Writing"];
 
@@ -17,16 +19,19 @@ export default function WorkFromHome() {
 
   useEffect(() => {
     // Try Adzuna first, fall back to Remotive customer-service category
-    fetch("/api/wfh-jobs")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) return data;
-        return fetch("/api/remote-jobs?category=customer-support").then((r) => r.json());
-      })
-      .then((data) => {
-        const jobs = Array.isArray(data) ? data : [];
-        setJobs(jobs);
-        setFiltered(jobs);
+    Promise.all([
+      fetch("/api/wfh-jobs")
+        .then((r) => r.json())
+        .then((data) => (Array.isArray(data) && data.length > 0 ? data : fetch("/api/remote-jobs?category=customer-support").then((r) => r.json())))
+        .catch(() => []),
+      fetch("/api/manual-jobs?category=wfh").then((r) => r.json()).catch(() => []),
+    ])
+      .then(([liveData, manualData]) => {
+        const liveJobs = Array.isArray(liveData) ? liveData : [];
+        const manualJobs = Array.isArray(manualData) ? manualData : [];
+        const merged = mergeManualJobs(liveJobs, manualJobs);
+        setJobs(merged);
+        setFiltered(merged);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -80,6 +85,12 @@ export default function WorkFromHome() {
         {!loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginated.map((job, i) => <JobCard key={job.id || job.job_id || i} job={job} />)}
+          </div>
+        )}
+
+        {!loading && paginated.length > 0 && (
+          <div className="mt-6">
+            <AdSlot placement="listing-grid" adSlot="0000000000" />
           </div>
         )}
 

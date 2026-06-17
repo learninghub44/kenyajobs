@@ -1,4 +1,4 @@
-import { MapPin, Clock, Building2, ArrowRight, Wifi } from "lucide-react";
+import { MapPin, Clock, Building2, ArrowRight, Wifi, Banknote, Star } from "lucide-react";
 import Link from "next/link";
 import { saveJob } from "@/utils/jobCache";
 
@@ -38,6 +38,18 @@ function companyColor(name) {
   return colors[Math.abs(hash) % colors.length];
 }
 
+// Different sources expose salary differently — a plain string (manual jobs,
+// Remotive), a min/max range (Jobicy, JSearch, Adzuna), or nothing at all.
+function formatSalary(job) {
+  if (job.salary && typeof job.salary === "string") return job.salary;
+  const min = job.annualSalaryMin ?? job.job_min_salary ?? job.salary_min;
+  const max = job.annualSalaryMax ?? job.job_max_salary ?? job.salary_max;
+  const currency = job.salaryCurrency || job.job_salary_currency || "";
+  if (min && max) return `${currency} ${Number(min).toLocaleString()} – ${Number(max).toLocaleString()}`.trim();
+  if (min) return `${currency} ${Number(min).toLocaleString()}+`.trim();
+  return null;
+}
+
 export default function JobCard({ job }) {
   const title = String(job.title || job.job_title || "Job Title");
   const company = String(job.company || job.company_name || job.employer_name || "Company");
@@ -48,6 +60,9 @@ export default function JobCard({ job }) {
   const posted = timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc);
   const isRemote = location.toLowerCase().includes("remote") || jobType.toLowerCase().includes("remote");
   const [fg, bg] = companyColor(company);
+  const logoUrl = job.companyLogo || job.company_logo || job.employer_logo || job.companyLogo_url;
+  const salary = formatSalary(job);
+  const isFeatured = Boolean(job.featured);
 
   return (
     <Link href={`/job/${jobId}`} onClick={() => saveJob(jobId, job)}
@@ -56,9 +71,20 @@ export default function JobCard({ job }) {
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          {/* Company logo placeholder */}
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg flex-shrink-0 border"
-            style={{ backgroundColor: bg, color: fg, borderColor: bg }}>
+          {/* Company logo */}
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={logoUrl}
+              alt={company}
+              className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-gray-100 bg-white"
+              onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
+            />
+          ) : null}
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg flex-shrink-0 border"
+            style={{ backgroundColor: bg, color: fg, borderColor: bg, display: logoUrl ? "none" : "flex" }}
+          >
             {company.charAt(0).toUpperCase()}
           </div>
           <div>
@@ -78,12 +104,22 @@ export default function JobCard({ job }) {
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2">
+        {isFeatured && (
+          <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-amber-50 text-amber-700 border-amber-200">
+            <Star size={10} className="fill-amber-500 text-amber-500" /> Featured
+          </span>
+        )}
         <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${TAG_COLORS[jobType] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
           {jobType}
         </span>
         {isRemote && (
           <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
             <Wifi size={10} /> Remote
+          </span>
+        )}
+        {salary && (
+          <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-green-50 text-green-700 border-green-200">
+            <Banknote size={10} /> {salary}
           </span>
         )}
         {source && (

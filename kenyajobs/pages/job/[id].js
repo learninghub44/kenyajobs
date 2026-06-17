@@ -4,7 +4,8 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
-import { MapPin, Briefcase, Calendar, ArrowUpRight, Building2, Clock, Share2, Bookmark, ChevronRight } from "lucide-react";
+import AdSlot from "@/components/AdSlot";
+import { MapPin, Briefcase, Calendar, ArrowUpRight, Building2, Clock, Share2, Bookmark, ChevronRight, Banknote, Link as LinkIcon } from "lucide-react";
 
 function timeAgo(dateStr) {
   if (!dateStr) return "Recently posted";
@@ -14,6 +15,18 @@ function timeAgo(dateStr) {
   if (days === 1) return "Posted yesterday";
   if (days < 7) return `Posted ${days} days ago`;
   return `Posted on ${new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`;
+}
+
+// Different sources expose salary differently — a plain string (manual jobs,
+// Remotive), a min/max range (Jobicy, JSearch, Adzuna), or nothing at all.
+function formatSalary(job) {
+  if (job.salary && typeof job.salary === "string") return job.salary;
+  const min = job.annualSalaryMin ?? job.job_min_salary ?? job.salary_min;
+  const max = job.annualSalaryMax ?? job.job_max_salary ?? job.salary_max;
+  const currency = job.salaryCurrency || job.job_salary_currency || "";
+  if (min && max) return `${currency} ${Number(min).toLocaleString()} – ${Number(max).toLocaleString()}`.trim();
+  if (min) return `${currency} ${Number(min).toLocaleString()}+`.trim();
+  return null;
 }
 
 function companyColor(name = "") {
@@ -37,6 +50,7 @@ async function fetchAllSources() {
     fetch("/api/entry-level-jobs").then(r => r.json()).catch(() => []),
     fetch("/api/graduate-jobs").then(r => r.json()).catch(() => []),
     fetch("/api/wfh-jobs").then(r => r.json()).catch(() => []),
+    fetch("/api/manual-jobs").then(r => r.json()).catch(() => []),
   ]);
   return results.filter(r => r.status === "fulfilled" && Array.isArray(r.value)).flatMap(r => r.value);
 }
@@ -81,6 +95,22 @@ export default function JobDetail() {
     async function findJob() {
       try {
         setLoading(true);
+
+        // Manually-posted jobs have a stable, prefixed id — fetch directly from the
+        // DB instead of waiting on every live source to respond.
+        if (String(id).startsWith("manual-")) {
+          const res = await fetch(`/api/manual-jobs/${id}`);
+          if (res.ok) {
+            const found = await res.json();
+            setJob(found);
+            saveJob(id, found);
+            const allJobs = await fetchAllSources();
+            setRelated(allJobs.filter(j => (j.id || j.job_id) !== id && (j.source === found.source || j.location === found.location)).slice(0, 3));
+            setLoading(false);
+            return;
+          }
+        }
+
         const allJobs = await fetchAllSources();
         const found = allJobs.find(j =>
           String(j.id) === String(id) ||
@@ -151,6 +181,9 @@ export default function JobDetail() {
   const source = job.source || "Source";
   const posted = timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc);
   const [fg, bg] = companyColor(company);
+  const logoUrl = job.companyLogo || job.company_logo || job.employer_logo;
+  const companyWebsite = job.companyWebsite || job.employer_website;
+  const salary = formatSalary(job);
 
   return (
     <>
@@ -179,8 +212,17 @@ export default function JobDetail() {
               <div className="bg-white rounded-2xl border border-gray-200 p-7 shadow-sm">
                 <div className="flex items-start gap-5 mb-6">
                   {/* Company logo */}
+                  {logoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={logoUrl}
+                      alt={company}
+                      className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 border-2 border-gray-100 bg-white"
+                      onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
+                    />
+                  ) : null}
                   <div className="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-2xl flex-shrink-0 border-2"
-                    style={{ backgroundColor: bg, color: fg, borderColor: bg }}>
+                    style={{ backgroundColor: bg, color: fg, borderColor: bg, display: logoUrl ? "none" : "flex" }}>
                     {company.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -210,6 +252,11 @@ export default function JobDetail() {
                   <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
                     <Clock size={13} className="text-orange-500" /> {posted}
                   </span>
+                  {salary && (
+                    <span className="flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 text-sm font-medium px-3 py-1.5 rounded-full">
+                      <Banknote size={13} className="text-green-600" /> {salary}
+                    </span>
+                  )}
                 </div>
 
                 {/* Apply button */}
@@ -263,13 +310,23 @@ export default function JobDetail() {
                       </div>
                     </li>
                   ))}
+                  {companyWebsite && (
+                    <li className="flex items-start gap-3">
+                      <div className="mt-0.5 text-indigo-500"><LinkIcon size={16} /></div>
+                      <div className="min-w-0">
+                        <p className="text-xs text-gray-400 font-medium">Company Website</p>
+                        <a href={companyWebsite} target="_blank" rel="noopener noreferrer"
+                          className="text-sm font-semibold text-blue-600 hover:underline truncate block">
+                          {companyWebsite.replace(/^https?:\/\//, "")}
+                        </a>
+                      </div>
+                    </li>
+                  )}
                 </ul>
               </div>
 
               {/* Ad slot */}
-              <div className="bg-gray-100 text-gray-400 text-center text-xs py-8 rounded-2xl border border-dashed border-gray-300">
-                Advertisement
-              </div>
+              <AdSlot placement="sidebar" adSlot="0000000000" />
 
               {/* Related jobs */}
               {related.length > 0 && (

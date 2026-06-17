@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import CategoryTabs from "@/components/CategoryTabs";
+import AdSlot from "@/components/AdSlot";
+import { mergeManualJobs } from "@/utils/mergeJobs";
 
 const filters = ["All", "Tech", "Banking", "Sales", "Admin"];
 
@@ -17,17 +19,19 @@ export default function EntryLevel() {
 
   useEffect(() => {
     // Try JSearch first, fall back to Remotive if empty
-    fetch("/api/entry-level-jobs")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) return data;
-        // Fallback: Remotive software-dev category as entry-level proxy
-        return fetch("/api/remote-jobs?category=software-dev").then((r) => r.json());
-      })
-      .then((data) => {
-        const jobs = Array.isArray(data) ? data : [];
-        setJobs(jobs);
-        setFiltered(jobs);
+    Promise.all([
+      fetch("/api/entry-level-jobs")
+        .then((r) => r.json())
+        .then((data) => (Array.isArray(data) && data.length > 0 ? data : fetch("/api/remote-jobs?category=software-dev").then((r) => r.json())))
+        .catch(() => []),
+      fetch("/api/manual-jobs?category=entry").then((r) => r.json()).catch(() => []),
+    ])
+      .then(([liveData, manualData]) => {
+        const liveJobs = Array.isArray(liveData) ? liveData : [];
+        const manualJobs = Array.isArray(manualData) ? manualData : [];
+        const merged = mergeManualJobs(liveJobs, manualJobs);
+        setJobs(merged);
+        setFiltered(merged);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -81,6 +85,12 @@ export default function EntryLevel() {
         {!loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginated.map((job, i) => <JobCard key={job.job_id || job.id || i} job={job} />)}
+          </div>
+        )}
+
+        {!loading && paginated.length > 0 && (
+          <div className="mt-6">
+            <AdSlot placement="listing-grid" adSlot="0000000000" />
           </div>
         )}
 

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
+import AdSlot from "@/components/AdSlot";
 import { Search, MapPin, TrendingUp, Users, Briefcase, Globe, ChevronRight, Star, Wifi, GraduationCap, Home as HomeIcon, Rocket } from "lucide-react";
 
 const CATEGORIES = [
@@ -27,7 +28,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("");
-  const [sources, setSources] = useState({ loaded: 0, total: 5 });
+  const [sources, setSources] = useState({ loaded: 0, total: 6 });
 
   const mergeJobs = (prev, incoming) => {
     const ids = new Set(prev.map(j => j.id));
@@ -58,6 +59,7 @@ export default function Home() {
     fetchSource("/api/entry-level-jobs", 8, "Entry Level");
     fetchSource("/api/graduate-jobs", 8, "Graduate");
     fetchSource("/api/wfh-jobs", 8, "WFH");
+    fetchSource("/api/manual-jobs", 20, "Manual");
 
     const t = setTimeout(() => setLoading(false), 7000);
     return () => { clearTimeout(t); controller.abort(); };
@@ -72,6 +74,7 @@ export default function Home() {
     const src = String(j.source || "").toLowerCase();
     const matchSearch = !q || t.includes(q) || c.includes(q) || l.includes(q);
     const matchTab = !activeTab ||
+      (Array.isArray(j.categories) && j.categories.includes(activeTab)) ||
       (activeTab === "remote" && (l.includes("remote") || tp.includes("remote"))) ||
       (activeTab === "entry" && src.includes("entry")) ||
       (activeTab === "graduate" && src.includes("graduate")) ||
@@ -220,8 +223,8 @@ export default function Home() {
               <div key={job.id || index}>
                 <JobCard job={job} />
                 {(index + 1) % 9 === 0 && (
-                  <div className="col-span-full bg-gray-100 text-gray-400 text-center text-xs py-5 rounded-xl mt-5">
-                    Advertisement
+                  <div className="col-span-full mt-5">
+                    <AdSlot placement="homepage-grid" adSlot="0000000000" />
                   </div>
                 )}
               </div>
