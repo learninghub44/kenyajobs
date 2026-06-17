@@ -1,0 +1,83 @@
+<svg width="680" height="340" viewBox="0 0 680 340" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>JobsWorldwide logo</title>
+  <desc>Premium JobsWorldwide logo: a bold globe icon mark with a location pin, beside a two-tone wordmark</desc>
+
+  <defs>
+    <clipPath id="gc">
+      <circle cx="130" cy="170" r="72"/>
+    </clipPath>
+    <linearGradient id="gBg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1E3A8A"/>
+    </linearGradient>
+    <linearGradient id="pinG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="130" cy="248" rx="58" ry="10" fill="#1E3A8A" opacity="0.18"/>
+  <circle cx="130" cy="170" r="72" fill="url(#gBg)"/>
+
+  <g clip-path="url(#gc)" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.2">
+    <ellipse cx="130" cy="170" rx="72" ry="24"/>
+    <ellipse cx="130" cy="170" rx="72" ry="48"/>
+    <line x1="58" y1="170" x2="202" y2="170"/>
+    <line x1="58" y1="134" x2="202" y2="134"/>
+    <line x1="58" y1="206" x2="202" y2="206"/>
+  </g>
+
+  <g clip-path="url(#gc)" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.2">
+    <ellipse cx="130" cy="170" rx="24" ry="72"/>
+    <ellipse cx="130" cy="170" rx="48" ry="72"/>
+    <line x1="130" y1="98" x2="130" y2="242"/>
+  </g>
+
+  <g clip-path="url(#gc)" opacity="0.72">
+    <path d="M138 145 Q148 140 152 150 Q158 162 155 180 Q152 192 144 194 Q134 196 130 185 Q126 172 130 158 Q132 148 138 145Z" fill="#60A5FA"/>
+    <path d="M110 130 Q118 124 126 126 Q132 128 130 136 Q126 142 118 140 Q110 138 110 130Z" fill="#93C5FD"/>
+    <path d="M72 148 Q78 142 84 146 Q88 154 86 164 Q82 170 76 166 Q70 160 72 148Z" fill="#60A5FA"/>
+    <path d="M68 172 Q74 168 78 174 Q80 182 76 188 Q70 190 66 184 Q64 176 68 172Z" fill="#60A5FA"/>
+    <path d="M158 128 Q168 122 176 128 Q184 136 180 146 Q174 150 166 148 Q156 144 158 128Z" fill="#93C5FD"/>
+  </g>
+
+  <ellipse cx="110" cy="138" rx="46" ry="32" fill="url(#sheen)" clip-path="url(#gc)"/>
+  <circle cx="130" cy="170" r="72" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <circle cx="148" cy="152" r="14" fill="#ffffff"/>
+  <circle cx="148" cy="152" r="8" fill="#2563EB"/>
+  <circle cx="148" cy="152" r="4" fill="#ffffff"/>
+  <line x1="148" y1="166" x2="148" y2="182" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="148" cy="184" r="3" fill="#ffffff"/>
+
+  <text x="226" y="158"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="72"
+        font-weight="700"
+        fill="#0F172A"
+        letter-spacing="-2">Jobs</text>
+
+  <text x="229" y="202"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="28"
+        font-weight="400"
+        fill="#2563EB"
+        letter-spacing="6">Worldwide</text>
+
+  <line x1="229" y1="168" x2="574" y2="168" stroke="#E2E8F0" stroke-width="1"/>
+
+  <text x="229" y="236"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="12"
+        font-weight="400"
+        fill="#94A3B8"
+        letter-spacing="3">Find your next opportunity, anywhere</text>
+
+  <circle cx="229" cy="256" r="4" fill="#2563EB"/>
+  <circle cx="243" cy="256" r="4" fill="#93C5FD"/>
+  <circle cx="257" cy="256" r="4" fill="#DBEAFE"/>
+</svg>
