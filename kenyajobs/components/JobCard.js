@@ -1,5 +1,6 @@
 import { MapPin, Clock, Building2, ArrowRight, Wifi } from "lucide-react";
 import Link from "next/link";
+import { saveJob } from "@/utils/jobCache";
 
 const TAG_COLORS = {
   "Full-time": "bg-green-50 text-green-700 border-green-200",
@@ -49,7 +50,7 @@ export default function JobCard({ job }) {
   const [fg, bg] = companyColor(company);
 
   return (
-    <Link href={`/job/${jobId}`}
+    <Link href={`/job/${jobId}`} onClick={() => saveJob(jobId, job)}
       className="group bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-400 hover:shadow-lg transition-all duration-200 flex flex-col gap-4">
 
       {/* Header */}

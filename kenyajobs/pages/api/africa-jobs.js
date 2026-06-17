@@ -1,4 +1,14 @@
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+import crypto from "crypto";
+
+// Stable, URL-safe, collision-resistant id fragment for a given string (e.g. a job's link).
+// Truncated base64 of a URL is NOT safe here: jobs from the same source share a long common
+// domain/path prefix, so naive truncation made many *different* jobs collide on the same id.
+// Hashing the full string avoids that, and hex output has no characters that are unsafe in a
+// Next.js dynamic route segment (unlike raw base64, which can contain `/`, `+`, `=`).
+function hashId(input) {
+  return crypto.createHash("sha1").update(String(input)).digest("hex").slice(0, 16);
+}
 
 const RSS_FEEDS = [
   { url: "https://www.brightermonday.co.ke/listings.rss",   source: "BrighterMonday KE" },
@@ -32,7 +42,7 @@ function parseRSS(xml, source, defaultLocation) {
     const location = get("location") || defaultLocation || "Worldwide";
     if (title && link) {
       items.push({
-        id: `rss-${source.toLowerCase().replace(/\s+/g, "-")}-${Buffer.from(link).toString("base64").slice(0, 30)}`,
+        id: `rss-${source.toLowerCase().replace(/\s+/g, "-")}-${hashId(link)}`,
         title, company, location,
         type: "Full-time",
         date: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
@@ -211,7 +221,7 @@ async function fetchViaRss2Json() {
         .then(d => {
           if (d.status !== "ok") return [];
           return (d.items || []).map(j => ({
-            id: `rss2json-${source.toLowerCase().replace(/\s+/g, "-")}-${Buffer.from(j.link || j.title).toString("base64").slice(0, 20)}`,
+            id: `rss2json-${source.toLowerCase().replace(/\s+/g, "-")}-${hashId(j.link || j.title)}`,
             title: j.title,
             company: j.author || source,
             location,

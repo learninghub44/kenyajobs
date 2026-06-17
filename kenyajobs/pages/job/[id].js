@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import DOMPurify from "dompurify";
+import { loadJob, saveJob } from "@/utils/jobCache";
 import { MapPin, Briefcase, Calendar, ArrowUpRight, Building2, Clock, Share2, Bookmark, ChevronRight } from "lucide-react";
 
 function timeAgo(dateStr) {
@@ -29,6 +30,17 @@ function companyColor(name = "") {
   return colors[Math.abs(hash) % colors.length];
 }
 
+async function fetchAllSources() {
+  const results = await Promise.allSettled([
+    fetch("/api/africa-jobs").then(r => r.json()).catch(() => []),
+    fetch("/api/remote-jobs").then(r => r.json()).catch(() => []),
+    fetch("/api/entry-level-jobs").then(r => r.json()).catch(() => []),
+    fetch("/api/graduate-jobs").then(r => r.json()).catch(() => []),
+    fetch("/api/wfh-jobs").then(r => r.json()).catch(() => []),
+  ]);
+  return results.filter(r => r.status === "fulfilled" && Array.isArray(r.value)).flatMap(r => r.value);
+}
+
 export default function JobDetail() {
   const router = useRouter();
   const { id } = router.query;
@@ -40,24 +52,44 @@ export default function JobDetail() {
 
   useEffect(() => {
     if (!id) return;
-    async function loadJob() {
+
+    // Prefer the exact job data the user just saw on the listing page — avoids depending on
+    // slow/rate-limited live sources returning the identical job again on a fresh request.
+    const cached = loadJob(id);
+    if (cached) {
+      async function applyCachedJob() {
+        setJob(cached);
+        setNotFound(false);
+        setLoading(false);
+        // Still fetch in the background, just to populate "Similar Jobs" — never blocks the
+        // main content and never flips this job to "not found" if a source is slow/unavailable.
+        try {
+          const allJobs = await fetchAllSources();
+          setRelated(allJobs.filter(j =>
+            (j.id || j.job_id) !== id && (j.source === cached.source || j.location === cached.location)
+          ).slice(0, 3));
+        } catch {
+          // Related jobs are a nice-to-have; ignore failures.
+        }
+      }
+      applyCachedJob();
+      return;
+    }
+
+    // No cached data (direct link, shared URL, or cleared session) — fall back to searching
+    // every live source for a match.
+    async function findJob() {
       try {
         setLoading(true);
-        const results = await Promise.allSettled([
-          fetch("/api/africa-jobs").then(r => r.json()).catch(() => []),
-          fetch("/api/remote-jobs").then(r => r.json()).catch(() => []),
-          fetch("/api/entry-level-jobs").then(r => r.json()).catch(() => []),
-          fetch("/api/graduate-jobs").then(r => r.json()).catch(() => []),
-          fetch("/api/wfh-jobs").then(r => r.json()).catch(() => []),
-        ]);
-        const allJobs = results.filter(r => r.status === "fulfilled" && Array.isArray(r.value)).flatMap(r => r.value);
+        const allJobs = await fetchAllSources();
         const found = allJobs.find(j =>
           String(j.id) === String(id) ||
           String(j.job_id) === String(id) ||
-          encodeURIComponent(j.title || j.job_title || "") === String(id)
+          String(j.title || j.job_title || "") === String(id)
         );
         if (found) {
           setJob(found);
+          saveJob(id, found);
           setRelated(allJobs.filter(j => j !== found && (j.source === found.source || j.location === found.location)).slice(0, 3));
         } else {
           setNotFound(true);
@@ -68,7 +100,7 @@ export default function JobDetail() {
         setLoading(false);
       }
     }
-    loadJob();
+    findJob();
   }, [id]);
 
   const handleShare = () => {
@@ -250,7 +282,7 @@ export default function JobDetail() {
                       const relId = j.id || j.job_id || encodeURIComponent(relTitle);
                       const [rfg, rbg] = companyColor(relCompany);
                       return (
-                        <Link key={i} href={`/job/${relId}`}
+                        <Link key={i} href={`/job/${relId}`} onClick={() => saveJob(relId, j)}
                           className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group border border-transparent hover:border-gray-200">
                           <div className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0"
                             style={{ backgroundColor: rbg, color: rfg }}>
