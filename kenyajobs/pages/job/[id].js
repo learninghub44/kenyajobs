@@ -124,7 +124,7 @@ export default function JobDetail() {
 
           <a href={applyUrl} target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors duration-200 text-base">
-            Apply Now <ArrowUpRight size={16} />
+            Apply on {source || "Source Site"} <ArrowUpRight size={16} />
           </a>
         </div>
 
@@ -140,7 +140,7 @@ export default function JobDetail() {
 
         <a href={applyUrl} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 py-4 rounded-xl transition-colors duration-200 text-base mb-10">
-          Apply for This Job <ArrowUpRight size={16} />
+          Apply on {source || "Source Site"} <ArrowUpRight size={16} />
         </a>
 
         {related.length > 0 && (
