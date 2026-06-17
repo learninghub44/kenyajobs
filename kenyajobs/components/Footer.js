@@ -9,8 +9,20 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="md:col-span-1">
-            <div className="mb-4">
-              <img src="/logo-nav.svg" alt="JobsWorldwide" className="h-11 w-auto brightness-0 invert" />
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1.5"/>
+                  <ellipse cx="12" cy="12" rx="4" ry="10" stroke="white" strokeWidth="1.5"/>
+                  <line x1="2" y1="12" x2="22" y2="12" stroke="white" strokeWidth="1.5"/>
+                  <line x1="4" y1="7" x2="20" y2="7" stroke="white" strokeWidth="1.2"/>
+                  <line x1="4" y1="17" x2="20" y2="17" stroke="white" strokeWidth="1.2"/>
+                </svg>
+              </div>
+              <div>
+                <div className="text-white font-bold text-lg leading-tight">Jobs<span className="text-blue-400">Worldwide</span></div>
+                <div className="text-slate-500 text-xs tracking-wide">Find your next opportunity, anywhere</div>
+              </div>
             </div>
             <p className="text-sm leading-relaxed mb-5">Your global destination for jobs worldwide. Remote, entry level, graduate and work-from-home opportunities updated daily.</p>
             <div className="space-y-2 text-sm">

@@ -87,49 +87,56 @@ export default function Home() {
       </Head>
 
       {/* HERO */}
-      <section className="relative bg-white overflow-hidden border-b border-gray-100">
-        <div className="absolute inset-0 opacity-40" style={{backgroundImage: "radial-gradient(circle, #cbd5e1 1px, transparent 1px)", backgroundSize: "28px 28px"}} />
+      <section className="relative overflow-hidden bg-[#0f172a]">
+        {/* Background glow blobs */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600 opacity-20 rounded-full blur-3xl -translate-y-1/2" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-500 opacity-15 rounded-full blur-3xl translate-y-1/2" />
+        <div className="absolute inset-0" style={{backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px)", backgroundSize: "32px 32px"}} />
 
-        <div className="relative max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
+        <div className="relative max-w-5xl mx-auto px-6 pt-24 pb-20 text-center">
 
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.05] tracking-tight text-gray-900 mb-6">
-            Find Your<br />
-            <span className="text-blue-600">Dream Job</span>
-          </h1>
-
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
+          {/* Continent pills */}
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
             {["Europe", "Asia", "North America", "South America", "Oceania", "Middle East"].map(c => (
-              <span key={c} className="text-xs font-medium bg-gray-100 text-gray-600 px-3 py-1 rounded-full border border-gray-200">{c}</span>
+              <span key={c} className="text-xs font-medium text-blue-300 bg-blue-900/40 border border-blue-700/50 px-3 py-1 rounded-full">{c}</span>
             ))}
           </div>
 
-          <p className="text-gray-500 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed">
-            Thousands of opportunities from top employers across every continent.
+          {/* Heading */}
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.08] tracking-tight text-white mb-6">
+            Find Your<br />
+            <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">Dream Job</span>
+          </h1>
+
+          <p className="text-slate-400 text-lg md:text-xl mb-12 max-w-lg mx-auto leading-relaxed">
+            Thousands of live opportunities from top employers across every continent — updated daily.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-8">
+          {/* Search bar */}
+          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10">
             <div className="flex-1 relative">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Job title, company, or keyword..."
-                className="w-full pl-11 pr-4 py-4 rounded-xl text-gray-900 text-sm font-medium border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent shadow-sm"
+                className="w-full pl-11 pr-4 py-4 rounded-xl bg-white/10 border border-white/15 text-white placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent backdrop-blur-sm"
               />
             </div>
             <button
               onClick={() => {}}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-xl transition-colors shadow-sm text-sm whitespace-nowrap">
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl transition-colors text-sm whitespace-nowrap shadow-lg shadow-blue-900/40">
               Search Jobs
             </button>
           </div>
 
+          {/* Trending searches */}
           <div className="flex flex-wrap justify-center gap-2 items-center">
-            <span className="text-gray-400 text-sm">Trending:</span>
+            <span className="text-slate-500 text-sm">Trending:</span>
             {POPULAR_SEARCHES.map(s => (
               <button key={s} onClick={() => setSearch(s)}
-                className="text-sm text-gray-600 hover:text-blue-600 bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-200 px-3 py-1 rounded-full transition-all">
+                className="text-sm text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 px-3 py-1 rounded-full transition-all">
                 {s}
               </button>
             ))}
