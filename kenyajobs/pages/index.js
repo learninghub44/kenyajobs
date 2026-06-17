@@ -16,7 +16,7 @@ const CATEGORIES = [
 const STATS = [
   { value: "10,000+", label: "Active Jobs", icon: Briefcase },
   { value: "500+", label: "Companies", icon: Users },
-  { value: "20+", label: "African Countries", icon: Globe },
+  { value: "150+", label: "Countries", icon: Globe },
   { value: "Daily", label: "New Listings", icon: TrendingUp },
 ];
 
@@ -80,29 +80,37 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>JobsWorldwide — Find Jobs in Kenya & Africa | Remote · Entry Level · Graduate</title>
-        <meta name="description" content="Find the latest jobs in Kenya and across Africa. Remote, entry level, graduate and work from home opportunities updated daily." />
+        <title>JobsWorldwide — Find Dream Jobs in Europe, Asia, Americas, Oceania & More | Remote · Entry Level · Graduate</title>
+        <meta name="description" content="Find your dream job worldwide. Thousands of opportunities across Europe, Asia, the Americas, Oceania, and beyond — remote, entry level, graduate and work from home." />
       </Head>
 
-      {/* ─── HERO ─── */}
-      <section className="relative bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
-        </div>
+      {/* HERO */}
+      <section className="relative bg-white overflow-hidden border-b border-gray-100">
+        <div className="absolute inset-0 opacity-40" style={{backgroundImage: "radial-gradient(circle, #cbd5e1 1px, transparent 1px)", backgroundSize: "28px 28px"}} />
 
-        <div className="relative max-w-5xl mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 tracking-tight">
-            Find Your Dream Job<br />
-            <span className="text-blue-200">in Kenya & Africa</span>
+        <div className="relative max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
+
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-600 text-xs font-semibold px-4 py-1.5 rounded-full mb-8 tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+            10,000+ live jobs updated daily
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.05] tracking-tight text-gray-900 mb-6">
+            Find Your<br />
+            <span className="text-blue-600">Dream Job</span>
           </h1>
-          <p className="text-blue-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-            Thousands of jobs from top employers — remote, on-site, entry level, and more.
+
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            {["Europe", "Asia", "North America", "South America", "Oceania", "Middle East"].map(c => (
+              <span key={c} className="text-xs font-medium bg-gray-100 text-gray-600 px-3 py-1 rounded-full border border-gray-200">{c}</span>
+            ))}
+          </div>
+
+          <p className="text-gray-500 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed">
+            Thousands of opportunities from top employers across every continent.
           </p>
 
-          {/* Search bar */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-8">
             <div className="flex-1 relative">
               <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
@@ -110,22 +118,21 @@ export default function Home() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Job title, company, or keyword..."
-                className="w-full pl-11 pr-4 py-4 rounded-xl text-gray-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-lg"
+                className="w-full pl-11 pr-4 py-4 rounded-xl text-gray-900 text-sm font-medium border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent shadow-sm"
               />
             </div>
             <button
               onClick={() => {}}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl transition-colors shadow-lg text-sm whitespace-nowrap">
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-xl transition-colors shadow-sm text-sm whitespace-nowrap">
               Search Jobs
             </button>
           </div>
 
-          {/* Popular searches */}
-          <div className="flex flex-wrap justify-center gap-2">
-            <span className="text-blue-200 text-sm">Popular:</span>
+          <div className="flex flex-wrap justify-center gap-2 items-center">
+            <span className="text-gray-400 text-sm">Trending:</span>
             {POPULAR_SEARCHES.map(s => (
               <button key={s} onClick={() => setSearch(s)}
-                className="text-sm text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1 rounded-full transition-all">
+                className="text-sm text-gray-600 hover:text-blue-600 bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-200 px-3 py-1 rounded-full transition-all">
                 {s}
               </button>
             ))}
@@ -160,7 +167,7 @@ export default function Home() {
               <span className="text-blue-200 text-sm font-medium">Featured Opportunity</span>
             </div>
             <h2 className="text-2xl font-bold mb-1">Are You Hiring?</h2>
-            <p className="text-blue-200 text-sm max-w-md">Reach thousands of qualified candidates across Kenya and Africa. Post your job today and get applications fast.</p>
+            <p className="text-blue-200 text-sm max-w-md">Reach thousands of qualified candidates across Europe, Asia, the Americas, Oceania and beyond. Post your job and get applications fast.</p>
           </div>
           <a href="mailto:hello@jobsworldwide.online"
             className="relative flex-shrink-0 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors text-sm whitespace-nowrap">

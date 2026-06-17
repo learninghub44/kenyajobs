@@ -12,7 +12,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0">
-            <img src="/logo-nav.svg" alt="JobsWorldwide" className="h-10 w-auto" />
+            <img src="/logo-nav.svg" alt="JobsWorldwide" className="h-11 w-auto" />
           </Link>
 
           {/* Desktop Nav */}
