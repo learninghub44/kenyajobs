@@ -57,11 +57,9 @@ export default function Contact() {
       {/* Header */}
       <div className="bg-gray-50 border-b border-gray-200 py-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <p style={{ fontFamily: "var(--font-mono)" }}
             className="text-sm uppercase tracking-widest text-gray-400 mb-3">
             Get in touch
           </p>
-          <h1 style={{ fontFamily: "DM Sans, sans-serif" }}
             className="text-4xl sm:text-5xl font-semibold tracking-tight text-gray-900 leading-tight mb-2">
             Contact Us
           </h1>
@@ -101,7 +99,6 @@ export default function Contact() {
                     <p className="text-sm text-gray-400 font-medium mb-0.5">{label}</p>
                     {href ? (
                       <a href={href}
-                        style={{ fontFamily: "var(--font-mono)" }}
                         className="text-sm text-blue-600 hover:underline break-all">
                         {value}
                       </a>
@@ -116,7 +113,6 @@ export default function Contact() {
 
             {/* Common reasons */}
             <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <p style={{ fontFamily: "DM Sans, sans-serif" }}
                 className="text-sm font-semibold text-gray-900 mb-3">
                 Common reasons to contact us
               </p>
@@ -143,7 +139,6 @@ export default function Contact() {
             {status === "success" ? (
               <div className="flex flex-col items-center justify-center text-center py-20 bg-white border border-gray-200 rounded-xl px-8">
                 <CheckCircle2 size={48} className="text-emerald-500 mb-4" />
-                <h2 style={{ fontFamily: "DM Sans, sans-serif" }}
                   className="text-2xl font-semibold text-gray-900 mb-2">
                   Message sent!
                 </h2>

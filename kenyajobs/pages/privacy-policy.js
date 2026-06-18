@@ -8,7 +8,6 @@ const DOMAIN = "jobsworldwide.online";
 function Section({ id, title, children }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 style={{ fontFamily: "DM Sans, sans-serif" }}
         className="text-xl font-semibold tracking-tight text-gray-900 mb-3 pb-2.5 border-b border-gray-100">
         {title}
       </h2>
@@ -32,7 +31,6 @@ function Ul({ items }) {
 
 function Mono({ children }) {
   return (
-    <span style={{ fontFamily: "var(--font-mono)" }} className="text-sm text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">
       {children}
     </span>
   );
@@ -65,15 +63,12 @@ export default function PrivacyPolicy() {
       {/* Page header */}
       <div className="bg-gray-50 border-b border-gray-200 py-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <p style={{ fontFamily: "var(--font-mono)" }}
             className="text-sm uppercase tracking-widest text-gray-400 mb-3">
             Legal Document
           </p>
-          <h1 style={{ fontFamily: "DM Sans, sans-serif" }}
             className="text-4xl sm:text-5xl font-semibold tracking-tight text-gray-900 leading-tight mb-2">
             Privacy Policy
           </h1>
-          <p style={{ fontFamily: "var(--font-mono)" }}
             className="text-sm text-gray-400">
             Last updated: <span className="text-gray-600">{UPDATED}</span>
             &nbsp;·&nbsp; Effective immediately
@@ -87,7 +82,6 @@ export default function PrivacyPolicy() {
           {/* Sidebar TOC */}
           <aside className="lg:w-52 flex-shrink-0">
             <div className="sticky top-24">
-              <p style={{ fontFamily: "var(--font-mono)" }}
                 className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-3">
                 Contents
               </p>
@@ -140,7 +134,6 @@ export default function PrivacyPolicy() {
                 identifying detail.
               </p>
               <p className="text-base font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "DM Sans, sans-serif" }}>
                 Automatically collected data
               </p>
               <p>When you visit our site, our hosting and analytics providers automatically record:</p>
@@ -155,7 +148,6 @@ export default function PrivacyPolicy() {
               ]} />
               <p>This data is processed in aggregate. We do not combine it with other sources to identify you personally.</p>
               <p className="text-base font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "DM Sans, sans-serif" }}>
                 Information you voluntarily provide
               </p>
               <p>
@@ -163,7 +155,6 @@ export default function PrivacyPolicy() {
                 include in the message. We use this only to respond to your enquiry.
               </p>
               <p className="text-base font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "DM Sans, sans-serif" }}>
                 Employer / job-poster information
               </p>
               <p>
@@ -200,7 +191,6 @@ export default function PrivacyPolicy() {
               <p>
                 If you encounter a suspicious listing, please report it to us at{" "}
                 <a href={`mailto:${EMAIL}`}
-                  style={{ fontFamily: "var(--font-mono)" }}
                   className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
@@ -208,19 +198,16 @@ export default function PrivacyPolicy() {
             <Section id="cookies" title="5. Cookies & Tracking">
               <p>We use a small number of cookies and similar technologies. A cookie is a small text file stored in your browser.</p>
               <p className="text-base font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "DM Sans, sans-serif" }}>Essential cookies (always active)</p>
               <Ul items={[
                 "Session state — remembers your search filters and preferences during your visit",
                 "Security tokens — protect against cross-site request forgery (CSRF)",
               ]} />
               <p className="text-base font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "DM Sans, sans-serif" }}>Analytics cookies (can be declined)</p>
               <Ul items={[
                 "Aggregate page-view and navigation data to help us improve the site",
                 "No cross-site tracking; data is not linked to your identity",
               ]} />
               <p className="text-base font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "DM Sans, sans-serif" }}>Advertising cookies (Google AdSense)</p>
               <Ul items={["Served by Google to display relevant ads — see Section 6 for full details"]} />
               <p>
                 You can disable or clear cookies at any time through your browser settings. You can also
@@ -283,7 +270,6 @@ export default function PrivacyPolicy() {
               <p>
                 To exercise any of these rights, email us at{" "}
                 <a href={`mailto:${EMAIL}`}
-                  style={{ fontFamily: "var(--font-mono)" }}
                   className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
                 We will respond within <strong>30 days</strong>.
               </p>
@@ -308,7 +294,6 @@ export default function PrivacyPolicy() {
               <p>
                 If you believe our systems have been compromised, notify us immediately at{" "}
                 <a href={`mailto:${EMAIL}`}
-                  style={{ fontFamily: "var(--font-mono)" }}
                   className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
@@ -333,7 +318,6 @@ export default function PrivacyPolicy() {
                 Where required by law, we ensure appropriate safeguards are in place for such transfers.
                 For questions, contact us at{" "}
                 <a href={`mailto:${EMAIL}`}
-                  style={{ fontFamily: "var(--font-mono)" }}
                   className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
@@ -353,15 +337,12 @@ export default function PrivacyPolicy() {
             <Section id="contact" title="13. Contact Us">
               <p>For any questions, complaints, or requests relating to this Privacy Policy:</p>
               <div className="mt-4 p-5 bg-gray-50 border border-gray-200 rounded-xl">
-                <p style={{ fontFamily: "DM Sans, sans-serif" }}
                   className="font-semibold text-base text-gray-900 mb-2">JobsWorldwide</p>
                 <p className="text-base text-gray-600">
                   Email:{" "}
                   <a href={`mailto:${EMAIL}`}
-                    style={{ fontFamily: "var(--font-mono)" }}
                     className="text-sm text-blue-600 hover:underline">{EMAIL}</a>
                 </p>
-                <p style={{ fontFamily: "var(--font-mono)" }}
                   className="text-sm text-gray-400 mt-2">
                   Response time: 2–3 business days
                 </p>

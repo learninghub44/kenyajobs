@@ -8,7 +8,6 @@ const DOMAIN = "jobsworldwide.online";
 function Section({ id, title, children }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 style={{ fontFamily: "DM Sans, sans-serif" }}
         className="text-xl font-semibold tracking-tight text-gray-900 mb-3 pb-2.5 border-b border-gray-100">
         {title}
       </h2>
@@ -32,7 +31,6 @@ function Ul({ items }) {
 
 function Mono({ children }) {
   return (
-    <span style={{ fontFamily: "var(--font-mono)" }} className="text-sm text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">
       {children}
     </span>
   );
@@ -40,7 +38,6 @@ function Mono({ children }) {
 
 function SubHead({ children }) {
   return (
-    <p style={{ fontFamily: "DM Sans, sans-serif" }}
       className="text-base font-semibold text-gray-800 mt-4">
       {children}
     </p>
@@ -78,15 +75,12 @@ export default function TermsAndConditions() {
       {/* Page header */}
       <div className="bg-gray-50 border-b border-gray-200 py-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <p style={{ fontFamily: "var(--font-mono)" }}
             className="text-sm uppercase tracking-widest text-gray-400 mb-3">
             Legal Document
           </p>
-          <h1 style={{ fontFamily: "DM Sans, sans-serif" }}
             className="text-4xl sm:text-5xl font-semibold tracking-tight text-gray-900 leading-tight mb-2">
             Terms and Conditions
           </h1>
-          <p style={{ fontFamily: "var(--font-mono)" }}
             className="text-sm text-gray-400">
             Last updated: <span className="text-gray-600">{UPDATED}</span>
             &nbsp;·&nbsp; Effective immediately
@@ -100,7 +94,6 @@ export default function TermsAndConditions() {
           {/* Sidebar TOC */}
           <aside className="lg:w-52 flex-shrink-0">
             <div className="sticky top-24">
-              <p style={{ fontFamily: "var(--font-mono)" }}
                 className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-3">
                 Contents
               </p>
@@ -235,7 +228,6 @@ export default function TermsAndConditions() {
                 <strong>Always verify job details directly with the employer before applying.</strong>{" "}
                 If you suspect a listing is fraudulent, report it immediately to{" "}
                 <a href={`mailto:${EMAIL}`}
-                  style={{ fontFamily: "var(--font-mono)" }}
                   className="text-sm text-blue-600 hover:underline">{EMAIL}</a>{" "}
                 and, where possible, to the source platform.
               </p>
@@ -273,7 +265,6 @@ export default function TermsAndConditions() {
                 If you believe any content on the Site infringes your intellectual property rights,
                 please notify us at{" "}
                 <a href={`mailto:${EMAIL}`}
-                  style={{ fontFamily: "var(--font-mono)" }}
                   className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
@@ -376,7 +367,6 @@ export default function TermsAndConditions() {
                 Any dispute arising from these Terms or your use of the Site shall first be addressed
                 by contacting us at{" "}
                 <a href={`mailto:${EMAIL}`}
-                  style={{ fontFamily: "var(--font-mono)" }}
                   className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
                 We will make reasonable efforts to resolve disputes informally within{" "}
                 <strong>30 days</strong>.
@@ -398,15 +388,12 @@ export default function TermsAndConditions() {
             <Section id="contact" title="17. Contact Us">
               <p>If you have questions about these Terms, please contact us:</p>
               <div className="mt-4 p-5 bg-gray-50 border border-gray-200 rounded-xl">
-                <p style={{ fontFamily: "DM Sans, sans-serif" }}
                   className="font-semibold text-base text-gray-900 mb-2">JobsWorldwide</p>
                 <p className="text-base text-gray-600">
                   Email:{" "}
                   <a href={`mailto:${EMAIL}`}
-                    style={{ fontFamily: "var(--font-mono)" }}
                     className="text-sm text-blue-600 hover:underline">{EMAIL}</a>
                 </p>
-                <p style={{ fontFamily: "var(--font-mono)" }}
                   className="text-sm text-gray-400 mt-2">
                   Response time: 2–3 business days
                 </p>
