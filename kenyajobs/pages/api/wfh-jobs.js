@@ -1,4 +1,7 @@
-// Providers: Adzuna (if key) + Remotive customer-support + Jobicy (free)
+// WFH-specific sources — deliberately different from /api/remote-jobs
+// Remote = broad global remote roles (Remotive general, Jobicy global, Arbeitnow)
+// WFH    = roles explicitly tagged work-from-home or in categories suited to home-based work
+//          Sources used here must NOT duplicate /api/remote-jobs fetch calls
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
 
@@ -7,11 +10,11 @@ export default async function handler(req, res) {
   const { page = 1 } = req.query;
 
   const sources = [
-    // 1. Remotive — customer support / writing as WFH proxy
-    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=customer-support&limit=15", {}, 5000)
+    // 1. Remotive — customer-support (home-based friendly category, not in remote-jobs general call)
+    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=customer-support&limit=10", {}, 5000)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
-        id: `remotive-wfh-${j.id}`,
+        id: `remotive-cs-${j.id}`,
         title: j.title,
         company: j.company_name,
         location: j.candidate_required_location || "Remote",
@@ -22,35 +25,57 @@ export default async function handler(req, res) {
         source: "Remotive",
         salary: j.salary || undefined,
         companyLogo: j.company_logo_url || j.company_logo || undefined,
+        categories: ["wfh"],
       })))
-      .catch(err => { console.error("Remotive wfh error:", err.message); return []; }),
+      .catch(() => []),
 
-    // 2. Jobicy — remote general
-    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=15&geo=worldwide", {}, 5000)
+    // 2. Remotive — writing (content/copywriting — strongly WFH-aligned)
+    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=writing&limit=8", {}, 5000)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
-        id: `jobicy-wfh-${j.id}`,
-        title: j.jobTitle,
-        company: j.companyName,
-        location: j.jobGeo || "Remote",
-        type: j.jobType || "Full-time",
-        date: j.pubDate,
+        id: `remotive-wr-${j.id}`,
+        title: j.title,
+        company: j.company_name,
+        location: j.candidate_required_location || "Remote",
+        type: j.job_type || "Full-time",
+        date: j.publication_date,
         url: j.url,
-        description: j.jobDescription,
-        source: "Jobicy",
-        companyLogo: j.companyLogo || undefined,
-        annualSalaryMin: j.annualSalaryMin || undefined,
-        annualSalaryMax: j.annualSalaryMax || undefined,
-        salaryCurrency: j.salaryCurrency || undefined,
+        description: j.description,
+        source: "Remotive",
+        salary: j.salary || undefined,
+        companyLogo: j.company_logo_url || j.company_logo || undefined,
+        categories: ["wfh"],
       })))
-      .catch(err => { console.error("Jobicy wfh error:", err.message); return []; }),
+      .catch(() => []),
 
-    // 3. Adzuna (only if keys set)
+    // 3. Remotive — data (data entry / data analyst — common WFH role)
+    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=data&limit=8", {}, 5000)
+      .then(r => r.json())
+      .then(d => (d.jobs || []).map(j => ({
+        id: `remotive-da-${j.id}`,
+        title: j.title,
+        company: j.company_name,
+        location: j.candidate_required_location || "Remote",
+        type: j.job_type || "Full-time",
+        date: j.publication_date,
+        url: j.url,
+        description: j.description,
+        source: "Remotive",
+        salary: j.salary || undefined,
+        companyLogo: j.company_logo_url || j.company_logo || undefined,
+        categories: ["wfh"],
+      })))
+      .catch(() => []),
+
+    // 4. Adzuna — explicit "work from home" keyword search (only if keys set)
     ...(process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY ? [
-      fetchWithTimeout(`https://api.adzuna.com/v1/api/jobs/gb/search/${page}?app_id=${process.env.ADZUNA_APP_ID}&app_key=${process.env.ADZUNA_APP_KEY}&results_per_page=20&what=work+from+home`, {}, 5000)
+      fetchWithTimeout(
+        `https://api.adzuna.com/v1/api/jobs/gb/search/${page}?app_id=${process.env.ADZUNA_APP_ID}&app_key=${process.env.ADZUNA_APP_KEY}&results_per_page=15&what=work+from+home`,
+        {}, 5000
+      )
         .then(r => r.json())
         .then(d => (d.results || []).map(j => ({
-          id: `adzuna-${j.id}`,
+          id: `adzuna-wfh-${j.id}`,
           title: j.title,
           company: j.company?.display_name || "Company",
           location: j.location?.display_name || "Remote",
@@ -62,8 +87,9 @@ export default async function handler(req, res) {
           category: j.category?.label || undefined,
           salary_min: j.salary_min || undefined,
           salary_max: j.salary_max || undefined,
+          categories: ["wfh"],
         })))
-        .catch(err => { console.error("Adzuna error:", err.message); return []; })
+        .catch(() => [])
     ] : []),
   ];
 

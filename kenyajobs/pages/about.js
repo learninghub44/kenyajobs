@@ -52,7 +52,7 @@ const CATEGORIES = [
   {
     icon: Home,
     label: "Work From Home",
-    desc: "Kenya-based and regional WFH roles — not just freelance gigs, but stable employment you can do from home.",
+    desc: "Home-based roles in customer support, writing, data, and admin — categories that are strongly WFH-aligned and distinct from our general remote feed.",
     href: "/work-from-home",
     color: "#d97706",
     bg: "#fffbeb",
