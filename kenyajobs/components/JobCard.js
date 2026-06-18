@@ -1,45 +1,51 @@
-import { MapPin, Clock, Building2, ArrowRight, Wifi, Banknote, Star } from "lucide-react";
+import { MapPin, Clock, Building2, ArrowRight, Wifi, Banknote, Star, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { saveJob } from "@/utils/jobCache";
 
-const TAG_COLORS = {
-  "Full-time": "bg-green-50 text-green-700 border-green-200",
-  "Part-time": "bg-yellow-50 text-yellow-700 border-yellow-200",
-  "Contract": "bg-purple-50 text-purple-700 border-purple-200",
-  "Remote": "bg-blue-50 text-blue-700 border-blue-200",
-  "Internship": "bg-orange-50 text-orange-700 border-orange-200",
+const TYPE_STYLES = {
+  "Full-time":  { pill: "bg-emerald-50 text-emerald-800 border-emerald-200", dot: "bg-emerald-500" },
+  "Part-time":  { pill: "bg-amber-50 text-amber-800 border-amber-200", dot: "bg-amber-400" },
+  "Contract":   { pill: "bg-violet-50 text-violet-800 border-violet-200", dot: "bg-violet-500" },
+  "Remote":     { pill: "bg-sky-50 text-sky-800 border-sky-200", dot: "bg-sky-500" },
+  "Internship": { pill: "bg-rose-50 text-rose-800 border-rose-200", dot: "bg-rose-400" },
 };
 
 function timeAgo(dateStr) {
-  if (!dateStr) return "Recently";
+  if (!dateStr) return "Recently posted";
   const diff = Date.now() - new Date(dateStr).getTime();
   const days = Math.floor(diff / 86400000);
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days < 7) return `${days}d ago`;
-  if (days < 30) return `${Math.floor(days / 7)}w ago`;
-  return new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  if (days === 0) return "Posted today";
+  if (days === 1) return "Posted yesterday";
+  if (days < 7) return `Posted ${days}d ago`;
+  if (days < 30) return `Posted ${Math.floor(days / 7)}w ago`;
+  return `Posted ${new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`;
 }
 
-// Generate a consistent color from company name
-function companyColor(name) {
-  const colors = [
-    ["#1d4ed8", "#dbeafe"], // blue
-    ["#047857", "#d1fae5"], // green
-    ["#7c3aed", "#ede9fe"], // purple
-    ["#dc2626", "#fee2e2"], // red
-    ["#d97706", "#fef3c7"], // amber
-    ["#0891b2", "#cffafe"], // cyan
-    ["#be185d", "#fce7f3"], // pink
-    ["#065f46", "#d1fae5"], // emerald
+function companyInitials(name) {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(w => w[0]?.toUpperCase() || "")
+    .join("");
+}
+
+// Deterministic soft palette — muted enough to feel professional
+function companyPalette(name) {
+  const palettes = [
+    { bg: "#EEF2FF", text: "#3730A3", border: "#C7D2FE" }, // indigo
+    { bg: "#F0FDF4", text: "#166534", border: "#BBF7D0" }, // green
+    { bg: "#FDF4FF", text: "#6B21A8", border: "#E9D5FF" }, // purple
+    { bg: "#FFF7ED", text: "#9A3412", border: "#FED7AA" }, // orange
+    { bg: "#F0F9FF", text: "#075985", border: "#BAE6FD" }, // sky
+    { bg: "#FFF1F2", text: "#9F1239", border: "#FECDD3" }, // rose
+    { bg: "#F7FEE7", text: "#3F6212", border: "#D9F99D" }, // lime
+    { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" }, // amber
   ];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  return colors[Math.abs(hash) % colors.length];
+  return palettes[Math.abs(hash) % palettes.length];
 }
 
-// Different sources expose salary differently — a plain string (manual jobs,
-// Remotive), a min/max range (Jobicy, JSearch, Adzuna), or nothing at all.
 function formatSalary(job) {
   if (job.salary && typeof job.salary === "string") return job.salary;
   const min = job.annualSalaryMin ?? job.job_min_salary ?? job.salary_min;
@@ -50,8 +56,7 @@ function formatSalary(job) {
   return null;
 }
 
-// Strip any HTML and collapse whitespace for a clean card preview.
-function excerpt(text, max = 130) {
+function excerpt(text, max = 110) {
   if (!text) return "";
   const plain = String(text).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
   if (plain.length <= max) return plain;
@@ -59,104 +64,127 @@ function excerpt(text, max = 130) {
 }
 
 export default function JobCard({ job }) {
-  const title = String(job.title || job.job_title || "Job Title");
-  const company = String(job.company || job.company_name || job.employer_name || "Company");
+  const title    = String(job.title || job.job_title || "Job Title");
+  const company  = String(job.company || job.company_name || job.employer_name || "Company");
   const location = String(job.location || job.candidate_required_location || job.job_city || "Worldwide");
-  const jobType = String(job.type || job.job_type || job.employment_type || "Full-time");
-  const source = String(job.source || "");
-  const jobId = job.id || job.job_id || encodeURIComponent(title);
-  const posted = timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc);
+  const jobType  = String(job.type || job.job_type || job.employment_type || "Full-time");
+  const source   = String(job.source || "");
+  const jobId    = job.id || job.job_id || encodeURIComponent(title);
+  const posted   = timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc);
   const isRemote = location.toLowerCase().includes("remote") || jobType.toLowerCase().includes("remote");
-  const [fg, bg] = companyColor(company);
-  const logoUrl = job.companyLogo || job.company_logo || job.employer_logo || job.companyLogo_url;
-  const salary = formatSalary(job);
+  const palette  = companyPalette(company);
+  const logoUrl  = job.companyLogo || job.company_logo || job.employer_logo || job.companyLogo_url;
+  const salary   = formatSalary(job);
   const isFeatured = Boolean(job.featured);
-  const preview = excerpt(job.description || job.job_description);
+  const preview  = excerpt(job.description || job.job_description);
+  const typeStyle = TYPE_STYLES[jobType] || { pill: "bg-gray-50 text-gray-700 border-gray-200", dot: "bg-gray-400" };
+  const initials  = companyInitials(company);
 
   return (
-    <Link href={`/job/${jobId}`} onClick={() => saveJob(jobId, job)}
-      className="group relative bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-blue-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
+    <Link
+      href={`/job/${jobId}`}
+      onClick={() => saveJob(jobId, job)}
+      className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-blue-300 hover:shadow-[0_4px_24px_rgba(59,130,246,0.10)] transition-all duration-200 flex flex-col"
+    >
+      {/* Featured ribbon */}
+      {isFeatured && (
+        <div className="absolute top-3.5 right-3.5 z-10 flex items-center gap-1 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+          <Star size={9} className="fill-amber-900" /> Featured
+        </div>
+      )}
 
-      {/* Colored accent strip, unique per company */}
-      <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${fg}, ${bg})` }} />
+      <div className="p-5 flex flex-col gap-4 flex-1">
 
-      <div className="p-5 flex flex-col gap-3.5 flex-1">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3">
-            {/* Company logo */}
+        {/* ── Company row ── */}
+        <div className="flex items-start gap-3.5">
+          {/* Logo / initials badge */}
+          <div className="flex-shrink-0 relative">
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={logoUrl}
                 alt={company}
-                className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-gray-100 bg-white"
-                onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
+                className="w-11 h-11 rounded-lg object-contain border border-gray-100 bg-white p-0.5"
+                onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
               />
             ) : null}
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg flex-shrink-0 border"
-              style={{ backgroundColor: bg, color: fg, borderColor: bg, display: logoUrl ? "none" : "flex" }}
+              className="w-11 h-11 rounded-lg flex items-center justify-center text-sm font-bold border flex-shrink-0"
+              style={{
+                backgroundColor: palette.bg,
+                color: palette.text,
+                borderColor: palette.border,
+                display: logoUrl ? "none" : "flex",
+              }}
             >
-              {company.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium">{company}</p>
-              <h3 className="font-semibold text-gray-900 text-base leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
-                {title}
-              </h3>
+              {initials}
             </div>
           </div>
-          {/* Bookmark placeholder */}
-          <div className="text-gray-300 group-hover:text-blue-400 transition-colors flex-shrink-0 mt-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
-            </svg>
+
+          {/* Title + company */}
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-medium text-gray-500 truncate mb-0.5 flex items-center gap-1">
+              <Building2 size={10} className="flex-shrink-0" />
+              {company}
+            </p>
+            <h3 className="font-semibold text-gray-900 text-[15px] leading-snug group-hover:text-blue-700 transition-colors line-clamp-2">
+              {title}
+            </h3>
           </div>
         </div>
 
+        {/* ── Description preview ── */}
         {preview && (
-          <p className="text-sm text-gray-500 leading-snug line-clamp-2">{preview}</p>
+          <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 -mt-1">{preview}</p>
         )}
 
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2">
-          {isFeatured && (
-            <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-amber-50 text-amber-700 border-amber-200">
-              <Star size={10} className="fill-amber-500 text-amber-500" /> Featured
-            </span>
-          )}
-          <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${TAG_COLORS[jobType] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
+        {/* ── Tag row ── */}
+        <div className="flex flex-wrap gap-1.5">
+          {/* Employment type */}
+          <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${typeStyle.pill}`}>
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${typeStyle.dot}`} />
             {jobType}
           </span>
-          {isRemote && (
-            <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
-              <Wifi size={10} /> Remote
+
+          {isRemote && !jobType.toLowerCase().includes("remote") && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border bg-sky-50 text-sky-800 border-sky-200">
+              <Wifi size={9} /> Remote
             </span>
           )}
+
           {salary && (
-            <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-green-50 text-green-700 border-green-200">
-              <Banknote size={10} /> {salary}
-            </span>
-          )}
-          {source && (
-            <span className="text-xs text-gray-400 px-2.5 py-1 rounded-full border border-gray-100 bg-gray-50">
-              via {source}
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border bg-emerald-50 text-emerald-800 border-emerald-200">
+              <Banknote size={9} /> {salary}
             </span>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-3 mt-auto border-t border-gray-100">
-          <div className="flex items-center gap-3 text-xs text-gray-400">
-            <span className="flex items-center gap-1"><MapPin size={11} />{location.split(",")[0]}</span>
-            <span className="flex items-center gap-1"><Clock size={11} />{posted}</span>
+        {/* ── Footer row ── */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
+          <div className="flex items-center gap-3 text-[11px] text-gray-400">
+            <span className="flex items-center gap-1 font-medium">
+              <MapPin size={10} />
+              {location.split(",")[0]}
+            </span>
+            <span className="w-0.5 h-0.5 rounded-full bg-gray-300" />
+            <span className="flex items-center gap-1">
+              <Clock size={10} />
+              {posted}
+            </span>
           </div>
-          <span className="text-xs font-semibold text-blue-600 flex items-center gap-1 group-hover:gap-2 transition-all">
-            View Job <ArrowRight size={12} />
+
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 group-hover:text-blue-700 transition-colors">
+            Apply <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
           </span>
         </div>
       </div>
+
+      {/* Source strip at bottom — subtle, but adds legitimacy */}
+      {source && (
+        <div className="px-5 pb-3 -mt-1">
+          <span className="text-[10px] text-gray-300 font-medium">via {source}</span>
+        </div>
+      )}
     </Link>
   );
 }

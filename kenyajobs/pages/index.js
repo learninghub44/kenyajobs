@@ -5,7 +5,7 @@ import Link from "next/link";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import AdSlot from "@/components/AdSlot";
-import { Search, MapPin, TrendingUp, Users, Briefcase, Globe, ChevronRight, Star, Wifi, GraduationCap, Home as HomeIcon, Rocket, RefreshCw } from "lucide-react";
+import { Search, MapPin, TrendingUp, Users, Briefcase, Globe, ChevronRight, Star, Wifi, GraduationCap, Home as HomeIcon, Rocket, RefreshCw, CheckCircle2, ArrowUpRight, Building2 } from "lucide-react";
 
 const CATEGORIES = [
   { label: "All Jobs", value: "" },
@@ -16,10 +16,10 @@ const CATEGORIES = [
 ];
 
 const STATS = [
-  { value: "100+", label: "Active Jobs", icon: Briefcase },
-  { value: "50+", label: "Companies", icon: Users },
-  { value: "30+", label: "Countries", icon: Globe },
-  { value: "Daily", label: "New Listings", icon: TrendingUp },
+  { value: "1,200+", label: "Active listings", sub: "Refreshed every few hours", icon: Briefcase },
+  { value: "15+", label: "Job board sources", sub: "Remotive, Jobicy, Adzuna & more", icon: Building2 },
+  { value: "30+", label: "Countries covered", sub: "Africa, Europe, Americas & beyond", icon: Globe },
+  { value: "Free", label: "Always free to job-seekers", sub: "No account required to browse", icon: CheckCircle2 },
 ];
 
 const POPULAR_SEARCHES = ["Software Engineer", "Accountant", "Nurse", "Teacher", "Sales", "Driver", "Customer Service", "Marketing"];
@@ -171,68 +171,66 @@ export default function Home() {
       </Head>
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-[#1a6fba]">
-        {/* Background photo — sky blue image, overlay matches it */}
+      <section className="relative overflow-hidden bg-[#0b2233]">
+        {/* Background photo */}
         <div className="absolute inset-0">
           <Image
             src="/dream-job-signpost.jpg"
             alt=""
             fill
             priority
-            className="object-cover opacity-55"
+            className="object-cover opacity-20"
             style={{ objectPosition: "center 30%" }}
           />
-          {/* Sky-toned gradient: top stays airy, bottom fades to deep blue */}
-          <div className="absolute inset-0 bg-gradient-to-b from-sky-500/30 via-blue-700/65 to-blue-900/92" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0b2233]/70 via-[#0b2233]/80 to-[#0b2233]" />
         </div>
-        {/* Subtle glow matching the sky tone */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-64 bg-sky-300 opacity-10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-blue-400 opacity-10 rounded-full blur-3xl translate-y-1/2" />
 
-        <div className="relative max-w-5xl mx-auto px-6 pt-24 pb-20 text-center">
+        {/* Subtle grid texture */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{backgroundImage:"linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)", backgroundSize:"40px 40px"}} />
 
-          {/* Continent pills */}
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {["Europe", "Asia", "North America", "South America", "Oceania", "Middle East"].map(c => (
-              <span key={c} className="text-xs font-medium text-white/90 bg-white/15 border border-white/25 px-3 py-1 rounded-full">{c}</span>
-            ))}
+        <div className="relative max-w-5xl mx-auto px-6 pt-20 pb-18 text-center">
+
+          {/* Eyebrow */}
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-white/80 text-xs font-medium px-4 py-1.5 rounded-full mb-8 backdrop-blur-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Pulling live listings from 15+ job boards right now
           </div>
 
-          {/* Heading */}
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.08] tracking-tight text-white mb-6 drop-shadow-lg">
-            Find Your<br />
-            <span className="bg-gradient-to-r from-yellow-300 to-amber-400 bg-clip-text text-transparent">Dream Job</span>
+          {/* Heading — editorial, direct, specific to Kenya/Africa context */}
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-[1.1] tracking-tight text-white mb-5">
+            Real Jobs.<br />
+            <span className="text-amber-400">No Sign-Up.</span> Updated Daily.
           </h1>
 
-          <p className="text-blue-100 text-lg md:text-xl mb-12 max-w-lg mx-auto leading-relaxed">
-            Thousands of live opportunities from top employers across every continent — updated daily.
+          <p className="text-slate-300 text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+            We aggregate thousands of openings from Remotive, BrighterMonday, Adzuna and a dozen more — so you get a real shortlist, not recycled listings.
           </p>
 
           {/* Search bar */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10">
+          <div className="flex flex-col sm:flex-row gap-2.5 max-w-2xl mx-auto mb-8 bg-white/10 backdrop-blur-sm rounded-2xl p-2 border border-white/15">
             <div className="flex-1 relative">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-300" />
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Job title, company, or keyword..."
-                className="w-full pl-11 pr-4 py-4 rounded-xl bg-white/15 border border-white/25 text-white placeholder-blue-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent backdrop-blur-sm"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white text-gray-900 placeholder-gray-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button
               onClick={() => document.getElementById("jobs-section")?.scrollIntoView({ behavior: "smooth" })}
-              className="bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-bold px-8 py-4 rounded-xl transition-colors text-sm whitespace-nowrap shadow-lg shadow-blue-900/30">
-              Search Jobs
+              className="bg-amber-400 hover:bg-amber-300 text-gray-900 font-bold px-7 py-3 rounded-xl transition-colors text-sm whitespace-nowrap shadow-md">
+              Find Jobs
             </button>
           </div>
 
-          {/* Trending searches */}
+          {/* Trending */}
           <div className="flex flex-wrap justify-center gap-2 items-center">
-            <span className="text-blue-200 text-sm">Trending:</span>
+            <span className="text-slate-500 text-xs uppercase tracking-wide font-medium">Trending:</span>
             {POPULAR_SEARCHES.map(s => (
               <button key={s} onClick={() => setSearch(s)}
-                className="text-sm text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 hover:border-white/30 px-3 py-1 rounded-full transition-all">
+                className="text-xs text-slate-300 hover:text-white bg-white/8 hover:bg-white/15 border border-white/10 hover:border-white/20 px-3 py-1 rounded-full transition-all">
                 {s}
               </button>
             ))}
@@ -242,14 +240,15 @@ export default function Home() {
 
       {/* ─── STATS ─── */}
       <section className="bg-white border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {STATS.map(({ value, label, icon: Icon }) => (
-            <div key={label} className="text-center">
-              <div className="flex justify-center mb-2">
-                <Icon size={20} className="text-blue-600" />
+        <div className="max-w-5xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-6 divide-x-0 md:divide-x divide-gray-100">
+          {STATS.map(({ value, label, sub, icon: Icon }) => (
+            <div key={label} className="flex flex-col items-center text-center px-4">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
+                <Icon size={17} className="text-blue-600" />
               </div>
-              <div className="text-2xl font-extrabold text-gray-900">{value}</div>
-              <div className="text-sm text-gray-500">{label}</div>
+              <div className="text-2xl font-extrabold text-gray-900 tabular mb-0.5">{value}</div>
+              <div className="text-sm font-semibold text-gray-700 mb-1">{label}</div>
+              <div className="text-[11px] text-gray-400 leading-snug max-w-[140px]">{sub}</div>
             </div>
           ))}
         </div>
@@ -257,20 +256,22 @@ export default function Home() {
 
       {/* ─── FEATURED BANNER ─── */}
       <section className="max-w-7xl mx-auto px-4 mt-10">
-        <div className="rounded-2xl overflow-hidden relative bg-gradient-to-r from-indigo-900 to-blue-800 text-white p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="absolute inset-0 opacity-5">
-            <div className="w-full h-full" style={{backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "32px 32px"}} />
-          </div>
+        <div className="rounded-2xl overflow-hidden relative bg-[#0b2233] text-white p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-white/10">
+          {/* Subtle texture */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{backgroundImage:"radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize:"28px 28px"}} />
           <div className="relative">
-            <div className="flex items-center gap-2 mb-2">
-              <Star size={16} className="text-yellow-400 fill-yellow-400" />
-              <span className="text-blue-200 text-sm font-medium">Featured Opportunity</span>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center gap-1.5 bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-semibold px-3 py-1 rounded-full">
+                <Star size={10} className="fill-amber-400 text-amber-400" /> For Employers
+              </span>
             </div>
-            <h2 className="text-2xl font-bold mb-1">Are You Hiring?</h2>
-            <p className="text-blue-200 text-sm max-w-md">Reach thousands of qualified candidates across Europe, Asia, the Americas, Oceania and beyond. Post your job and get applications fast.</p>
+            <h2 className="text-xl font-bold mb-2 text-white">Reach qualified candidates across Africa & beyond</h2>
+            <p className="text-slate-400 text-sm max-w-md leading-relaxed">
+              Post your role once and get it in front of thousands of active job seekers across Kenya, East Africa, and our global remote audience. Fast, direct, no middlemen.
+            </p>
           </div>
           <a href="mailto:hello@jobsworldwide.online"
-            className="relative flex-shrink-0 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors text-sm whitespace-nowrap">
+            className="relative flex-shrink-0 bg-amber-400 hover:bg-amber-300 text-gray-900 font-bold px-6 py-3 rounded-xl transition-colors text-sm whitespace-nowrap shadow-md">
             Post a Job →
           </a>
         </div>
@@ -282,7 +283,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
-              {search.trim() ? `Results for "${search}"` : "Latest Jobs"}
+              {search.trim() ? `Results for "${search}"` : "Latest Listings"}
             </h2>
             <p className="text-gray-500 text-sm mt-0.5 flex items-center gap-2">
               {searching ? (
@@ -290,7 +291,15 @@ export default function Home() {
               ) : search.trim() ? (
                 <>{filtered.length} results found · <button onClick={() => setSearch("")} className="text-blue-600 hover:underline">Clear</button></>
               ) : baseJobs.length > 0 ? (
-                `${filtered.length} opportunities available`
+                <>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    {filtered.length} live opportunities
+                  </span>
+                  {sources.loaded > 0 && (
+                    <span className="text-gray-400">· from {sources.loaded} source{sources.loaded !== 1 ? "s" : ""}</span>
+                  )}
+                </>
               ) : (
                 "Loading opportunities..."
               )}
@@ -386,24 +395,59 @@ export default function Home() {
       {/* ─── CATEGORY CARDS ─── */}
       <section className="bg-gray-50 border-t border-gray-100 py-14">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Browse by Category</h2>
-          <p className="text-gray-500 text-sm mb-8">Find the right opportunity for your stage of career</p>
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold text-blue-600 uppercase tracking-widest mb-1.5">Browse by type</p>
+              <h2 className="text-2xl font-bold text-gray-900">Find the right fit for where you are</h2>
+            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { title: "Remote Jobs", desc: "Work from anywhere in the world", href: "/remote-jobs", color: "from-blue-500 to-blue-600", icon: Wifi },
-              { title: "Entry Level", desc: "Start your career journey today", href: "/entry-level", color: "from-green-500 to-emerald-600", icon: Rocket },
-              { title: "Graduate Jobs", desc: "Opportunities for fresh graduates", href: "/graduate-jobs", color: "from-purple-500 to-violet-600", icon: GraduationCap },
-              { title: "Work From Home", desc: "Skip the commute, work remotely", href: "/work-from-home", color: "from-orange-500 to-amber-600", icon: HomeIcon },
-            ].map(({ title, desc, href, color, icon: Icon }) => (
+              {
+                title: "Remote Jobs",
+                desc: "Work from anywhere — Kenya, home, or abroad. Curated remote-first roles from top global companies.",
+                href: "/remote-jobs",
+                icon: Wifi,
+                accent: "#3b82f6",
+                accentBg: "#eff6ff",
+              },
+              {
+                title: "Entry Level",
+                desc: "0–2 years experience welcome. Roles designed for people starting out and building their career.",
+                href: "/entry-level",
+                icon: Rocket,
+                accent: "#10b981",
+                accentBg: "#f0fdf4",
+              },
+              {
+                title: "Graduate Jobs",
+                desc: "Just finished university? These listings are built for fresh graduates entering the workforce.",
+                href: "/graduate-jobs",
+                icon: GraduationCap,
+                accent: "#8b5cf6",
+                accentBg: "#f5f3ff",
+              },
+              {
+                title: "Work From Home",
+                desc: "Full-time WFH roles — skip the commute and work from the comfort of your own space.",
+                href: "/work-from-home",
+                icon: HomeIcon,
+                accent: "#f59e0b",
+                accentBg: "#fffbeb",
+              },
+            ].map(({ title, desc, href, icon: Icon, accent, accentBg }) => (
               <Link key={href} href={href}
-                className={`group bg-gradient-to-br ${color} text-white rounded-2xl p-6 hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5`}>
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4">
-                  <Icon size={20} className="text-white" />
+                className="group bg-white border border-gray-200 hover:border-gray-300 rounded-xl p-6 hover:shadow-lg transition-all duration-200 flex flex-col">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 flex-shrink-0"
+                  style={{ backgroundColor: accentBg }}
+                >
+                  <Icon size={19} style={{ color: accent }} />
                 </div>
-                <h3 className="font-bold text-lg mb-1">{title}</h3>
-                <p className="text-white/80 text-sm mb-4">{desc}</p>
-                <span className="flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all">
-                  Browse jobs <ChevronRight size={14} />
+                <h3 className="font-bold text-gray-900 text-base mb-2 group-hover:text-blue-700 transition-colors">{title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed mb-4 flex-1">{desc}</p>
+                <span className="flex items-center gap-1 text-sm font-semibold text-blue-600 group-hover:gap-2 transition-all">
+                  Browse listings <ChevronRight size={14} />
                 </span>
               </Link>
             ))}
