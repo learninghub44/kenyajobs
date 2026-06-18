@@ -237,10 +237,6 @@ async function fetchKenyaJobs() {
     { url: "https://kenyanjobsearch.com/feed/",                source: "KenyanJobSearch",     location: "Kenya" },
     { url: "https://www.humaniplex.com/rss/jobs-in-kenya.xml", source: "Humaniplex KE",      location: "Kenya" },
     { url: "https://www.developmentaid.org/rss/jobs/kenya",    source: "DevelopmentAid KE",  location: "Kenya" },
-    { url: "https://vacancykenya.co.ke/feed/",                 source: "VacancyKenya",        location: "Kenya" },
-    { url: "https://kenyansconsult.co.ke/feed/",               source: "KenyanSconsult",      location: "Kenya" },
-    { url: "https://joblistkenya.com/feed/",                   source: "JobListKenya",        location: "Kenya" },
-    { url: "https://www.careerpoint.co.ke/feed/",              source: "CareerPoint KE",      location: "Kenya" },
   ];
   const results = await Promise.allSettled(
     kenyaFeeds.map(({ url, source, location }) =>
@@ -250,7 +246,10 @@ async function fetchKenyaJobs() {
       )
         .then(r => r.ok ? r.json() : { items: [] })
         .then(d => {
-          if (d.status !== "ok") return [];
+          if (d.status !== "ok") {
+            console.warn(`JobsWorldwide: Kenya feed "${source}" via rss2json returned status "${d.status}"`);
+            return [];
+          }
           return (d.items || []).map(j => ({
             id: `ke-${source.toLowerCase().replace(/\s+/g, "-")}-${hashId(j.link || j.title)}`,
             title: String(j.title || ""),
@@ -263,7 +262,7 @@ async function fetchKenyaJobs() {
             source,
           })).filter(j => j.title && j.url);
         })
-        .catch(() => [])
+        .catch(err => { console.warn(`JobsWorldwide: Kenya feed "${source}" failed — ${err.message}`); return []; }),
     )
   );
   return results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
@@ -331,10 +330,10 @@ export default async function handler(req, res) {
     fetchViaRss2Json(),
     fetchKenyaJobs(),
     ...RSS_FEEDS.map(({ url, source }) =>
-      fetchWithTimeout(url, { headers }, 3000)
+      fetchWithTimeout(url, { headers }, 7000)
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
         .then(xml => parseRSS(xml, source))
-        .catch(() => [])
+        .catch(err => { console.warn(`JobsWorldwide: RSS feed "${source}" failed — ${err.message}`); return []; }),
     ),
   ]);
 

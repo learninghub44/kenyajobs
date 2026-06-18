@@ -24,6 +24,21 @@ const STATS = [
 
 const POPULAR_SEARCHES = ["Software Engineer", "Accountant", "Nurse", "Teacher", "Sales", "Driver", "Customer Service", "Marketing"];
 
+// /api/africa-jobs mixes ~30 global remote-job sources (which post very frequently) with
+// Kenya-specific RSS feeds (which post much less often). Sorting everything by date and
+// taking the top N — as the API itself does — means the high-volume global sources can
+// flood out every Kenya listing before it ever reaches the homepage. Reserve half the
+// slice for Kenya/local jobs specifically so they're never crowded out by source volume.
+function prioritizeLocal(items, sliceCount, keyword = "kenya") {
+  const isLocal = (j) =>
+    String(j.location || "").toLowerCase().includes(keyword) ||
+    String(j.source || "").toLowerCase().includes(keyword);
+  const local = items.filter(isLocal);
+  const other = items.filter((j) => !isLocal(j));
+  const localQuota = Math.min(local.length, Math.ceil(sliceCount / 2));
+  return [...local.slice(0, localQuota), ...other.slice(0, sliceCount - localQuota)];
+}
+
 export default function Home() {
   const [baseJobs, setBaseJobs]       = useState([]);   // jobs loaded on mount
   const [searchJobs, setSearchJobs]   = useState([]);   // live search results
@@ -36,9 +51,14 @@ export default function Home() {
   const [refreshing, setRefreshing]   = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  const mergeJobs = (prev, incoming) => {
+  const mergeJobs = (prev, incoming, prioritize = false) => {
     const ids = new Set(prev.map(j => j.id));
-    return [...prev, ...incoming.filter(j => !ids.has(j.id))].slice(0, 60);
+    const fresh = incoming.filter(j => !ids.has(j.id));
+    // Africa/Kenya results are appended after every other source's fetch finishes (it
+    // aggregates 13 sub-sources internally, so it's typically the slowest of the six
+    // parallel calls). Appending as usual risks the 60-item cap already being full by
+    // then. Prepending guarantees they survive the slice regardless of arrival order.
+    return (prioritize ? [...fresh, ...prev] : [...prev, ...fresh]).slice(0, 60);
   };
 
   const refreshJobs = async () => {
@@ -46,18 +66,19 @@ export default function Home() {
     setRefreshing(true);
     setBaseJobs([]);
     setSources({ loaded: 0, total: 6 });
-    const fetchSource = async (url, sliceCount) => {
+    const fetchSource = async (url, sliceCount, label) => {
       try {
         const res = await fetch(url + "?bust=" + Date.now());
         if (!res.ok) return;
         const data = await res.json();
-        const items = Array.isArray(data) ? data.slice(0, sliceCount) : [];
-        if (items.length > 0) setBaseJobs(prev => mergeJobs(prev, items));
+        const raw = Array.isArray(data) ? data : [];
+        const items = label === "Africa" ? prioritizeLocal(raw, sliceCount) : raw.slice(0, sliceCount);
+        if (items.length > 0) setBaseJobs(prev => mergeJobs(prev, items, label === "Africa"));
       } catch {}
       finally { setSources(prev => ({ ...prev, loaded: prev.loaded + 1 })); }
     };
     await Promise.allSettled([
-      fetchSource("/api/africa-jobs", 20),
+      fetchSource("/api/africa-jobs", 20, "Africa"),
       fetchSource("/api/remote-jobs", 15),
       fetchSource("/api/entry-level-jobs", 8),
       fetchSource("/api/graduate-jobs", 8),
@@ -76,9 +97,10 @@ export default function Home() {
         const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) throw new Error(`${label}: HTTP ${res.status}`);
         const data = await res.json();
-        const items = Array.isArray(data) ? data.slice(0, sliceCount) : [];
+        const raw = Array.isArray(data) ? data : [];
+        const items = label === "Africa" ? prioritizeLocal(raw, sliceCount) : raw.slice(0, sliceCount);
         if (items.length > 0) {
-          setBaseJobs(prev => mergeJobs(prev, items));
+          setBaseJobs(prev => mergeJobs(prev, items, label === "Africa"));
           setLoading(false);
         }
       } catch (e) {
@@ -104,12 +126,11 @@ export default function Home() {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     if (!search.trim()) {
-      setSearchJobs([]);
-      setSearching(false);
+      (function clearSearch() { setSearchJobs([]); setSearching(false); })();
       return;
     }
 
-    setSearching(true);
+    (function startSearching() { setSearching(true); })();
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/search-jobs?query=${encodeURIComponent(search.trim())}`);

@@ -113,7 +113,10 @@ export default function AIAssistant() {
   const [isSpeaking, setIsSpeaking]     = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [transcript, setTranscript]     = useState("");
-  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [voiceSupported] = useState(() =>
+    typeof window !== "undefined" &&
+    ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)
+  );
 
   const messagesEndRef = useRef(null);
   const inputRef       = useRef(null);
@@ -121,13 +124,6 @@ export default function AIAssistant() {
   const synthRef       = useRef(null);
 
   const messages = allMessages[activeTab];
-
-  // Check browser support for speech recognition
-  useEffect(() => {
-    const hasSpeech = typeof window !== "undefined" &&
-      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
-    setVoiceSupported(hasSpeech);
-  }, []);
 
   useEffect(() => {
     if (open && !minimized) {
@@ -141,7 +137,7 @@ export default function AIAssistant() {
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => { setInput(""); }, [activeTab]);
+  useEffect(() => { (function clearInputOnTabChange() { setInput(""); })(); }, [activeTab]);
 
   // Stop speech when assistant closes
   useEffect(() => {
