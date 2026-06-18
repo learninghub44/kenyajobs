@@ -122,14 +122,11 @@ export default function AIAssistant() {
 
   const messages = allMessages[activeTab];
 
-  // Check browser support
+  // Check browser support for speech recognition
   useEffect(() => {
     const hasSpeech = typeof window !== "undefined" &&
       ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
     setVoiceSupported(hasSpeech);
-    if (typeof window !== "undefined") {
-      synthRef.current = window.speechSynthesis;
-    }
   }, []);
 
   useEffect(() => {
@@ -151,19 +148,18 @@ export default function AIAssistant() {
     if (!open && synthRef.current) synthRef.current.cancel();
   }, [open]);
 
-  // ── Text-to-speech: Puter.js → ElevenLabs neural (free, no API key) ────────
-  const audioRef = useRef(null);
-  const puterReadyRef = useRef(false);
+  // ── Text-to-speech: Web Speech API with best available voice ──────────────
+  const voicesRef = useRef([]);
 
-  // Load Puter.js once
+  // Pre-load voices list (needed on some browsers)
   useEffect(() => {
-    if (typeof window === "undefined" || puterReadyRef.current) return;
-    if (window.puter) { puterReadyRef.current = true; return; }
-    const s = document.createElement("script");
-    s.src = "https://js.puter.com/v2/";
-    s.async = true;
-    s.onload = () => { puterReadyRef.current = true; };
-    document.head.appendChild(s);
+    if (typeof window === "undefined") return;
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    synthRef.current = synth;
+    const load = () => { voicesRef.current = synth.getVoices(); };
+    load();
+    synth.onvoiceschanged = load;
   }, []);
 
   const cleanText = (text) => text
@@ -175,65 +171,71 @@ export default function AIAssistant() {
     .replace(/^\s*\d+\.\s/gm, "")
     .replace(/\n{2,}/g, ". ")
     .replace(/\n/g, " ")
+    .replace(/\s+/g, " ")
     .trim()
     .slice(0, 900);
 
   const stopSpeaking = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-      audioRef.current = null;
-    }
     synthRef.current?.cancel();
     setIsSpeaking(false);
   }, []);
 
-  const speakWithBrowser = useCallback((text) => {
-    if (!synthRef.current) return;
-    synthRef.current.cancel();
-    const utt = new SpeechSynthesisUtterance(cleanText(text));
-    utt.rate = 1.0; utt.pitch = 1.0; utt.volume = 1.0;
-    const voices = synthRef.current.getVoices();
-    const preferred = voices.find(v =>
-      v.name.includes("Google UK English Female") ||
-      v.name.includes("Samantha") || v.name.includes("Karen") ||
-      v.lang === "en-GB" || v.lang === "en-US"
-    );
-    if (preferred) utt.voice = preferred;
-    utt.onstart = () => setIsSpeaking(true);
-    utt.onend   = () => setIsSpeaking(false);
-    utt.onerror = () => setIsSpeaking(false);
-    synthRef.current.speak(utt);
-  }, []);
-
-  const speak = useCallback(async (text) => {
-    if (!voiceEnabled) return;
-    stopSpeaking();
-    const clean = cleanText(text);
-
-    // Try Puter.js ElevenLabs (free, human-quality, no API key)
-    if (typeof window !== "undefined" && window.puter) {
-      try {
-        setIsSpeaking(true);
-        const audio = await window.puter.ai.txt2speech(clean, {
-          provider: "elevenlabs",
-          voice: "21m00Tcm4TlvDq8ikWAM",   // Rachel — warm natural female
-          model: "eleven_multilingual_v2",
-        });
-        audioRef.current = audio;
-        audio.onended = () => { setIsSpeaking(false); audioRef.current = null; };
-        audio.onerror = () => { setIsSpeaking(false); speakWithBrowser(text); };
-        audio.play();
-        return;
-      } catch {
-        setIsSpeaking(false);
-        // Fall through to browser TTS
-      }
+  // Pick the most natural-sounding voice available
+  const getBestVoice = () => {
+    const voices = voicesRef.current;
+    if (!voices.length) return null;
+    // Priority order — most human-sounding first
+    const priority = [
+      v => v.name === "Google UK English Female",
+      v => v.name === "Google US English",
+      v => v.name === "Samantha",
+      v => v.name === "Karen",
+      v => v.name === "Daniel",
+      v => v.name === "Moira",
+      v => v.name.includes("Google") && v.lang.startsWith("en"),
+      v => v.lang === "en-GB",
+      v => v.lang === "en-US",
+      v => v.lang.startsWith("en"),
+    ];
+    for (const test of priority) {
+      const match = voices.find(test);
+      if (match) return match;
     }
+    return voices[0];
+  };
 
-    // Browser TTS fallback
-    speakWithBrowser(text);
-  }, [voiceEnabled, stopSpeaking, speakWithBrowser]);
+  const speak = useCallback((text) => {
+    if (!voiceEnabled || !synthRef.current) return;
+    stopSpeaking();
+
+    const clean = cleanText(text);
+    // Split into natural sentence chunks to avoid cut-off on long text
+    const sentences = clean.match(/[^.!?]+[.!?]*/g) || [clean];
+    const chunks = [];
+    let current = "";
+    for (const s of sentences) {
+      if ((current + s).length > 200) { if (current) chunks.push(current.trim()); current = s; }
+      else current += s;
+    }
+    if (current.trim()) chunks.push(current.trim());
+
+    let idx = 0;
+    const speakChunk = () => {
+      if (idx >= chunks.length) { setIsSpeaking(false); return; }
+      const utt = new SpeechSynthesisUtterance(chunks[idx++]);
+      const voice = getBestVoice();
+      if (voice) utt.voice = voice;
+      utt.rate   = 0.95;   // Slightly slower = more natural
+      utt.pitch  = 1.05;   // Slight warmth
+      utt.volume = 1.0;
+      utt.lang   = "en-GB";
+      utt.onstart = () => setIsSpeaking(true);
+      utt.onend   = speakChunk;
+      utt.onerror = () => setIsSpeaking(false);
+      synthRef.current.speak(utt);
+    };
+    speakChunk();
+  }, [voiceEnabled, stopSpeaking]);
 
   // ── Speech-to-text ──────────────────────────────────────────────────────────
   const startListening = useCallback(() => {
