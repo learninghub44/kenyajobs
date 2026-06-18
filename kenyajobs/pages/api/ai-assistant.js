@@ -1,7 +1,6 @@
-// pages/api/ai-assistant.js
 import OpenAI from "openai";
 
-const SYSTEM_PROMPT = `You are a friendly and expert job search assistant for JobsWorldwide, a global job board. 
+const SYSTEM_PROMPT = `You are a friendly and expert job search assistant for JobsWorldwide, a global job board.
 You help job seekers with:
 - Finding the right jobs based on their skills and experience
 - Writing and improving CVs/resumes
@@ -21,19 +20,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { messages } = req.body;
+  const key = process.env.GROQ_API_KEY;
 
+  if (!key) {
+    console.error("GROQ_API_KEY is not set in environment variables");
+    return res.status(500).json({ error: "AI assistant is not configured. GROQ_API_KEY missing." });
+  }
+
+  const { messages } = req.body;
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: "Invalid messages" });
   }
 
-  if (!process.env.GROQ_API_KEY) {
-    return res.status(500).json({ error: "AI assistant is not configured." });
-  }
-
   try {
     const client = new OpenAI({
-      apiKey: process.env.GROQ_API_KEY,
+      apiKey: key,
       baseURL: "https://api.groq.com/openai/v1",
     });
 
@@ -41,16 +42,16 @@ export default async function handler(req, res) {
       model: "llama3-8b-8192",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
-        ...messages.slice(-10), // keep last 10 messages for context
+        ...messages.slice(-10),
       ],
-      max_tokens: 500,
+      max_tokens: 600,
       temperature: 0.7,
     });
 
     const reply = completion.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
-    res.status(200).json({ reply });
+    return res.status(200).json({ reply });
   } catch (err) {
-    console.error("AI assistant error:", err.message);
-    res.status(500).json({ error: "Failed to get AI response. Please try again." });
+    console.error("Groq API error:", err?.message || err);
+    return res.status(500).json({ error: "AI service error: " + (err?.message || "Unknown error") });
   }
 }
