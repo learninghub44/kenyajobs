@@ -12,15 +12,25 @@ function hashId(input) {
 }
 
 const RSS_FEEDS = [
-  { url: "https://www.brightermonday.co.ke/listings.rss",   source: "BrighterMonday KE" },
-  { url: "https://www.myjobmag.co.ke/rss-jobs.xml",         source: "MyJobMag KE" },
-  { url: "https://www.brightermonday.co.ug/listings.rss",   source: "BrighterMonday UG" },
-  { url: "https://www.brightermonday.co.tz/listings.rss",   source: "BrighterMonday TZ" },
-  { url: "https://www.myjobmag.com/rss-jobs.xml",           source: "MyJobMag NG" },
-  { url: "https://www.myjobmag.co.za/rss-jobs.xml",         source: "MyJobMag SA" },
-  { url: "https://www.pnet.co.za/rss/jobs.xml",             source: "PNet SA" },
-  { url: "https://www.wuzzuf.net/feed/jobs",                source: "Wuzzuf EG" },
-  { url: "https://www.fuzu.com/feed",                       source: "Fuzu" },
+  // ── Kenya ──────────────────────────────────────────────────────────────────
+  { url: "https://www.brightermonday.co.ke/listings.rss",        source: "BrighterMonday KE",  location: "Kenya" },
+  { url: "https://www.myjobmag.co.ke/rss-jobs.xml",              source: "MyJobMag KE",         location: "Kenya" },
+  { url: "https://vacancykenya.co.ke/feed/",                     source: "VacancyKenya",        location: "Kenya" },
+  { url: "https://kenyansconsult.co.ke/feed/",                   source: "KenyanSconsult",      location: "Kenya" },
+  { url: "https://www.kenyajobsearch.co.ke/feed/",               source: "KenyaJobSearch",      location: "Kenya" },
+  { url: "https://jobsinkenya.co.ke/feed/",                      source: "JobsInKenya",         location: "Kenya" },
+  { url: "https://joblistkenya.com/feed/",                       source: "JobListKenya",        location: "Kenya" },
+  { url: "https://www.careerpoint.co.ke/feed/",                  source: "CareerPoint KE",      location: "Kenya" },
+  { url: "https://natkelp.go.ke/feed/",                          source: "Natkelp Gov",         location: "Kenya" },
+  // ── East Africa ─────────────────────────────────────────────────────────────
+  { url: "https://www.brightermonday.co.ug/listings.rss",        source: "BrighterMonday UG",  location: "Uganda" },
+  { url: "https://www.brightermonday.co.tz/listings.rss",        source: "BrighterMonday TZ",  location: "Tanzania" },
+  { url: "https://www.fuzu.com/feed",                            source: "Fuzu EA",             location: "East Africa" },
+  // ── Rest of Africa ──────────────────────────────────────────────────────────
+  { url: "https://www.myjobmag.com/rss-jobs.xml",                source: "MyJobMag NG",        location: "Nigeria" },
+  { url: "https://www.myjobmag.co.za/rss-jobs.xml",              source: "MyJobMag SA",        location: "South Africa" },
+  { url: "https://www.pnet.co.za/rss/jobs.xml",                  source: "PNet SA",            location: "South Africa" },
+  { url: "https://www.wuzzuf.net/feed/jobs",                     source: "Wuzzuf EG",          location: "Egypt" },
 ];
 
 function parseRSS(xml, source, defaultLocation) {
@@ -216,10 +226,51 @@ async function fetchHimalayas() {
 }
 
 // rss2json proxy for feeds that block server-side requests
+// Dedicated Kenya fetcher via rss2json proxy
+async function fetchKenyaJobs() {
+  const kenyaFeeds = [
+    { url: "https://www.jobwebkenya.com/feed/",                source: "Jobweb Kenya",        location: "Kenya" },
+    { url: "https://kenyacurrent.com/category/jobs/feed/",     source: "Kenya Current",       location: "Kenya" },
+    { url: "https://www.corporatestaffing.co.ke/feed/",        source: "Corporate Staffing",  location: "Kenya" },
+    { url: "https://turinjobs.com/feed/",                      source: "TurinJobs KE",        location: "Kenya" },
+    { url: "https://jobsikaz.com/feed/",                       source: "JobSiKaz",            location: "Kenya" },
+    { url: "https://kenyanjobsearch.com/feed/",                source: "KenyanJobSearch",     location: "Kenya" },
+    { url: "https://www.humaniplex.com/rss/jobs-in-kenya.xml", source: "Humaniplex KE",      location: "Kenya" },
+    { url: "https://www.developmentaid.org/rss/jobs/kenya",    source: "DevelopmentAid KE",  location: "Kenya" },
+    { url: "https://vacancykenya.co.ke/feed/",                 source: "VacancyKenya",        location: "Kenya" },
+    { url: "https://kenyansconsult.co.ke/feed/",               source: "KenyanSconsult",      location: "Kenya" },
+    { url: "https://joblistkenya.com/feed/",                   source: "JobListKenya",        location: "Kenya" },
+    { url: "https://www.careerpoint.co.ke/feed/",              source: "CareerPoint KE",      location: "Kenya" },
+  ];
+  const results = await Promise.allSettled(
+    kenyaFeeds.map(({ url, source, location }) =>
+      fetchWithTimeout(
+        `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=20`,
+        {}, 6000
+      )
+        .then(r => r.ok ? r.json() : { items: [] })
+        .then(d => {
+          if (d.status !== "ok") return [];
+          return (d.items || []).map(j => ({
+            id: `ke-${source.toLowerCase().replace(/\s+/g, "-")}-${hashId(j.link || j.title)}`,
+            title: String(j.title || ""),
+            company: String(j.author || source),
+            location,
+            type: "Full-time",
+            date: j.pubDate ? new Date(j.pubDate).toISOString() : new Date().toISOString(),
+            url: String(j.link || j.guid || ""),
+            description: (j.description || "").replace(/<[^>]*>/g, "").trim().slice(0, 500),
+            source,
+          })).filter(j => j.title && j.url);
+        })
+        .catch(() => [])
+    )
+  );
+  return results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
+}
+
 async function fetchViaRss2Json() {
   const feeds = [
-    { url: "https://www.brightermonday.co.ke/listings.rss", source: "BrighterMonday KE", location: "Kenya" },
-    { url: "https://www.jobwebkenya.com/feed/",             source: "Jobweb KE",          location: "Kenya" },
     { url: "https://www.careersportal.co.za/feed/",         source: "CareersPortal SA",   location: "South Africa" },
     { url: "https://ngcareers.com/feed/",                   source: "NGCareers",          location: "Nigeria" },
   ];
@@ -267,6 +318,7 @@ export default async function handler(req, res) {
     reliefWebResult,
     himalayasResult,
     rss2jsonResult,
+    kenyaResult,
     ...rssResults
   ] = await Promise.allSettled([
     fetchRemotive(),
@@ -277,6 +329,7 @@ export default async function handler(req, res) {
     fetchReliefWeb(),
     fetchHimalayas(),
     fetchViaRss2Json(),
+    fetchKenyaJobs(),
     ...RSS_FEEDS.map(({ url, source }) =>
       fetchWithTimeout(url, { headers }, 3000)
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
@@ -294,6 +347,7 @@ export default async function handler(req, res) {
     ...(reliefWebResult.status === "fulfilled"   ? reliefWebResult.value   : []),
     ...(himalayasResult.status === "fulfilled"   ? himalayasResult.value   : []),
     ...(rss2jsonResult.status === "fulfilled"    ? rss2jsonResult.value    : []),
+    ...(kenyaResult.status === "fulfilled"       ? kenyaResult.value       : []),
     ...rssResults.filter(r => r.status === "fulfilled").flatMap(r => r.value),
   ].filter(j => j.title && j.url);
 
