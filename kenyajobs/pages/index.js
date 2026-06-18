@@ -5,7 +5,7 @@ import Link from "next/link";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import AdSlot from "@/components/AdSlot";
-import { Search, MapPin, TrendingUp, Users, Briefcase, Globe, ChevronRight, Star, Wifi, GraduationCap, Home as HomeIcon, Rocket } from "lucide-react";
+import { Search, MapPin, TrendingUp, Users, Briefcase, Globe, ChevronRight, Star, Wifi, GraduationCap, Home as HomeIcon, Rocket, RefreshCw } from "lucide-react";
 
 const CATEGORIES = [
   { label: "All Jobs", value: "" },
@@ -33,10 +33,39 @@ export default function Home() {
   const [activeTab, setActiveTab]     = useState("");
   const [sources, setSources]         = useState({ loaded: 0, total: 6 });
   const debounceRef                   = useRef(null);
+  const [refreshing, setRefreshing]   = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const mergeJobs = (prev, incoming) => {
     const ids = new Set(prev.map(j => j.id));
     return [...prev, ...incoming.filter(j => !ids.has(j.id))].slice(0, 60);
+  };
+
+  const refreshJobs = async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    setBaseJobs([]);
+    setSources({ loaded: 0, total: 6 });
+    const fetchSource = async (url, sliceCount) => {
+      try {
+        const res = await fetch(url + "?bust=" + Date.now());
+        if (!res.ok) return;
+        const data = await res.json();
+        const items = Array.isArray(data) ? data.slice(0, sliceCount) : [];
+        if (items.length > 0) setBaseJobs(prev => mergeJobs(prev, items));
+      } catch {}
+      finally { setSources(prev => ({ ...prev, loaded: prev.loaded + 1 })); }
+    };
+    await Promise.allSettled([
+      fetchSource("/api/africa-jobs", 20),
+      fetchSource("/api/remote-jobs", 15),
+      fetchSource("/api/entry-level-jobs", 8),
+      fetchSource("/api/graduate-jobs", 8),
+      fetchSource("/api/wfh-jobs", 8),
+      fetchSource("/api/manual-jobs", 20),
+    ]);
+    setLastUpdated(new Date());
+    setRefreshing(false);
   };
 
   // ── Load base jobs on mount ──────────────────────────────────────────────
@@ -247,21 +276,45 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Category tabs */}
-          <div className="flex gap-2 flex-wrap">
-            {CATEGORIES.map(cat => (
-              <button key={cat.value}
-                onClick={() => setActiveTab(cat.value)}
-                className={`text-sm font-medium px-4 py-2 rounded-lg transition-all ${
-                  activeTab === cat.value
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}>
-                {cat.label}
-              </button>
-            ))}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            {/* Category tabs */}
+            <div className="flex gap-2 flex-wrap">
+              {CATEGORIES.map(cat => (
+                <button key={cat.value}
+                  onClick={() => setActiveTab(cat.value)}
+                  className={`text-sm font-medium px-4 py-2 rounded-lg transition-all ${
+                    activeTab === cat.value
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}>
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Refresh button */}
+            <button
+              onClick={refreshJobs}
+              disabled={refreshing}
+              title="Scan for new jobs"
+              className={`flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg border transition-all whitespace-nowrap ${
+                refreshing
+                  ? "bg-blue-50 border-blue-200 text-blue-500 cursor-wait"
+                  : "bg-white border-gray-200 text-gray-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50"
+              }`}
+            >
+              <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
+              {refreshing ? "Scanning..." : "Refresh Jobs"}
+            </button>
           </div>
         </div>
+
+        {/* Last updated */}
+        {lastUpdated && !refreshing && (
+          <p className="text-xs text-gray-400 -mt-3 mb-4 flex items-center gap-1">
+            <RefreshCw size={10} /> Last scanned: {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </p>
+        )}
 
         {/* Job grid */}
         {(loading && baseJobs.length === 0 && !search.trim()) && (
