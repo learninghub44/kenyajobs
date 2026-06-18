@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Globe, Search, ShieldCheck, Zap, Mail, Users, Briefcase,
@@ -71,12 +72,20 @@ export default function About() {
       </Head>
 
       {/* ── PAGE HEADER ── */}
-      <div className="bg-[#0b2233] text-white">
-        <div className="max-w-4xl mx-auto px-6 py-16">
+      <div className="relative bg-[#0b2233] text-white overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1400&q=80&auto=format&fit=crop"
+            alt="Team working together"
+            fill className="object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0b2233]/90 to-[#0b2233]/60" />
+        </div>
+        <div className="relative max-w-4xl mx-auto px-6 py-20">
           <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">About us</p>
           <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
             One place for every<br />
-            <span className="text-amber-400">job in Kenya & beyond.</span>
+            <span className="text-amber-400">job in Africa & beyond.</span>
           </h1>
           <p className="text-slate-300 text-lg max-w-xl leading-relaxed">
             JobsWorldwide is a free job aggregator built to save you hours of searching. We pull live listings from 15+ trusted boards across Kenya, East Africa, and global remote platforms — and surface them in one clean feed.
