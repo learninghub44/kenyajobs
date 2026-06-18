@@ -47,11 +47,22 @@
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 }
 
+html {
+  font-size: 18px; /* up from browser default 16px — makes all rem units larger */
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+/* Bump paragraph and list text */
+p, li, td, th, label, input, textarea, select, button {
+  font-size: inherit;
 }
 
 /* Tabular figures wherever board-style data is set in mono */

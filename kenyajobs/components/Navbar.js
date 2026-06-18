@@ -16,7 +16,7 @@ export default function Navbar() {
   return (
     <header>
       {/* Trust bar */}
-      <div className="bg-[#0b2233] text-white/70 text-[11px] py-1.5 px-4 hidden sm:block">
+      <div className="bg-[#0b2233] text-white/70 text-sm py-1.5 px-4 hidden sm:block">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
@@ -50,7 +50,7 @@ export default function Navbar() {
                 Home
               </Link>
               {NAV_LINKS.map(([label, href]) => (
-                <Link key={href} href={href} className="text-sm font-medium text-gray-500 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
+                <Link key={href} href={href} className="text-base font-medium text-gray-500 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
                   {label}
                 </Link>
               ))}
@@ -91,7 +91,7 @@ export default function Navbar() {
                 key={href}
                 href={href}
                 onClick={() => setMenuOpen(false)}
-                className="text-sm font-medium text-gray-700 px-3 py-2.5 rounded-lg hover:bg-gray-50 hover:text-gray-900"
+                className="text-base font-medium text-gray-700 px-3 py-2.5 rounded-lg hover:bg-gray-50 hover:text-gray-900"
               >
                 {label}
               </Link>

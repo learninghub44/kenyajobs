@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Shield, Globe, Rss, CheckCircle2 } from "lucide-react";
+import { Mail } from "lucide-react";
 
 const SOURCES = ["Remotive", "Jobicy", "Arbeitnow", "ReliefWeb", "BrighterMonday", "MyJobMag", "Adzuna"];
 
@@ -11,25 +11,21 @@ export default function Footer() {
       <div className="border-b border-white/10 py-5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 justify-center md:justify-between">
-            <div className="flex items-center gap-2 text-sm">
-              <CheckCircle2 size={14} className="text-emerald-400 flex-shrink-0" />
-              <span className="text-slate-300 font-medium">Verified job listings</span>
-              <span className="text-slate-500 text-xs">from 15+ trusted global sources</span>
+            <div className="text-base">
+              <span className="text-slate-300 font-semibold">Verified job listings</span>
+              <span className="text-slate-500"> — from 15+ trusted global sources</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Rss size={14} className="text-blue-400 flex-shrink-0" />
-              <span className="text-slate-300 font-medium">Live aggregation</span>
-              <span className="text-slate-500 text-xs">updated multiple times daily</span>
+            <div className="text-base">
+              <span className="text-slate-300 font-semibold">Live aggregation</span>
+              <span className="text-slate-500"> — updated multiple times daily</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Globe size={14} className="text-amber-400 flex-shrink-0" />
-              <span className="text-slate-300 font-medium">30+ countries</span>
-              <span className="text-slate-500 text-xs">Africa, Europe, Americas & more</span>
+            <div className="text-base">
+              <span className="text-slate-300 font-semibold">30+ countries</span>
+              <span className="text-slate-500"> — Africa, Europe, Americas &amp; more</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Shield size={14} className="text-violet-400 flex-shrink-0" />
-              <span className="text-slate-300 font-medium">No fake listings</span>
-              <span className="text-slate-500 text-xs">sourced from reputable boards only</span>
+            <div className="text-base">
+              <span className="text-slate-300 font-semibold">No fake listings</span>
+              <span className="text-slate-500"> — sourced from reputable boards only</span>
             </div>
           </div>
         </div>
@@ -60,8 +56,8 @@ export default function Footer() {
 
           {/* Categories */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-xs uppercase tracking-widest">Job Categories</h3>
-            <ul className="space-y-2.5 text-sm">
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Job Categories</h3>
+            <ul className="space-y-2.5 text-base">
               {[
                 ["Remote Jobs", "/remote-jobs"],
                 ["Entry Level", "/entry-level"],
@@ -77,8 +73,8 @@ export default function Footer() {
 
           {/* Popular roles */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-xs uppercase tracking-widest">Popular Roles</h3>
-            <ul className="space-y-2.5 text-sm">
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Popular Roles</h3>
+            <ul className="space-y-2.5 text-base">
               {["Software Engineer", "Accountant", "Nurse", "Teacher", "Sales Manager", "Customer Service"].map(r => (
                 <li key={r}>
                   <span className="hover:text-white transition-colors cursor-pointer">{r}</span>
@@ -89,7 +85,7 @@ export default function Footer() {
 
           {/* Job sources */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-xs uppercase tracking-widest">Our Sources</h3>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Our Sources</h3>
             <div className="flex flex-wrap gap-1.5 mb-5">
               {SOURCES.map(src => (
                 <span key={src} className="text-[10px] font-medium px-2 py-0.5 rounded bg-white/8 text-slate-400 border border-white/10">
@@ -100,7 +96,7 @@ export default function Footer() {
                 +8 more
               </span>
             </div>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-2.5 text-base">
               {[["About Us", "/about"], ["Contact Us", "/contact"], ["Privacy Policy", "/privacy-policy"], ["Terms & Conditions", "/terms-and-conditions"]].map(([l, h]) => (
                 <li key={h}><Link href={h} className="hover:text-white transition-colors">{l}</Link></li>
               ))}
@@ -110,7 +106,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500">
           <p>© {new Date().getFullYear()} JobsWorldwide. All rights reserved.</p>
           <p>Aggregating opportunities from trusted boards worldwide.</p>
         </div>
