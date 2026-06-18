@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import JobCard from "@/components/JobCard";
@@ -91,6 +92,17 @@ export default function Home() {
 
       {/* HERO */}
       <section className="relative overflow-hidden bg-[#0f172a]">
+        {/* Background photo */}
+        <div className="absolute inset-0">
+          <Image
+            src="/dream-job-signpost.jpg"
+            alt=""
+            fill
+            priority
+            className="object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a]/80 via-[#0f172a]/90 to-[#0f172a]" />
+        </div>
         {/* Background glow blobs */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600 opacity-20 rounded-full blur-3xl -translate-y-1/2" />
         <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-500 opacity-15 rounded-full blur-3xl translate-y-1/2" />
