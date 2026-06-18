@@ -151,37 +151,83 @@ export default function AIAssistant() {
     if (!open && synthRef.current) synthRef.current.cancel();
   }, [open]);
 
-  // ── Text-to-speech ──────────────────────────────────────────────────────────
-  const speak = useCallback((text) => {
-    if (!voiceEnabled || !synthRef.current) return;
+  // ── Text-to-speech (ElevenLabs neural → browser fallback) ─────────────────
+  const audioRef = useRef(null);
+
+  const stopSpeaking = useCallback(() => {
+    // Stop ElevenLabs audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+    // Stop browser TTS
+    synthRef.current?.cancel();
+    setIsSpeaking(false);
+  }, []);
+
+  const speakWithBrowser = useCallback((text) => {
+    if (!synthRef.current) return;
     synthRef.current.cancel();
-    // Strip markdown symbols for cleaner speech
     const clean = text
-      .replace(/#+\s/g, "")
-      .replace(/\*\*/g, "")
-      .replace(/\*/g, "")
-      .replace(/- /g, "")
-      .replace(/\d+\.\s/g, "")
-      .slice(0, 800); // Keep TTS snappy
+      .replace(/#{1,6}\s/g, "")
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .replace(/\*(.*?)\*/g, "$1")
+      .replace(/^\s*[-•]\s/gm, "")
+      .replace(/^\s*\d+\.\s/gm, "")
+      .replace(/\n/g, " ")
+      .trim()
+      .slice(0, 900);
     const utt = new SpeechSynthesisUtterance(clean);
-    utt.rate  = 1.05;
+    utt.rate  = 1.0;
     utt.pitch = 1.0;
-    // Prefer a natural English voice
+    utt.volume = 1.0;
     const voices = synthRef.current.getVoices();
     const preferred = voices.find(v =>
-      v.name.includes("Google") || v.name.includes("Samantha") || v.name.includes("Daniel") || v.lang === "en-US"
+      v.name.includes("Google UK English Female") ||
+      v.name.includes("Samantha") ||
+      v.name.includes("Karen") ||
+      v.name.includes("Google") ||
+      (v.lang === "en-GB") ||
+      (v.lang === "en-US")
     );
     if (preferred) utt.voice = preferred;
     utt.onstart = () => setIsSpeaking(true);
     utt.onend   = () => setIsSpeaking(false);
     utt.onerror = () => setIsSpeaking(false);
     synthRef.current.speak(utt);
-  }, [voiceEnabled]);
+  }, []);
 
-  const stopSpeaking = () => {
-    synthRef.current?.cancel();
-    setIsSpeaking(false);
-  };
+  const speak = useCallback(async (text) => {
+    if (!voiceEnabled) return;
+    stopSpeaking();
+
+    // Try ElevenLabs neural voice first
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+
+      if (res.ok && res.status !== 204) {
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audioRef.current = audio;
+        audio.onplay  = () => setIsSpeaking(true);
+        audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; };
+        audio.onerror = () => { setIsSpeaking(false); speakWithBrowser(text); };
+        audio.play().catch(() => speakWithBrowser(text));
+        return;
+      }
+    } catch {
+      // ElevenLabs unavailable — fall through to browser TTS
+    }
+
+    // Browser TTS fallback
+    speakWithBrowser(text);
+  }, [voiceEnabled, stopSpeaking, speakWithBrowser]);
 
   // ── Speech-to-text ──────────────────────────────────────────────────────────
   const startListening = useCallback(() => {
