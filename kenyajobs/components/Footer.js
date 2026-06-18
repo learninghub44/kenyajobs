@@ -41,20 +41,14 @@ export default function Footer() {
 
           {/* Brand col */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1.5"/>
-                  <ellipse cx="12" cy="12" rx="4" ry="10" stroke="white" strokeWidth="1.5"/>
-                  <line x1="2" y1="12" x2="22" y2="12" stroke="white" strokeWidth="1.5"/>
-                  <line x1="4" y1="7" x2="20" y2="7" stroke="white" strokeWidth="1.2"/>
-                  <line x1="4" y1="17" x2="20" y2="17" stroke="white" strokeWidth="1.2"/>
-                </svg>
-              </div>
-              <div>
-                <div className="text-white font-bold text-base leading-tight">Jobs<span className="text-blue-400">Worldwide</span></div>
-                <div className="text-slate-500 text-[10px] tracking-wide uppercase">Global Job Aggregator</div>
-              </div>
+            <div className="mb-4">
+              <Link href="/">
+                <img
+                  src="/logo-nav.svg"
+                  alt="JobsWorldwide"
+                  style={{ height: "44px", width: "auto", filter: "brightness(0) invert(1)" }}
+                />
+              </Link>
             </div>
             <p className="text-sm leading-relaxed mb-5 text-slate-400">
               We aggregate live job listings from 15+ reputable boards and post them in one place — so you spend less time searching and more time applying.
