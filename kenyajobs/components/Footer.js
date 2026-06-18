@@ -101,7 +101,7 @@ export default function Footer() {
               </span>
             </div>
             <ul className="space-y-2.5 text-sm">
-              {[["About Us", "/about"], ["Privacy Policy", "/privacy-policy"], ["Terms & Conditions", "/terms-and-conditions"]].map(([l, h]) => (
+              {[["About Us", "/about"], ["Contact Us", "/contact"], ["Privacy Policy", "/privacy-policy"], ["Terms & Conditions", "/terms-and-conditions"]].map(([l, h]) => (
                 <li key={h}><Link href={h} className="hover:text-white transition-colors">{l}</Link></li>
               ))}
               <li><a href="mailto:hello@jobsworldwide.online" className="hover:text-white transition-colors">Post a Job</a></li>

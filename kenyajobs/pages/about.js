@@ -285,14 +285,14 @@ export default function About() {
             Whether you've spotted a broken listing, want to suggest a new job board source, have a partnership idea, or just want to say hello — reach out.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <a href="mailto:hello@jobsworldwide.online"
+            <Link href="/contact"
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
-              <Mail size={14} /> hello@jobsworldwide.online
-            </a>
-            <Link href="/"
-              className="inline-flex items-center gap-2 border border-gray-200 hover:border-gray-300 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
-              Browse jobs <ArrowRight size={14} />
+              <Mail size={14} /> Contact Us
             </Link>
+            <a href="mailto:hello@jobsworldwide.online"
+              className="inline-flex items-center gap-2 border border-gray-200 hover:border-gray-300 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
+              hello@jobsworldwide.online
+            </a>
           </div>
           <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-400">
             <Link href="/privacy-policy" className="hover:text-gray-700 transition-colors">Privacy Policy</Link>
