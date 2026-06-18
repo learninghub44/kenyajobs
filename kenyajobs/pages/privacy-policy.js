@@ -8,11 +8,11 @@ const DOMAIN = "jobsworldwide.online";
 function Section({ id, title, children }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 style={{ fontFamily: "var(--font-display)" }}
-        className="text-[17px] font-semibold tracking-tight text-gray-900 mb-3 pb-2.5 border-b border-gray-100">
+      <h2 style={{ fontFamily: "DM Sans, sans-serif" }}
+        className="text-xl font-semibold tracking-tight text-gray-900 mb-3 pb-2.5 border-b border-gray-100">
         {title}
       </h2>
-      <div className="space-y-3 text-[15px] text-gray-600 leading-[1.75]">{children}</div>
+      <div className="space-y-3 text-base text-gray-600 leading-[1.75]">{children}</div>
     </section>
   );
 }
@@ -21,7 +21,7 @@ function Ul({ items }) {
   return (
     <ul className="space-y-2 mt-2 ml-1">
       {items.map((item, i) => (
-        <li key={i} className="flex gap-3 text-[14px] text-gray-600 leading-relaxed">
+        <li key={i} className="flex gap-3 text-base text-gray-600 leading-relaxed">
           <span className="mt-2 w-1 h-1 rounded-full bg-gray-400 flex-shrink-0" />
           <span>{item}</span>
         </li>
@@ -32,7 +32,7 @@ function Ul({ items }) {
 
 function Mono({ children }) {
   return (
-    <span style={{ fontFamily: "var(--font-mono)" }} className="text-[13px] text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">
+    <span style={{ fontFamily: "var(--font-mono)" }} className="text-sm text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">
       {children}
     </span>
   );
@@ -66,15 +66,15 @@ export default function PrivacyPolicy() {
       <div className="bg-gray-50 border-b border-gray-200 py-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <p style={{ fontFamily: "var(--font-mono)" }}
-            className="text-[11px] uppercase tracking-widest text-gray-400 mb-3">
+            className="text-sm uppercase tracking-widest text-gray-400 mb-3">
             Legal Document
           </p>
-          <h1 style={{ fontFamily: "var(--font-display)" }}
-            className="text-[32px] sm:text-[38px] font-semibold tracking-tight text-gray-900 leading-tight mb-2">
+          <h1 style={{ fontFamily: "DM Sans, sans-serif" }}
+            className="text-4xl sm:text-5xl font-semibold tracking-tight text-gray-900 leading-tight mb-2">
             Privacy Policy
           </h1>
           <p style={{ fontFamily: "var(--font-mono)" }}
-            className="text-[13px] text-gray-400">
+            className="text-sm text-gray-400">
             Last updated: <span className="text-gray-600">{UPDATED}</span>
             &nbsp;·&nbsp; Effective immediately
           </p>
@@ -88,24 +88,24 @@ export default function PrivacyPolicy() {
           <aside className="lg:w-52 flex-shrink-0">
             <div className="sticky top-24">
               <p style={{ fontFamily: "var(--font-mono)" }}
-                className="text-[10px] font-medium text-gray-400 uppercase tracking-widest mb-3">
+                className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-3">
                 Contents
               </p>
               <nav className="space-y-0.5">
                 {toc.map(([id, label]) => (
                   <a key={id} href={`#${id}`}
-                    className="block text-[13px] text-gray-500 hover:text-gray-900 px-2 py-1.5 rounded hover:bg-gray-50 transition-all">
+                    className="block text-sm text-gray-500 hover:text-gray-900 px-2 py-1.5 rounded hover:bg-gray-50 transition-all">
                     {label}
                   </a>
                 ))}
               </nav>
               <div className="mt-6 pt-5 border-t border-gray-200 space-y-2">
                 <Link href="/terms-and-conditions"
-                  className="block text-[13px] text-blue-600 hover:underline">
+                  className="block text-sm text-blue-600 hover:underline">
                   Terms & Conditions →
                 </Link>
                 <Link href="/"
-                  className="block text-[13px] text-gray-400 hover:text-gray-700">
+                  className="block text-sm text-gray-400 hover:text-gray-700">
                   ← Back to Jobs
                 </Link>
               </div>
@@ -139,8 +139,8 @@ export default function PrivacyPolicy() {
                 job listings and use the search without providing your name, email, or any other
                 identifying detail.
               </p>
-              <p className="text-[14px] font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "var(--font-display)" }}>
+              <p className="text-base font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "DM Sans, sans-serif" }}>
                 Automatically collected data
               </p>
               <p>When you visit our site, our hosting and analytics providers automatically record:</p>
@@ -154,16 +154,16 @@ export default function PrivacyPolicy() {
                 "Date and time of each request",
               ]} />
               <p>This data is processed in aggregate. We do not combine it with other sources to identify you personally.</p>
-              <p className="text-[14px] font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "var(--font-display)" }}>
+              <p className="text-base font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "DM Sans, sans-serif" }}>
                 Information you voluntarily provide
               </p>
               <p>
                 If you email us directly, we will receive your email address and any information you
                 include in the message. We use this only to respond to your enquiry.
               </p>
-              <p className="text-[14px] font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "var(--font-display)" }}>
+              <p className="text-base font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "DM Sans, sans-serif" }}>
                 Employer / job-poster information
               </p>
               <p>
@@ -201,26 +201,26 @@ export default function PrivacyPolicy() {
                 If you encounter a suspicious listing, please report it to us at{" "}
                 <a href={`mailto:${EMAIL}`}
                   style={{ fontFamily: "var(--font-mono)" }}
-                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
+                  className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
 
             <Section id="cookies" title="5. Cookies & Tracking">
               <p>We use a small number of cookies and similar technologies. A cookie is a small text file stored in your browser.</p>
-              <p className="text-[14px] font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "var(--font-display)" }}>Essential cookies (always active)</p>
+              <p className="text-base font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "DM Sans, sans-serif" }}>Essential cookies (always active)</p>
               <Ul items={[
                 "Session state — remembers your search filters and preferences during your visit",
                 "Security tokens — protect against cross-site request forgery (CSRF)",
               ]} />
-              <p className="text-[14px] font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "var(--font-display)" }}>Analytics cookies (can be declined)</p>
+              <p className="text-base font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "DM Sans, sans-serif" }}>Analytics cookies (can be declined)</p>
               <Ul items={[
                 "Aggregate page-view and navigation data to help us improve the site",
                 "No cross-site tracking; data is not linked to your identity",
               ]} />
-              <p className="text-[14px] font-semibold text-gray-800 mt-4"
-                style={{ fontFamily: "var(--font-display)" }}>Advertising cookies (Google AdSense)</p>
+              <p className="text-base font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "DM Sans, sans-serif" }}>Advertising cookies (Google AdSense)</p>
               <Ul items={["Served by Google to display relevant ads — see Section 6 for full details"]} />
               <p>
                 You can disable or clear cookies at any time through your browser settings. You can also
@@ -284,7 +284,7 @@ export default function PrivacyPolicy() {
                 To exercise any of these rights, email us at{" "}
                 <a href={`mailto:${EMAIL}`}
                   style={{ fontFamily: "var(--font-mono)" }}
-                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
+                  className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
                 We will respond within <strong>30 days</strong>.
               </p>
               <p>
@@ -309,7 +309,7 @@ export default function PrivacyPolicy() {
                 If you believe our systems have been compromised, notify us immediately at{" "}
                 <a href={`mailto:${EMAIL}`}
                   style={{ fontFamily: "var(--font-mono)" }}
-                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
+                  className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
 
@@ -334,7 +334,7 @@ export default function PrivacyPolicy() {
                 For questions, contact us at{" "}
                 <a href={`mailto:${EMAIL}`}
                   style={{ fontFamily: "var(--font-mono)" }}
-                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
+                  className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
 
@@ -353,22 +353,22 @@ export default function PrivacyPolicy() {
             <Section id="contact" title="13. Contact Us">
               <p>For any questions, complaints, or requests relating to this Privacy Policy:</p>
               <div className="mt-4 p-5 bg-gray-50 border border-gray-200 rounded-xl">
-                <p style={{ fontFamily: "var(--font-display)" }}
-                  className="font-semibold text-[15px] text-gray-900 mb-2">JobsWorldwide</p>
-                <p className="text-[14px] text-gray-600">
+                <p style={{ fontFamily: "DM Sans, sans-serif" }}
+                  className="font-semibold text-base text-gray-900 mb-2">JobsWorldwide</p>
+                <p className="text-base text-gray-600">
                   Email:{" "}
                   <a href={`mailto:${EMAIL}`}
                     style={{ fontFamily: "var(--font-mono)" }}
-                    className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>
+                    className="text-sm text-blue-600 hover:underline">{EMAIL}</a>
                 </p>
                 <p style={{ fontFamily: "var(--font-mono)" }}
-                  className="text-[12px] text-gray-400 mt-2">
+                  className="text-sm text-gray-400 mt-2">
                   Response time: 2–3 business days
                 </p>
               </div>
             </Section>
 
-            <div className="pt-8 border-t border-gray-200 flex flex-wrap gap-5 text-[13px]">
+            <div className="pt-8 border-t border-gray-200 flex flex-wrap gap-5 text-sm">
               <Link href="/" className="text-gray-500 hover:text-gray-900 transition-colors">← Back to Jobs</Link>
               <Link href="/terms-and-conditions" className="text-blue-600 hover:underline">Terms & Conditions →</Link>
             </div>

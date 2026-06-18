@@ -8,11 +8,11 @@ const DOMAIN = "jobsworldwide.online";
 function Section({ id, title, children }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 style={{ fontFamily: "var(--font-display)" }}
-        className="text-[17px] font-semibold tracking-tight text-gray-900 mb-3 pb-2.5 border-b border-gray-100">
+      <h2 style={{ fontFamily: "DM Sans, sans-serif" }}
+        className="text-xl font-semibold tracking-tight text-gray-900 mb-3 pb-2.5 border-b border-gray-100">
         {title}
       </h2>
-      <div className="space-y-3 text-[15px] text-gray-600 leading-[1.75]">{children}</div>
+      <div className="space-y-3 text-base text-gray-600 leading-[1.75]">{children}</div>
     </section>
   );
 }
@@ -21,7 +21,7 @@ function Ul({ items }) {
   return (
     <ul className="space-y-2 mt-2 ml-1">
       {items.map((item, i) => (
-        <li key={i} className="flex gap-3 text-[14px] text-gray-600 leading-relaxed">
+        <li key={i} className="flex gap-3 text-base text-gray-600 leading-relaxed">
           <span className="mt-2 w-1 h-1 rounded-full bg-gray-400 flex-shrink-0" />
           <span>{item}</span>
         </li>
@@ -32,7 +32,7 @@ function Ul({ items }) {
 
 function Mono({ children }) {
   return (
-    <span style={{ fontFamily: "var(--font-mono)" }} className="text-[13px] text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">
+    <span style={{ fontFamily: "var(--font-mono)" }} className="text-sm text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">
       {children}
     </span>
   );
@@ -40,8 +40,8 @@ function Mono({ children }) {
 
 function SubHead({ children }) {
   return (
-    <p style={{ fontFamily: "var(--font-display)" }}
-      className="text-[14px] font-semibold text-gray-800 mt-4">
+    <p style={{ fontFamily: "DM Sans, sans-serif" }}
+      className="text-base font-semibold text-gray-800 mt-4">
       {children}
     </p>
   );
@@ -79,15 +79,15 @@ export default function TermsAndConditions() {
       <div className="bg-gray-50 border-b border-gray-200 py-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <p style={{ fontFamily: "var(--font-mono)" }}
-            className="text-[11px] uppercase tracking-widest text-gray-400 mb-3">
+            className="text-sm uppercase tracking-widest text-gray-400 mb-3">
             Legal Document
           </p>
-          <h1 style={{ fontFamily: "var(--font-display)" }}
-            className="text-[32px] sm:text-[38px] font-semibold tracking-tight text-gray-900 leading-tight mb-2">
+          <h1 style={{ fontFamily: "DM Sans, sans-serif" }}
+            className="text-4xl sm:text-5xl font-semibold tracking-tight text-gray-900 leading-tight mb-2">
             Terms and Conditions
           </h1>
           <p style={{ fontFamily: "var(--font-mono)" }}
-            className="text-[13px] text-gray-400">
+            className="text-sm text-gray-400">
             Last updated: <span className="text-gray-600">{UPDATED}</span>
             &nbsp;·&nbsp; Effective immediately
           </p>
@@ -101,24 +101,24 @@ export default function TermsAndConditions() {
           <aside className="lg:w-52 flex-shrink-0">
             <div className="sticky top-24">
               <p style={{ fontFamily: "var(--font-mono)" }}
-                className="text-[10px] font-medium text-gray-400 uppercase tracking-widest mb-3">
+                className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-3">
                 Contents
               </p>
               <nav className="space-y-0.5">
                 {toc.map(([id, label]) => (
                   <a key={id} href={`#${id}`}
-                    className="block text-[13px] text-gray-500 hover:text-gray-900 px-2 py-1.5 rounded hover:bg-gray-50 transition-all">
+                    className="block text-sm text-gray-500 hover:text-gray-900 px-2 py-1.5 rounded hover:bg-gray-50 transition-all">
                     {label}
                   </a>
                 ))}
               </nav>
               <div className="mt-6 pt-5 border-t border-gray-200 space-y-2">
                 <Link href="/privacy-policy"
-                  className="block text-[13px] text-blue-600 hover:underline">
+                  className="block text-sm text-blue-600 hover:underline">
                   Privacy Policy →
                 </Link>
                 <Link href="/"
-                  className="block text-[13px] text-gray-400 hover:text-gray-700">
+                  className="block text-sm text-gray-400 hover:text-gray-700">
                   ← Back to Jobs
                 </Link>
               </div>
@@ -236,7 +236,7 @@ export default function TermsAndConditions() {
                 If you suspect a listing is fraudulent, report it immediately to{" "}
                 <a href={`mailto:${EMAIL}`}
                   style={{ fontFamily: "var(--font-mono)" }}
-                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>{" "}
+                  className="text-sm text-blue-600 hover:underline">{EMAIL}</a>{" "}
                 and, where possible, to the source platform.
               </p>
             </Section>
@@ -274,7 +274,7 @@ export default function TermsAndConditions() {
                 please notify us at{" "}
                 <a href={`mailto:${EMAIL}`}
                   style={{ fontFamily: "var(--font-mono)" }}
-                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
+                  className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
 
@@ -377,7 +377,7 @@ export default function TermsAndConditions() {
                 by contacting us at{" "}
                 <a href={`mailto:${EMAIL}`}
                   style={{ fontFamily: "var(--font-mono)" }}
-                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
+                  className="text-sm text-blue-600 hover:underline">{EMAIL}</a>.
                 We will make reasonable efforts to resolve disputes informally within{" "}
                 <strong>30 days</strong>.
               </p>
@@ -398,22 +398,22 @@ export default function TermsAndConditions() {
             <Section id="contact" title="17. Contact Us">
               <p>If you have questions about these Terms, please contact us:</p>
               <div className="mt-4 p-5 bg-gray-50 border border-gray-200 rounded-xl">
-                <p style={{ fontFamily: "var(--font-display)" }}
-                  className="font-semibold text-[15px] text-gray-900 mb-2">JobsWorldwide</p>
-                <p className="text-[14px] text-gray-600">
+                <p style={{ fontFamily: "DM Sans, sans-serif" }}
+                  className="font-semibold text-base text-gray-900 mb-2">JobsWorldwide</p>
+                <p className="text-base text-gray-600">
                   Email:{" "}
                   <a href={`mailto:${EMAIL}`}
                     style={{ fontFamily: "var(--font-mono)" }}
-                    className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>
+                    className="text-sm text-blue-600 hover:underline">{EMAIL}</a>
                 </p>
                 <p style={{ fontFamily: "var(--font-mono)" }}
-                  className="text-[12px] text-gray-400 mt-2">
+                  className="text-sm text-gray-400 mt-2">
                   Response time: 2–3 business days
                 </p>
               </div>
             </Section>
 
-            <div className="pt-8 border-t border-gray-200 flex flex-wrap gap-5 text-[13px]">
+            <div className="pt-8 border-t border-gray-200 flex flex-wrap gap-5 text-sm">
               <Link href="/" className="text-gray-500 hover:text-gray-900 transition-colors">← Back to Jobs</Link>
               <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy →</Link>
             </div>
