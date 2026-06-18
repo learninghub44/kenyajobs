@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { LogOut, Briefcase, Megaphone } from "lucide-react";
+import { LogOut, Briefcase, Megaphone, Activity } from "lucide-react";
 
 export default function AdminLayout({ children, active }) {
   const router = useRouter();
@@ -50,6 +50,12 @@ export default function AdminLayout({ children, active }) {
             active === "ads" ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-blue-300"
           }`}>
           <Megaphone size={14} /> Sponsored Ads
+        </Link>
+        <Link href="/admin/diagnostics"
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            active === "diagnostics" ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-blue-300"
+          }`}>
+          <Activity size={14} /> Source Status
         </Link>
       </div>
       {children}
