@@ -151,17 +151,39 @@ export default function AIAssistant() {
     if (!open && synthRef.current) synthRef.current.cancel();
   }, [open]);
 
-  // ── Text-to-speech (ElevenLabs neural → browser fallback) ─────────────────
+  // ── Text-to-speech: Puter.js → ElevenLabs neural (free, no API key) ────────
   const audioRef = useRef(null);
+  const puterReadyRef = useRef(false);
+
+  // Load Puter.js once
+  useEffect(() => {
+    if (typeof window === "undefined" || puterReadyRef.current) return;
+    if (window.puter) { puterReadyRef.current = true; return; }
+    const s = document.createElement("script");
+    s.src = "https://js.puter.com/v2/";
+    s.async = true;
+    s.onload = () => { puterReadyRef.current = true; };
+    document.head.appendChild(s);
+  }, []);
+
+  const cleanText = (text) => text
+    .replace(/#{1,6}\s/g, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/`(.*?)`/g, "$1")
+    .replace(/^\s*[-•]\s/gm, "")
+    .replace(/^\s*\d+\.\s/gm, "")
+    .replace(/\n{2,}/g, ". ")
+    .replace(/\n/g, " ")
+    .trim()
+    .slice(0, 900);
 
   const stopSpeaking = useCallback(() => {
-    // Stop ElevenLabs audio
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.src = "";
       audioRef.current = null;
     }
-    // Stop browser TTS
     synthRef.current?.cancel();
     setIsSpeaking(false);
   }, []);
@@ -169,27 +191,13 @@ export default function AIAssistant() {
   const speakWithBrowser = useCallback((text) => {
     if (!synthRef.current) return;
     synthRef.current.cancel();
-    const clean = text
-      .replace(/#{1,6}\s/g, "")
-      .replace(/\*\*(.*?)\*\*/g, "$1")
-      .replace(/\*(.*?)\*/g, "$1")
-      .replace(/^\s*[-•]\s/gm, "")
-      .replace(/^\s*\d+\.\s/gm, "")
-      .replace(/\n/g, " ")
-      .trim()
-      .slice(0, 900);
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.rate  = 1.0;
-    utt.pitch = 1.0;
-    utt.volume = 1.0;
+    const utt = new SpeechSynthesisUtterance(cleanText(text));
+    utt.rate = 1.0; utt.pitch = 1.0; utt.volume = 1.0;
     const voices = synthRef.current.getVoices();
     const preferred = voices.find(v =>
       v.name.includes("Google UK English Female") ||
-      v.name.includes("Samantha") ||
-      v.name.includes("Karen") ||
-      v.name.includes("Google") ||
-      (v.lang === "en-GB") ||
-      (v.lang === "en-US")
+      v.name.includes("Samantha") || v.name.includes("Karen") ||
+      v.lang === "en-GB" || v.lang === "en-US"
     );
     if (preferred) utt.voice = preferred;
     utt.onstart = () => setIsSpeaking(true);
@@ -201,28 +209,26 @@ export default function AIAssistant() {
   const speak = useCallback(async (text) => {
     if (!voiceEnabled) return;
     stopSpeaking();
+    const clean = cleanText(text);
 
-    // Try ElevenLabs neural voice first
-    try {
-      const res = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-
-      if (res.ok && res.status !== 204) {
-        const blob = await res.blob();
-        const url  = URL.createObjectURL(blob);
-        const audio = new Audio(url);
+    // Try Puter.js ElevenLabs (free, human-quality, no API key)
+    if (typeof window !== "undefined" && window.puter) {
+      try {
+        setIsSpeaking(true);
+        const audio = await window.puter.ai.txt2speech(clean, {
+          provider: "elevenlabs",
+          voice: "21m00Tcm4TlvDq8ikWAM",   // Rachel — warm natural female
+          model: "eleven_multilingual_v2",
+        });
         audioRef.current = audio;
-        audio.onplay  = () => setIsSpeaking(true);
-        audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; };
+        audio.onended = () => { setIsSpeaking(false); audioRef.current = null; };
         audio.onerror = () => { setIsSpeaking(false); speakWithBrowser(text); };
-        audio.play().catch(() => speakWithBrowser(text));
+        audio.play();
         return;
+      } catch {
+        setIsSpeaking(false);
+        // Fall through to browser TTS
       }
-    } catch {
-      // ElevenLabs unavailable — fall through to browser TTS
     }
 
     // Browser TTS fallback
