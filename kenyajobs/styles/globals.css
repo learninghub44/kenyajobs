@@ -1,18 +1,75 @@
 @import "tailwindcss";
 
+/*
+  JobsWorldwide design tokens — "departures board" identity.
+  Navy + amber instead of generic SaaS blue; monospace reserved for data
+  (locations, timestamps, salary) the way a real board would set it.
+*/
 :root {
-  --background: #f9fafb;
-  --foreground: #111827;
+  --background: #ffffff;
+  --foreground: #12161c;
+
+  --color-navy: #0b2233;
+  --color-navy-soft: #16344a;
+  --color-navy-line: #25455c;
+  --color-paper: #ffffff;
+  --color-paper-dim: #f4f5f3;
+  --color-ink: #12161c;
+  --color-ink-soft: #5b6472;
+  --color-ink-faint: #8b94a0;
+  --color-amber: #f2a93c;
+  --color-amber-dark: #c97c12;
+  --color-signal: #3f8f5f;
+  --color-signal-dim: #e7f1ea;
+  --color-line: #e2e5e8;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-navy: var(--color-navy);
+  --color-navy-soft: var(--color-navy-soft);
+  --color-navy-line: var(--color-navy-line);
+  --color-paper: var(--color-paper);
+  --color-paper-dim: var(--color-paper-dim);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-ink-faint: var(--color-ink-faint);
+  --color-amber: var(--color-amber);
+  --color-amber-dark: var(--color-amber-dark);
+  --color-signal: var(--color-signal);
+  --color-signal-dim: var(--color-signal-dim);
+  --color-line: var(--color-line);
+
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Tabular figures wherever board-style data is set in mono */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* Split-flap reveal used once, deliberately, in the homepage board */
+@keyframes flap-reveal {
+  0% { opacity: 0; transform: translateY(-6px); filter: blur(1px); }
+  60% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  100% { opacity: 1; }
+}
+.flap-row {
+  animation: flap-reveal 420ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flap-row { animation: none; }
 }
