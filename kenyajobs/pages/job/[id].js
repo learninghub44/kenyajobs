@@ -1,11 +1,12 @@
 import Head from "next/head";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
 import AdSlot from "@/components/AdSlot";
-import { MapPin, Briefcase, ArrowUpRight, Building2, Clock, Share2, ChevronRight, Banknote, Link as LinkIcon, Tag, ListChecks, CheckCircle2, Gift } from "lucide-react";
+import { MapPin, Briefcase, ArrowUpRight, Building2, Clock, Share2, ChevronRight, Banknote, Link as LinkIcon, Tag, ListChecks, CheckCircle2, Gift, Search } from "lucide-react";
 
 function timeAgo(dateStr) {
   if (!dateStr) return "Recently posted";
@@ -171,10 +172,35 @@ export default function JobDetail() {
   );
 
   if (notFound || !job) return (
-    <div className="text-center py-32">
-      <p className="text-gray-500 text-lg mb-4">Job not found.</p>
-      <Link href="/" className="text-blue-600 hover:underline">← Back to Jobs</Link>
-    </div>
+    <>
+      <Head>
+        <title>Job Not Found | JobsWorldwide</title>
+      </Head>
+      <div className="max-w-lg mx-auto px-4 py-20 text-center">
+        <div className="relative w-full max-w-sm mx-auto mb-8 rounded-2xl overflow-hidden">
+          <Image
+            src="/dream-job-signpost.jpg"
+            alt="Signpost pointing the way to your dream job"
+            width={1280}
+            height={854}
+            className="w-full h-auto"
+            priority
+          />
+        </div>
+        <h1 className="text-xl font-bold text-gray-900 mb-2">This job has wandered off</h1>
+        <p className="text-gray-500 mb-8">
+          It may have expired, been filled, or the link is out of date. Your dream job is still out there though — let&apos;s keep looking.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link href="/" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
+            ← Back to Jobs
+          </Link>
+          <Link href="/search" className="inline-flex items-center gap-2 bg-white border border-gray-200 hover:border-blue-300 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
+            <Search size={15} /> Search Jobs
+          </Link>
+        </div>
+      </div>
+    </>
   );
 
   const title = job.title || job.job_title || "Job Title";
