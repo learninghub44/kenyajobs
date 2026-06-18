@@ -294,6 +294,11 @@ export default function About() {
               Browse jobs <ArrowRight size={14} />
             </Link>
           </div>
+          <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-400">
+            <Link href="/privacy-policy" className="hover:text-gray-700 transition-colors">Privacy Policy</Link>
+            <Link href="/terms-and-conditions" className="hover:text-gray-700 transition-colors">Terms & Conditions</Link>
+            <span>© {new Date().getFullYear()} JobsWorldwide</span>
+          </div>
         </section>
 
       </div>
