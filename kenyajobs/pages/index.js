@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
@@ -25,17 +25,21 @@ const STATS = [
 const POPULAR_SEARCHES = ["Software Engineer", "Accountant", "Nurse", "Teacher", "Sales", "Driver", "Customer Service", "Marketing"];
 
 export default function Home() {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState("");
-  const [sources, setSources] = useState({ loaded: 0, total: 6 });
+  const [baseJobs, setBaseJobs]       = useState([]);   // jobs loaded on mount
+  const [searchJobs, setSearchJobs]   = useState([]);   // live search results
+  const [loading, setLoading]         = useState(true);
+  const [searching, setSearching]     = useState(false);
+  const [search, setSearch]           = useState("");
+  const [activeTab, setActiveTab]     = useState("");
+  const [sources, setSources]         = useState({ loaded: 0, total: 6 });
+  const debounceRef                   = useRef(null);
 
   const mergeJobs = (prev, incoming) => {
     const ids = new Set(prev.map(j => j.id));
     return [...prev, ...incoming.filter(j => !ids.has(j.id))].slice(0, 60);
   };
 
+  // ── Load base jobs on mount ──────────────────────────────────────────────
   useEffect(() => {
     const controller = new AbortController();
     const fetchSource = async (url, sliceCount, label) => {
@@ -45,7 +49,7 @@ export default function Home() {
         const data = await res.json();
         const items = Array.isArray(data) ? data.slice(0, sliceCount) : [];
         if (items.length > 0) {
-          setJobs(prev => mergeJobs(prev, items));
+          setBaseJobs(prev => mergeJobs(prev, items));
           setLoading(false);
         }
       } catch (e) {
@@ -66,21 +70,47 @@ export default function Home() {
     return () => { clearTimeout(t); controller.abort(); };
   }, []);
 
-  const filtered = jobs.filter(j => {
-    const q = search.toLowerCase();
-    const t = String(j.title || "").toLowerCase();
-    const c = String(j.company || "").toLowerCase();
-    const l = String(j.location || "").toLowerCase();
-    const tp = String(j.type || "").toLowerCase();
+  // ── Live search: debounced, calls /api/search-jobs ──────────────────────
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (!search.trim()) {
+      setSearchJobs([]);
+      setSearching(false);
+      return;
+    }
+
+    setSearching(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search-jobs?query=${encodeURIComponent(search.trim())}`);
+        if (!res.ok) throw new Error("Search failed");
+        const data = await res.json();
+        setSearchJobs(Array.isArray(data) ? data : []);
+      } catch {
+        setSearchJobs([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 400); // 400ms debounce — fast but not hammering
+
+    return () => clearTimeout(debounceRef.current);
+  }, [search]);
+
+  // ── Use search results when query active, base jobs otherwise ────────────
+  const jobPool = search.trim() ? searchJobs : baseJobs;
+
+  const filtered = jobPool.filter(j => {
+    const l   = String(j.location || "").toLowerCase();
+    const tp  = String(j.type || "").toLowerCase();
     const src = String(j.source || "").toLowerCase();
-    const matchSearch = !q || t.includes(q) || c.includes(q) || l.includes(q);
     const matchTab = !activeTab ||
       (Array.isArray(j.categories) && j.categories.includes(activeTab)) ||
       (activeTab === "remote" && (l.includes("remote") || tp.includes("remote"))) ||
       (activeTab === "entry" && src.includes("entry")) ||
       (activeTab === "graduate" && src.includes("graduate")) ||
       (activeTab === "wfh" && (l.includes("home") || tp.includes("home")));
-    return matchSearch && matchTab;
+    return matchTab;
   });
 
   return (
@@ -201,9 +231,19 @@ export default function Home() {
         {/* Section header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Latest Jobs</h2>
-            <p className="text-gray-500 text-sm mt-0.5">
-              {jobs.length > 0 ? `${filtered.length} opportunities available` : "Loading opportunities..."}
+            <h2 className="text-2xl font-bold text-gray-900">
+              {search.trim() ? `Results for "${search}"` : "Latest Jobs"}
+            </h2>
+            <p className="text-gray-500 text-sm mt-0.5 flex items-center gap-2">
+              {searching ? (
+                <><span className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block" /> Searching live...</>
+              ) : search.trim() ? (
+                <>{filtered.length} results found · <button onClick={() => setSearch("")} className="text-blue-600 hover:underline">Clear</button></>
+              ) : baseJobs.length > 0 ? (
+                `${filtered.length} opportunities available`
+              ) : (
+                "Loading opportunities..."
+              )}
             </p>
           </div>
 
@@ -224,13 +264,19 @@ export default function Home() {
         </div>
 
         {/* Job grid */}
-        {loading && jobs.length === 0 && (
+        {(loading && baseJobs.length === 0 && !search.trim()) && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {Array.from({ length: 9 }).map((_, i) => <JobSkeleton key={i} />)}
           </div>
         )}
 
-        {filtered.length > 0 && (
+        {searching && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, i) => <JobSkeleton key={i} />)}
+          </div>
+        )}
+
+        {!searching && filtered.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map((job, index) => (
               <div key={job.id || index}>
@@ -245,15 +291,16 @@ export default function Home() {
           </div>
         )}
 
-        {!loading && filtered.length === 0 && jobs.length > 0 && (
+        {!searching && !loading && filtered.length === 0 && search.trim() && (
           <div className="text-center py-20">
             <Search size={40} className="mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500 font-medium">No jobs match &ldquo;{search}&rdquo;</p>
-            <button onClick={() => setSearch("")} className="mt-3 text-blue-600 text-sm hover:underline">Clear search</button>
+            <p className="text-gray-700 font-semibold text-lg">No results for &ldquo;{search}&rdquo;</p>
+            <p className="text-gray-400 text-sm mt-1 mb-4">Try a different keyword or browse categories below</p>
+            <button onClick={() => setSearch("")} className="bg-blue-600 text-white text-sm px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors">Browse all jobs</button>
           </div>
         )}
 
-        {!loading && jobs.length === 0 && (
+        {!searching && !loading && baseJobs.length === 0 && !search.trim() && (
           <div className="text-center py-20 text-gray-400">
             <Briefcase size={40} className="mx-auto mb-4 text-gray-300" />
             <p className="font-medium">No jobs right now</p>
