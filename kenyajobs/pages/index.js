@@ -188,15 +188,9 @@ export default function Home() {
         {/* Subtle grid texture */}
         <div className="absolute inset-0 opacity-[0.04]" style={{backgroundImage:"linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)", backgroundSize:"40px 40px"}} />
 
-        <div className="relative max-w-5xl mx-auto px-6 pt-20 pb-18 text-center">
+        <div className="relative max-w-5xl mx-auto px-6 pt-24 pb-20 text-center">
 
-          {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-white/80 text-xs font-medium px-4 py-1.5 rounded-full mb-8 backdrop-blur-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Pulling live listings from 15+ job boards right now
-          </div>
-
-          {/* Heading — editorial, direct, specific to Kenya/Africa context */}
+          {/* Heading */}
           <h1 className="text-4xl md:text-6xl font-extrabold leading-[1.1] tracking-tight text-white mb-5">
             Real Jobs.<br />
             <span className="text-amber-400">No Sign-Up.</span> Updated Daily.
@@ -254,25 +248,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── FEATURED BANNER ─── */}
+      {/* ─── HIRING BANNER ─── */}
       <section className="max-w-7xl mx-auto px-4 mt-10">
-        <div className="rounded-2xl overflow-hidden relative bg-[#0b2233] text-white p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-white/10">
-          {/* Subtle texture */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{backgroundImage:"radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize:"28px 28px"}} />
-          <div className="relative">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center gap-1.5 bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-semibold px-3 py-1 rounded-full">
-                <Star size={10} className="fill-amber-400 text-amber-400" /> For Employers
-              </span>
-            </div>
-            <h2 className="text-xl font-bold mb-2 text-white">Reach qualified candidates across Africa & beyond</h2>
-            <p className="text-slate-400 text-sm max-w-md leading-relaxed">
-              Post your role once and get it in front of thousands of active job seekers across Kenya, East Africa, and our global remote audience. Fast, direct, no middlemen.
+        <div className="rounded-2xl bg-[#f8f9fb] border border-gray-200 px-8 py-7 flex flex-col md:flex-row items-center justify-between gap-5">
+          <div>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Hiring?</p>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">Post a job and reach thousands of active candidates</h2>
+            <p className="text-gray-500 text-sm max-w-md">
+              Kenya, East Africa, and global remote audiences — direct placements, no recruiter fees.
             </p>
           </div>
           <a href="mailto:hello@jobsworldwide.online"
-            className="relative flex-shrink-0 bg-amber-400 hover:bg-amber-300 text-gray-900 font-bold px-6 py-3 rounded-xl transition-colors text-sm whitespace-nowrap shadow-md">
-            Post a Job →
+            className="flex-shrink-0 bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm whitespace-nowrap">
+            Get in touch →
           </a>
         </div>
       </section>
