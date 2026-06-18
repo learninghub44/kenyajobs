@@ -8,22 +8,33 @@ const DOMAIN = "jobsworldwide.online";
 function Section({ id, title, children }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 className="text-lg font-semibold text-gray-900 mb-3 pb-2 border-b border-gray-100">{title}</h2>
-      <div className="space-y-3 text-gray-600 text-sm leading-relaxed">{children}</div>
+      <h2 style={{ fontFamily: "var(--font-display)" }}
+        className="text-[17px] font-semibold tracking-tight text-gray-900 mb-3 pb-2.5 border-b border-gray-100">
+        {title}
+      </h2>
+      <div className="space-y-3 text-[15px] text-gray-600 leading-[1.75]">{children}</div>
     </section>
   );
 }
 
 function Ul({ items }) {
   return (
-    <ul className="space-y-1.5 mt-2">
+    <ul className="space-y-2 mt-2 ml-1">
       {items.map((item, i) => (
-        <li key={i} className="flex gap-2.5">
-          <span className="mt-1.5 w-1 h-1 rounded-full bg-gray-400 flex-shrink-0" />
+        <li key={i} className="flex gap-3 text-[14px] text-gray-600 leading-relaxed">
+          <span className="mt-2 w-1 h-1 rounded-full bg-gray-400 flex-shrink-0" />
           <span>{item}</span>
         </li>
       ))}
     </ul>
+  );
+}
+
+function Mono({ children }) {
+  return (
+    <span style={{ fontFamily: "var(--font-mono)" }} className="text-[13px] text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">
+      {children}
+    </span>
   );
 }
 
@@ -51,51 +62,70 @@ export default function PrivacyPolicy() {
         <meta name="description" content="Privacy Policy for JobsWorldwide — how we collect, use, and protect your information." />
       </Head>
 
+      {/* Page header */}
       <div className="bg-gray-50 border-b border-gray-200 py-10">
-        <div className="max-w-4xl mx-auto px-4">
-          <p className="text-xs uppercase tracking-widest text-gray-400 font-medium mb-2">Legal</p>
-          <h1 className="text-3xl font-bold text-gray-900 mb-1">Privacy Policy</h1>
-          <p className="text-gray-500 text-sm">Last updated: {UPDATED} &nbsp;·&nbsp; Effective immediately</p>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <p style={{ fontFamily: "var(--font-mono)" }}
+            className="text-[11px] uppercase tracking-widest text-gray-400 mb-3">
+            Legal Document
+          </p>
+          <h1 style={{ fontFamily: "var(--font-display)" }}
+            className="text-[32px] sm:text-[38px] font-semibold tracking-tight text-gray-900 leading-tight mb-2">
+            Privacy Policy
+          </h1>
+          <p style={{ fontFamily: "var(--font-mono)" }}
+            className="text-[13px] text-gray-400">
+            Last updated: <span className="text-gray-600">{UPDATED}</span>
+            &nbsp;·&nbsp; Effective immediately
+          </p>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
 
           {/* Sidebar TOC */}
-          <aside className="lg:w-56 flex-shrink-0">
+          <aside className="lg:w-52 flex-shrink-0">
             <div className="sticky top-24">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Contents</p>
-              <nav className="space-y-1">
+              <p style={{ fontFamily: "var(--font-mono)" }}
+                className="text-[10px] font-medium text-gray-400 uppercase tracking-widest mb-3">
+                Contents
+              </p>
+              <nav className="space-y-0.5">
                 {toc.map(([id, label]) => (
                   <a key={id} href={`#${id}`}
-                    className="block text-sm text-gray-500 hover:text-gray-900 hover:translate-x-0.5 transition-all py-0.5">
+                    className="block text-[13px] text-gray-500 hover:text-gray-900 px-2 py-1.5 rounded hover:bg-gray-50 transition-all">
                     {label}
                   </a>
                 ))}
               </nav>
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <Link href="/terms-and-conditions" className="text-sm text-blue-600 hover:underline">
+              <div className="mt-6 pt-5 border-t border-gray-200 space-y-2">
+                <Link href="/terms-and-conditions"
+                  className="block text-[13px] text-blue-600 hover:underline">
                   Terms & Conditions →
+                </Link>
+                <Link href="/"
+                  className="block text-[13px] text-gray-400 hover:text-gray-700">
+                  ← Back to Jobs
                 </Link>
               </div>
             </div>
           </aside>
 
           {/* Body */}
-          <main className="flex-1 space-y-10">
+          <main className="flex-1 space-y-10 min-w-0">
 
             <Section id="overview" title="1. Overview">
               <p>
                 This Privacy Policy describes how <strong>JobsWorldwide</strong> ("we", "us", or "our"),
-                operated at <strong>{DOMAIN}</strong>, handles information when you visit or use our website.
+                operated at <Mono>{DOMAIN}</Mono>, handles information when you visit or use our website.
                 JobsWorldwide is a free, independent job aggregator that pulls listings from multiple
                 trusted global job boards and displays them in one place.
               </p>
               <p>
-                We are committed to your privacy. <strong>We do not sell your personal data.</strong> We do not
-                require you to register or log in to browse or search for jobs. This policy explains what
-                limited data we do collect, why, and how you can control it.
+                We are committed to your privacy. <strong>We do not sell your personal data.</strong> We
+                do not require you to register or log in to browse or search for jobs. This policy
+                explains what limited data we do collect, why, and how you can control it.
               </p>
               <p>
                 By using our website you agree to the practices described here. If you do not agree,
@@ -104,10 +134,15 @@ export default function PrivacyPolicy() {
             </Section>
 
             <Section id="info-collected" title="2. Information We Collect">
-              <p><strong>We do not collect personal information directly.</strong> You can browse all job
-              listings and use the search without providing your name, email, or any other identifying detail.</p>
-
-              <p className="font-medium text-gray-700 mt-4">Automatically collected data</p>
+              <p>
+                <strong>We do not collect personal information directly.</strong> You can browse all
+                job listings and use the search without providing your name, email, or any other
+                identifying detail.
+              </p>
+              <p className="text-[14px] font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "var(--font-display)" }}>
+                Automatically collected data
+              </p>
               <p>When you visit our site, our hosting and analytics providers automatically record:</p>
               <Ul items={[
                 "IP address (used only for geolocation at country/city level — never stored long-term)",
@@ -118,19 +153,24 @@ export default function PrivacyPolicy() {
                 "Referring website or URL that brought you here",
                 "Date and time of each request",
               ]} />
-              <p className="mt-2">
-                This data is processed in aggregate. We do not combine it with other sources to identify
-                you personally.
+              <p>This data is processed in aggregate. We do not combine it with other sources to identify you personally.</p>
+              <p className="text-[14px] font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "var(--font-display)" }}>
+                Information you voluntarily provide
               </p>
-
-              <p className="font-medium text-gray-700 mt-4">Information you voluntarily provide</p>
-              <p>If you email us directly or use a contact form, we will receive your email address
-              and any information you include in the message. We use this only to respond to your enquiry.</p>
-
-              <p className="font-medium text-gray-700 mt-4">Employer / job-poster information</p>
-              <p>If you submit a job listing through our admin panel or by email request, we collect
-              the company name, job details, and your contact email in order to display the listing.
-              We do not share this with third parties.</p>
+              <p>
+                If you email us directly, we will receive your email address and any information you
+                include in the message. We use this only to respond to your enquiry.
+              </p>
+              <p className="text-[14px] font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "var(--font-display)" }}>
+                Employer / job-poster information
+              </p>
+              <p>
+                If you submit a job listing through our admin panel or by email, we collect the company
+                name, job details, and your contact email to display the listing. We do not share this
+                with third parties.
+              </p>
             </Section>
 
             <Section id="how-we-use" title="3. How We Use Information">
@@ -142,10 +182,7 @@ export default function PrivacyPolicy() {
                 "Respond to enquiries sent directly to us",
                 "Comply with legal obligations where required",
               ]} />
-              <p className="mt-2">
-                <strong>We do not use your data for automated profiling, targeted marketing, or sale to
-                third parties.</strong>
-              </p>
+              <p><strong>We do not use your data for automated profiling, targeted marketing, or sale to third parties.</strong></p>
             </Section>
 
             <Section id="third-party-links" title="4. Third-Party Job Links">
@@ -161,36 +198,33 @@ export default function PrivacyPolicy() {
                 privacy policies before submitting any personal information.
               </p>
               <p>
-                We make reasonable efforts to source listings from reputable boards, but we cannot
-                guarantee the accuracy, completeness, or legitimacy of every listing. If you encounter
-                a suspicious listing, please report it to us at <a href={`mailto:${EMAIL}`}
-                className="text-blue-600 hover:underline">{EMAIL}</a>.
+                If you encounter a suspicious listing, please report it to us at{" "}
+                <a href={`mailto:${EMAIL}`}
+                  style={{ fontFamily: "var(--font-mono)" }}
+                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
 
             <Section id="cookies" title="5. Cookies & Tracking">
-              <p>
-                We use a small number of cookies and similar technologies. A cookie is a small text
-                file stored in your browser.
-              </p>
-              <p className="font-medium text-gray-700 mt-3">Essential cookies (always active)</p>
+              <p>We use a small number of cookies and similar technologies. A cookie is a small text file stored in your browser.</p>
+              <p className="text-[14px] font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "var(--font-display)" }}>Essential cookies (always active)</p>
               <Ul items={[
                 "Session state — remembers your search filters and preferences during your visit",
                 "Security tokens — protect against cross-site request forgery (CSRF)",
               ]} />
-              <p className="font-medium text-gray-700 mt-3">Analytics cookies (can be declined)</p>
+              <p className="text-[14px] font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "var(--font-display)" }}>Analytics cookies (can be declined)</p>
               <Ul items={[
                 "Aggregate page-view and navigation data to help us improve the site",
                 "No cross-site tracking; data is not linked to your identity",
               ]} />
-              <p className="font-medium text-gray-700 mt-3">Advertising cookies (Google AdSense)</p>
-              <Ul items={[
-                "Served by Google to display relevant ads — see Section 6 for full details",
-              ]} />
-              <p className="mt-3">
-                You can disable or clear cookies at any time through your browser settings. Disabling
-                essential cookies may affect site functionality. You can also use browser extensions
-                such as uBlock Origin or Privacy Badger to control tracking across all sites you visit.
+              <p className="text-[14px] font-semibold text-gray-800 mt-4"
+                style={{ fontFamily: "var(--font-display)" }}>Advertising cookies (Google AdSense)</p>
+              <Ul items={["Served by Google to display relevant ads — see Section 6 for full details"]} />
+              <p>
+                You can disable or clear cookies at any time through your browser settings. You can also
+                use browser extensions such as uBlock Origin or Privacy Badger to control tracking.
               </p>
             </Section>
 
@@ -202,17 +236,17 @@ export default function PrivacyPolicy() {
               </p>
               <p>You can opt out of personalised advertising at any time:</p>
               <Ul items={[
-                "Visit Google Ad Settings: https://www.google.com/settings/ads",
-                "Use the Digital Advertising Alliance opt-out tool: https://optout.aboutads.info/",
-                "Use the Network Advertising Initiative opt-out: https://optout.networkadvertising.org/",
+                "Google Ad Settings — https://www.google.com/settings/ads",
+                "Digital Advertising Alliance opt-out — https://optout.aboutads.info/",
+                "Network Advertising Initiative opt-out — https://optout.networkadvertising.org/",
               ]} />
-              <p className="mt-2">
+              <p>
                 Google's use of advertising cookies is governed by the{" "}
                 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"
                   className="text-blue-600 hover:underline">Google Privacy Policy</a>.
                 We do not have access to the data Google collects through AdSense.
               </p>
-              <p className="mt-2">
+              <p>
                 We also display sponsored listings managed directly by us. These are clearly labelled
                 "Sponsored" and do not involve tracking cookies from our side.
               </p>
@@ -221,13 +255,13 @@ export default function PrivacyPolicy() {
             <Section id="data-retention" title="7. Data Retention">
               <p>
                 We retain aggregate analytics data for up to <strong>24 months</strong> to identify
-                long-term trends and improve the site. Individual IP addresses, where temporarily
-                logged by our hosting provider, are anonymised or deleted within <strong>30 days</strong>.
+                long-term trends. Individual IP addresses, where temporarily logged by our hosting
+                provider, are anonymised or deleted within <strong>30 days</strong>.
               </p>
               <p>
                 Email correspondence is retained for as long as necessary to resolve your enquiry, then
-                deleted. Job listing submissions (employer data) are retained for as long as the listing
-                remains live, or until you request removal.
+                deleted. Job listing submissions are retained for as long as the listing remains live,
+                or until you request removal.
               </p>
             </Section>
 
@@ -246,13 +280,14 @@ export default function PrivacyPolicy() {
                 "Right to object — object to processing based on legitimate interests",
                 "Right to withdraw consent — where processing is based on consent, withdraw it at any time",
               ]} />
-              <p className="mt-2">
+              <p>
                 To exercise any of these rights, email us at{" "}
-                <a href={`mailto:${EMAIL}`} className="text-blue-600 hover:underline">{EMAIL}</a>.
-                We will respond within <strong>30 days</strong>. We may need to verify your identity
-                before actioning a request.
+                <a href={`mailto:${EMAIL}`}
+                  style={{ fontFamily: "var(--font-mono)" }}
+                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
+                We will respond within <strong>30 days</strong>.
               </p>
-              <p className="mt-2">
+              <p>
                 If you are unsatisfied with our response, you have the right to lodge a complaint with
                 your local data protection authority (in Kenya: the Office of the Data Protection
                 Commissioner).
@@ -266,23 +301,24 @@ export default function PrivacyPolicy() {
                 controls on our database and admin systems, and regular dependency updates.
               </p>
               <p>
-                However, no method of data transmission over the internet or electronic storage is
-                completely secure. We cannot guarantee absolute security. We encourage you not to
-                share sensitive personal information (such as your ID number, banking details, or
-                passwords) through any website, including ours.
+                However, no method of data transmission or electronic storage is completely secure. We
+                encourage you not to share sensitive personal information (such as your ID number,
+                banking details, or passwords) through any website.
               </p>
               <p>
-                If you believe our systems have been compromised, please notify us immediately at{" "}
-                <a href={`mailto:${EMAIL}`} className="text-blue-600 hover:underline">{EMAIL}</a>.
+                If you believe our systems have been compromised, notify us immediately at{" "}
+                <a href={`mailto:${EMAIL}`}
+                  style={{ fontFamily: "var(--font-mono)" }}
+                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
 
             <Section id="children" title="10. Children's Privacy">
               <p>
-                JobsWorldwide is a professional job board intended for users who are at least{" "}
-                <strong>16 years old</strong> (or the minimum working age in your jurisdiction, if higher).
-                We do not knowingly collect personal data from anyone under 16. If you believe a child
-                has submitted information to us, please contact us immediately and we will delete it.
+                JobsWorldwide is intended for users who are at least <strong>16 years old</strong> (or
+                the minimum working age in your jurisdiction, if higher). We do not knowingly collect
+                personal data from anyone under 16. If you believe a child has submitted information
+                to us, please contact us immediately and we will delete it.
               </p>
             </Section>
 
@@ -294,36 +330,46 @@ export default function PrivacyPolicy() {
                 different data protection standards than your own.
               </p>
               <p>
-                Where required by law, we ensure appropriate safeguards are in place for such transfers
-                (such as standard contractual clauses). For questions about international transfers,
-                contact us at{" "}
-                <a href={`mailto:${EMAIL}`} className="text-blue-600 hover:underline">{EMAIL}</a>.
+                Where required by law, we ensure appropriate safeguards are in place for such transfers.
+                For questions, contact us at{" "}
+                <a href={`mailto:${EMAIL}`}
+                  style={{ fontFamily: "var(--font-mono)" }}
+                  className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>.
               </p>
             </Section>
 
             <Section id="changes" title="12. Changes to This Policy">
               <p>
                 We may update this Privacy Policy periodically to reflect changes in our practices,
-                technology, legal requirements, or for other operational reasons. When we make material
-                changes, we will update the "Last updated" date at the top of this page.
+                technology, or legal requirements. When we make material changes, we will update the
+                "Last updated" date at the top of this page.
               </p>
               <p>
-                We encourage you to review this page whenever you use our site. Continued use of
-                JobsWorldwide after changes are posted constitutes your acceptance of the updated policy.
+                Continued use of JobsWorldwide after changes are posted constitutes your acceptance
+                of the updated policy.
               </p>
             </Section>
 
             <Section id="contact" title="13. Contact Us">
               <p>For any questions, complaints, or requests relating to this Privacy Policy:</p>
-              <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm">
-                <p className="font-semibold text-gray-800 mb-1">JobsWorldwide</p>
-                <p>Email: <a href={`mailto:${EMAIL}`} className="text-blue-600 hover:underline">{EMAIL}</a></p>
-                <p className="mt-1 text-gray-400 text-xs">We aim to respond within 2–3 business days.</p>
+              <div className="mt-4 p-5 bg-gray-50 border border-gray-200 rounded-xl">
+                <p style={{ fontFamily: "var(--font-display)" }}
+                  className="font-semibold text-[15px] text-gray-900 mb-2">JobsWorldwide</p>
+                <p className="text-[14px] text-gray-600">
+                  Email:{" "}
+                  <a href={`mailto:${EMAIL}`}
+                    style={{ fontFamily: "var(--font-mono)" }}
+                    className="text-[13px] text-blue-600 hover:underline">{EMAIL}</a>
+                </p>
+                <p style={{ fontFamily: "var(--font-mono)" }}
+                  className="text-[12px] text-gray-400 mt-2">
+                  Response time: 2–3 business days
+                </p>
               </div>
             </Section>
 
-            <div className="pt-8 border-t border-gray-200 flex flex-wrap gap-4 text-sm">
-              <Link href="/" className="text-blue-600 hover:underline">← Back to Jobs</Link>
+            <div className="pt-8 border-t border-gray-200 flex flex-wrap gap-5 text-[13px]">
+              <Link href="/" className="text-gray-500 hover:text-gray-900 transition-colors">← Back to Jobs</Link>
               <Link href="/terms-and-conditions" className="text-blue-600 hover:underline">Terms & Conditions →</Link>
             </div>
           </main>
