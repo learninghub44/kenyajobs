@@ -4,7 +4,9 @@ import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import CategoryTabs from "@/components/CategoryTabs";
 import AdSlot from "@/components/AdSlot";
+import PageHeader from "@/components/PageHeader";
 import { mergeManualJobs } from "@/utils/mergeJobs";
+import { Home as HomeIcon } from "lucide-react";
 
 const filters = ["All", "Data Entry", "Virtual Assistant", "Customer Service", "Writing"];
 
@@ -62,8 +64,13 @@ export default function WorkFromHome() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <CategoryTabs />
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Work From Home Jobs</h1>
-        <p className="text-gray-500 mb-6">Legitimate online jobs — earn from home</p>
+        <PageHeader
+          icon={HomeIcon}
+          title="Work From Home Jobs"
+          subtitle="Legitimate online jobs — earn from home"
+          badge={jobs.length > 0 ? `${jobs.length} live opportunities` : undefined}
+          gradient="linear-gradient(135deg, #d97706, #dc2626)"
+        />
 
         <div className="flex flex-wrap gap-2 mb-6">
           {filters.map((f) => (

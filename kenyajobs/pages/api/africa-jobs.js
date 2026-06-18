@@ -1,4 +1,5 @@
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+import { cacheJobs } from "@/lib/liveJobCache";
 import crypto from "crypto";
 
 // Stable, URL-safe, collision-resistant id fragment for a given string (e.g. a job's link).
@@ -47,7 +48,7 @@ function parseRSS(xml, source, defaultLocation) {
         type: "Full-time",
         date: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
         url: link,
-        description: description.replace(/<[^>]*>/g, "").slice(0, 300),
+        description: description.replace(/<[^>]*>/g, "").trim().slice(0, 5000),
         source,
       });
     }
@@ -69,7 +70,8 @@ async function fetchRemotive() {
       type: j.job_type || "Full-time",
       date: j.publication_date,
       url: j.url,
-      description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 300),
+      description: j.description || "",
+      category: j.category || undefined,
       source: "Remotive",
       salary: j.salary || undefined,
       companyLogo: j.company_logo_url || j.company_logo || undefined,
@@ -91,7 +93,7 @@ async function fetchTheMuse() {
       type: j.levels?.[0]?.name || "Full-time",
       date: j.publication_date || new Date().toISOString(),
       url: j.refs?.landing_page || `https://www.themuse.com/jobs/${j.id}`,
-      description: (j.contents || "").replace(/<[^>]*>/g, "").slice(0, 300),
+      description: j.contents || "",
       source: "The Muse",
     }));
   } catch { return []; }
@@ -112,9 +114,10 @@ async function fetchJobicy() {
           type: j.jobType || "Full-time",
           date: j.pubDate,
           url: j.url,
-          description: (j.jobDescription || "").replace(/<[^>]*>/g, "").slice(0, 300),
+          description: j.jobDescription || "",
           source: "Jobicy",
           companyLogo: j.companyLogo || undefined,
+          category: j.jobIndustry || undefined,
           annualSalaryMin: j.annualSalaryMin || undefined,
           annualSalaryMax: j.annualSalaryMax || undefined,
           salaryCurrency: j.salaryCurrency || undefined,
@@ -139,9 +142,10 @@ async function fetchArbeitnow() {
       type: j.remote ? "Remote" : "Full-time",
       date: j.created_at ? new Date(j.created_at * 1000).toISOString() : new Date().toISOString(),
       url: j.url,
-      description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 300),
+      description: j.description || "",
       source: "Arbeitnow",
       companyLogo: j.company_logo || undefined,
+      tags: Array.isArray(j.tags) ? j.tags : undefined,
     }));
   } catch { return []; }
 }
@@ -183,7 +187,7 @@ async function fetchReliefWeb() {
         type: f["job-type"]?.[0]?.name || "Full-time",
         date: f.date?.created || new Date().toISOString(),
         url: f.url || `https://reliefweb.int/job/${j.id}`,
-        description: (f.body || "").replace(/<[^>]*>/g, "").slice(0, 300),
+        description: (f.body || "").replace(/<[^>]*>/g, ""),
         source: "ReliefWeb",
       };
     });
@@ -204,7 +208,7 @@ async function fetchHimalayas() {
       type: j.employmentType || "Remote",
       date: j.pubDate || j.createdAt || new Date().toISOString(),
       url: j.applicationLink || `https://himalayas.app/jobs/${j.slug}`,
-      description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 300),
+      description: j.description || "",
       source: "Himalayas",
       companyLogo: j.company?.logo || undefined,
     }));
@@ -236,7 +240,7 @@ async function fetchViaRss2Json() {
             type: "Full-time",
             date: j.pubDate ? new Date(j.pubDate).toISOString() : new Date().toISOString(),
             url: j.link || j.guid,
-            description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 300),
+            description: (j.description || "").replace(/<[^>]*>/g, "").trim().slice(0, 5000),
             source,
           })).filter(j => j.title && j.url);
         })
@@ -302,5 +306,6 @@ export default async function handler(req, res) {
 
   unique.sort((a, b) => new Date(b.date) - new Date(a.date));
   console.log(`JobsWorldwide: ${unique.length} total jobs from all sources`);
+  cacheJobs(unique); // fire-and-forget — never blocks the response
   res.status(200).json(unique);
 }

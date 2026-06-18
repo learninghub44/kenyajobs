@@ -1,5 +1,6 @@
 // Providers: The Muse (free) + Remotive (free) + JSearch (if key set)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+import { cacheJobs } from "@/lib/liveJobCache";
 
 export default async function handler(req, res) {
   const { page = 1 } = req.query;
@@ -65,6 +66,7 @@ export default async function handler(req, res) {
           job_min_salary: j.job_min_salary || undefined,
           job_max_salary: j.job_max_salary || undefined,
           job_salary_currency: j.job_salary_currency || undefined,
+          highlights: j.job_highlights || undefined,
         })))
         .catch(err => { console.error("JSearch error:", err.message); return []; })
     ] : []),
@@ -75,5 +77,6 @@ export default async function handler(req, res) {
     .filter(r => r.status === "fulfilled")
     .flatMap(r => r.value);
 
+  cacheJobs(jobs);
   res.status(200).json(jobs);
 }

@@ -4,7 +4,9 @@ import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import CategoryTabs from "@/components/CategoryTabs";
 import AdSlot from "@/components/AdSlot";
+import PageHeader from "@/components/PageHeader";
 import { mergeManualJobs } from "@/utils/mergeJobs";
+import { GraduationCap } from "lucide-react";
 
 const filters = ["All", "Graduate Trainee", "Internship", "Management Trainee", "Attachment"];
 
@@ -61,8 +63,13 @@ export default function GraduateJobs() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <CategoryTabs />
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Graduate Jobs</h1>
-        <p className="text-gray-500 mb-6">Trainee programs, internships and attachments</p>
+        <PageHeader
+          icon={GraduationCap}
+          title="Graduate Jobs"
+          subtitle="Trainee programs, internships and attachments"
+          badge={jobs.length > 0 ? `${jobs.length} live opportunities` : undefined}
+          gradient="linear-gradient(135deg, #7c3aed, #db2777)"
+        />
 
         <div className="flex flex-wrap gap-2 mb-6">
           {filters.map((f) => (

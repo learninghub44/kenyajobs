@@ -5,7 +5,7 @@ import Link from "next/link";
 import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
 import AdSlot from "@/components/AdSlot";
-import { MapPin, Briefcase, Calendar, ArrowUpRight, Building2, Clock, Share2, Bookmark, ChevronRight, Banknote, Link as LinkIcon } from "lucide-react";
+import { MapPin, Briefcase, ArrowUpRight, Building2, Clock, Share2, ChevronRight, Banknote, Link as LinkIcon, Tag, ListChecks, CheckCircle2, Gift } from "lucide-react";
 
 function timeAgo(dateStr) {
   if (!dateStr) return "Recently posted";
@@ -90,28 +90,35 @@ export default function JobDetail() {
       return;
     }
 
-    // No cached data (direct link, shared URL, or cleared session) — fall back to searching
-    // every live source for a match.
+    // No cached data (direct link, shared URL, new tab, or cleared session storage).
+    let cancelled = false;
     async function findJob() {
+      setLoading(true);
+      setNotFound(false);
       try {
-        setLoading(true);
-
-        // Manually-posted jobs have a stable, prefixed id — fetch directly from the
-        // DB instead of waiting on every live source to respond.
-        if (String(id).startsWith("manual-")) {
-          const res = await fetch(`/api/manual-jobs/${id}`);
-          if (res.ok) {
-            const found = await res.json();
-            setJob(found);
-            saveJob(id, found);
-            const allJobs = await fetchAllSources();
-            setRelated(allJobs.filter(j => (j.id || j.job_id) !== id && (j.source === found.source || j.location === found.location)).slice(0, 3));
-            setLoading(false);
-            return;
-          }
+        // Fast, reliable path: a single DB lookup. Covers manually-posted jobs and any
+        // live-pulled job that's been seen by any *-jobs API route recently — which is
+        // almost always true, since every listing page writes through to this cache.
+        // This is what makes opening a job in a new tab / sharing a link / refreshing the
+        // page actually work, instead of depending on every one of ~15 live sources
+        // responding identically (and within their timeout) a second time.
+        const lookupRes = await fetch(`/api/job-lookup/${id}`);
+        if (lookupRes.ok) {
+          const found = await lookupRes.json();
+          if (cancelled) return;
+          setJob(found);
+          saveJob(id, found);
+          setLoading(false);
+          fetchAllSources()
+            .then(allJobs => { if (!cancelled) setRelated(allJobs.filter(j => (j.id || j.job_id) !== id && (j.source === found.source || j.location === found.location)).slice(0, 3)); })
+            .catch(() => {});
+          return;
         }
 
+        // Last resort: the job hasn't been cached yet (e.g. opened within seconds of a
+        // cold start) — scan every live source fresh.
         const allJobs = await fetchAllSources();
+        if (cancelled) return;
         const found = allJobs.find(j =>
           String(j.id) === String(id) ||
           String(j.job_id) === String(id) ||
@@ -125,12 +132,13 @@ export default function JobDetail() {
           setNotFound(true);
         }
       } catch {
-        setNotFound(true);
+        if (!cancelled) setNotFound(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     findJob();
+    return () => { cancelled = true; };
   }, [id]);
 
   const handleShare = () => {
@@ -184,6 +192,9 @@ export default function JobDetail() {
   const logoUrl = job.companyLogo || job.company_logo || job.employer_logo;
   const companyWebsite = job.companyWebsite || job.employer_website;
   const salary = formatSalary(job);
+  const category = job.category;
+  const tags = Array.isArray(job.tags) ? job.tags.slice(0, 8) : [];
+  const highlights = job.highlights && typeof job.highlights === "object" ? job.highlights : null;
 
   return (
     <>
@@ -209,62 +220,79 @@ export default function JobDetail() {
             <div className="lg:col-span-2 space-y-5">
 
               {/* Job header card */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-7 shadow-sm">
-                <div className="flex items-start gap-5 mb-6">
-                  {/* Company logo */}
-                  {logoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={logoUrl}
-                      alt={company}
-                      className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 border-2 border-gray-100 bg-white"
-                      onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
-                    />
-                  ) : null}
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-2xl flex-shrink-0 border-2"
-                    style={{ backgroundColor: bg, color: fg, borderColor: bg, display: logoUrl ? "none" : "flex" }}>
-                    {company.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-blue-600 font-semibold text-sm mb-0.5">{company}</p>
-                        <h1 className="text-2xl font-extrabold text-gray-900 leading-tight">{title}</h1>
-                        {source && <p className="text-xs text-gray-400 mt-1">via {source}</p>}
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="h-20 sm:h-24" style={{ background: `linear-gradient(135deg, ${bg}, white)` }} />
+                <div className="px-7 pb-7 -mt-10">
+                  <div className="flex items-start gap-5 mb-6">
+                    {/* Company logo */}
+                    {logoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={logoUrl}
+                        alt={company}
+                        className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 border-4 border-white shadow-md bg-white"
+                        onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
+                      />
+                    ) : null}
+                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center font-bold text-2xl flex-shrink-0 border-4 border-white shadow-md"
+                      style={{ backgroundColor: bg, color: fg, display: logoUrl ? "none" : "flex" }}>
+                      {company.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0 pt-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-sm mb-0.5" style={{ color: fg }}>{company}</p>
+                          <h1 className="text-2xl font-extrabold text-gray-900 leading-tight">{title}</h1>
+                          {source && <p className="text-xs text-gray-400 mt-1">via {source}</p>}
+                        </div>
+                        <button onClick={handleShare}
+                          className="flex-shrink-0 p-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:text-blue-600 transition-all text-gray-400"
+                          title="Copy link">
+                          <Share2 size={16} />
+                        </button>
                       </div>
-                      <button onClick={handleShare}
-                        className="flex-shrink-0 p-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:text-blue-600 transition-all text-gray-400"
-                        title="Copy link">
-                        <Share2 size={16} />
-                      </button>
                     </div>
                   </div>
-                </div>
 
-                {/* Meta chips */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                  <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                    <MapPin size={13} className="text-blue-500" /> {location}
-                  </span>
-                  <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                    <Briefcase size={13} className="text-green-500" /> {jobType}
-                  </span>
-                  <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                    <Clock size={13} className="text-orange-500" /> {posted}
-                  </span>
-                  {salary && (
-                    <span className="flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                      <Banknote size={13} className="text-green-600" /> {salary}
+                  {/* Meta chips */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
+                      <MapPin size={13} className="text-blue-500" /> {location}
                     </span>
-                  )}
-                </div>
+                    <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
+                      <Briefcase size={13} className="text-green-500" /> {jobType}
+                    </span>
+                    <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
+                      <Clock size={13} className="text-orange-500" /> {posted}
+                    </span>
+                    {salary && (
+                      <span className="flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 text-sm font-medium px-3 py-1.5 rounded-full">
+                        <Banknote size={13} className="text-green-600" /> {salary}
+                      </span>
+                    )}
+                    {category && (
+                      <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm font-medium px-3 py-1.5 rounded-full">
+                        <Tag size={13} className="text-indigo-500" /> {category}
+                      </span>
+                    )}
+                  </div>
 
-                {/* Apply button */}
-                <a href={applyUrl} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-sm text-base">
-                  Apply on {source} <ArrowUpRight size={17} />
-                </a>
-                {copied && <span className="ml-3 text-sm text-green-600 font-medium">Link copied!</span>}
+                  {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-6">
+                      {tags.map((t) => (
+                        <span key={t} className="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">{t}</span>
+                      ))}
+                    </div>
+                  )}
+                  {tags.length === 0 && <div className="mb-6" />}
+
+                  {/* Apply button */}
+                  <a href={applyUrl} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-sm text-base">
+                    Apply on {source} <ArrowUpRight size={17} />
+                  </a>
+                  {copied && <span className="ml-3 text-sm text-green-600 font-medium">Link copied!</span>}
+                </div>
               </div>
 
               {/* Description */}
@@ -276,6 +304,21 @@ export default function JobDetail() {
                 <div className="text-gray-600 leading-relaxed prose prose-sm max-w-none prose-headings:text-gray-800 prose-a:text-blue-600"
                   dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
               </div>
+
+              {/* Highlights: Qualifications / Responsibilities / Benefits (JSearch sources) */}
+              {highlights && (highlights.Qualifications || highlights.Responsibilities || highlights.Benefits) && (
+                <div className="grid sm:grid-cols-2 gap-5">
+                  {highlights.Responsibilities?.length > 0 && (
+                    <HighlightCard icon={ListChecks} color="#2563eb" bg="#eff6ff" title="Responsibilities" items={highlights.Responsibilities} />
+                  )}
+                  {highlights.Qualifications?.length > 0 && (
+                    <HighlightCard icon={CheckCircle2} color="#059669" bg="#ecfdf5" title="Qualifications" items={highlights.Qualifications} />
+                  )}
+                  {highlights.Benefits?.length > 0 && (
+                    <HighlightCard icon={Gift} color="#d97706" bg="#fffbeb" title="Benefits" items={highlights.Benefits} />
+                  )}
+                </div>
+              )}
 
               {/* Bottom apply */}
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -371,5 +414,26 @@ function Globe2({ size }) {
       <line x1="2" y1="12" x2="22" y2="12"/>
       <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
     </svg>
+  );
+}
+
+function HighlightCard({ icon: Icon, color, bg, title, items }) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+      <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: bg, color }}>
+          <Icon size={14} />
+        </span>
+        {title}
+      </h3>
+      <ul className="space-y-2.5">
+        {items.slice(0, 8).map((item, i) => (
+          <li key={i} className="flex items-start gap-2 text-sm text-gray-600 leading-snug">
+            <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

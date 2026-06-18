@@ -4,7 +4,9 @@ import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import CategoryTabs from "@/components/CategoryTabs";
 import AdSlot from "@/components/AdSlot";
+import PageHeader from "@/components/PageHeader";
 import { mergeManualJobs } from "@/utils/mergeJobs";
+import { Wifi } from "lucide-react";
 
 const filters = ["All", "Software Development", "Customer Service", "Marketing", "Design"];
 
@@ -59,8 +61,13 @@ export default function RemoteJobs() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <CategoryTabs />
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Remote Jobs</h1>
-        <p className="text-gray-500 mb-6">Work from anywhere — updated daily</p>
+        <PageHeader
+          icon={Wifi}
+          title="Remote Jobs"
+          subtitle="Work from anywhere — updated daily"
+          badge={jobs.length > 0 ? `${jobs.length} live opportunities` : undefined}
+          gradient="linear-gradient(135deg, #1d4ed8, #4f46e5)"
+        />
 
         <div className="flex flex-wrap gap-2 mb-6">
           {filters.map((f) => (

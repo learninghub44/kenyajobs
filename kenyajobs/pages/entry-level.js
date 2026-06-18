@@ -4,7 +4,9 @@ import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import CategoryTabs from "@/components/CategoryTabs";
 import AdSlot from "@/components/AdSlot";
+import PageHeader from "@/components/PageHeader";
 import { mergeManualJobs } from "@/utils/mergeJobs";
+import { Rocket } from "lucide-react";
 
 const filters = ["All", "Tech", "Banking", "Sales", "Admin"];
 
@@ -62,8 +64,13 @@ export default function EntryLevel() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <CategoryTabs />
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Entry Level Jobs</h1>
-        <p className="text-gray-500 mb-6">No experience? No problem — start your career here</p>
+        <PageHeader
+          icon={Rocket}
+          title="Entry Level Jobs"
+          subtitle="No experience? No problem — start your career here"
+          badge={jobs.length > 0 ? `${jobs.length} live opportunities` : undefined}
+          gradient="linear-gradient(135deg, #047857, #0891b2)"
+        />
 
         <div className="flex flex-wrap gap-2 mb-6">
           {filters.map((f) => (

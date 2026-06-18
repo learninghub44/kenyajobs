@@ -1,5 +1,6 @@
 // Providers: Remotive + Jobicy + Arbeitnow (all free, no key)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+import { cacheJobs } from "@/lib/liveJobCache";
 
 export default async function handler(req, res) {
   const { category = "", limit = 30 } = req.query;
@@ -24,6 +25,7 @@ export default async function handler(req, res) {
         url: j.url,
         description: j.description,
         source: "Remotive",
+        category: j.category || undefined,
         salary: j.salary || undefined,
         companyLogo: j.company_logo_url || j.company_logo || undefined,
       })))
@@ -43,6 +45,7 @@ export default async function handler(req, res) {
         description: j.jobDescription,
         source: "Jobicy",
         companyLogo: j.companyLogo || undefined,
+        category: j.jobIndustry || undefined,
         annualSalaryMin: j.annualSalaryMin || undefined,
         annualSalaryMax: j.annualSalaryMax || undefined,
         salaryCurrency: j.salaryCurrency || undefined,
@@ -63,6 +66,7 @@ export default async function handler(req, res) {
         description: j.description,
         source: "Arbeitnow",
         companyLogo: j.company_logo || undefined,
+        tags: Array.isArray(j.tags) ? j.tags : undefined,
       })))
       .catch(err => { console.error("Arbeitnow error:", err.message); return []; }),
   ]);
@@ -71,5 +75,6 @@ export default async function handler(req, res) {
     .filter(r => r.status === "fulfilled")
     .flatMap(r => r.value);
 
+  cacheJobs(jobs);
   res.status(200).json(jobs);
 }

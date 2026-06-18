@@ -77,8 +77,20 @@ async function ensureSchema() {
           updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
 
+        -- Snapshot of live-pulled jobs, written whenever any *-jobs API route resolves a
+        -- batch. This is what makes the job detail page reliable for shared links, new-tab
+        -- opens, and crawler visits: instead of re-querying every live source (which is
+        -- subject to per-source timeouts and upstream feeds rotating jobs out), the detail
+        -- page can do one fast, deterministic lookup here first.
+        CREATE TABLE IF NOT EXISTS live_job_cache (
+          id TEXT PRIMARY KEY,
+          data JSONB NOT NULL,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+
         CREATE INDEX IF NOT EXISTS manual_jobs_published_idx ON manual_jobs (published);
         CREATE INDEX IF NOT EXISTS ads_active_placement_idx ON ads (active, placement);
+        CREATE INDEX IF NOT EXISTS live_job_cache_updated_idx ON live_job_cache (updated_at);
       `)
       .catch((err) => {
         // Let the next call retry instead of caching a failed bootstrap forever.

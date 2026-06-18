@@ -1,5 +1,6 @@
 // Search: The Muse + Remotive + Jobicy + JSearch (if key)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+import { cacheJobs } from "@/lib/liveJobCache";
 
 export default async function handler(req, res) {
   const { query = "" } = req.query;
@@ -14,8 +15,8 @@ export default async function handler(req, res) {
     fetchWithTimeout(`https://www.themuse.com/api/public/jobs?descending=true&page=1`)
       .then(r => r.json())
       .then(d => (d.results || [])
-        .filter(j => j.name.toLowerCase().includes(query.toLowerCase()) ||
-          j.company?.name?.toLowerCase().includes(query.toLowerCase()))
+        .filter(j => (j.name || "").toLowerCase().includes(query.toLowerCase()) ||
+          (j.company?.name || "").toLowerCase().includes(query.toLowerCase()))
         .map(j => ({
           id: `muse-${j.id}`,
           title: j.name,
@@ -58,7 +59,7 @@ export default async function handler(req, res) {
         type: j.jobType || "Full-time",
         date: j.pubDate,
         url: j.url,
-        description: (j.jobDescription || "").replace(/<[^>]*>/g, "").slice(0, 300),
+        description: j.jobDescription || "",
         source: "Jobicy",
         companyLogo: j.companyLogo || undefined,
         annualSalaryMin: j.annualSalaryMin || undefined,
@@ -101,5 +102,6 @@ export default async function handler(req, res) {
     .filter(r => r.status === "fulfilled")
     .flatMap(r => r.value);
 
+  cacheJobs(jobs);
   res.status(200).json(jobs);
 }

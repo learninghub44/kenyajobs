@@ -50,6 +50,14 @@ function formatSalary(job) {
   return null;
 }
 
+// Strip any HTML and collapse whitespace for a clean card preview.
+function excerpt(text, max = 130) {
+  if (!text) return "";
+  const plain = String(text).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (plain.length <= max) return plain;
+  return plain.slice(0, max).trim() + "…";
+}
+
 export default function JobCard({ job }) {
   const title = String(job.title || job.job_title || "Job Title");
   const company = String(job.company || job.company_name || job.employer_name || "Company");
@@ -63,81 +71,91 @@ export default function JobCard({ job }) {
   const logoUrl = job.companyLogo || job.company_logo || job.employer_logo || job.companyLogo_url;
   const salary = formatSalary(job);
   const isFeatured = Boolean(job.featured);
+  const preview = excerpt(job.description || job.job_description);
 
   return (
     <Link href={`/job/${jobId}`} onClick={() => saveJob(jobId, job)}
-      className="group bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-400 hover:shadow-lg transition-all duration-200 flex flex-col gap-4">
+      className="group relative bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-blue-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {/* Company logo */}
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={logoUrl}
-              alt={company}
-              className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-gray-100 bg-white"
-              onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
-            />
-          ) : null}
-          <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg flex-shrink-0 border"
-            style={{ backgroundColor: bg, color: fg, borderColor: bg, display: logoUrl ? "none" : "flex" }}
-          >
-            {company.charAt(0).toUpperCase()}
+      {/* Colored accent strip, unique per company */}
+      <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${fg}, ${bg})` }} />
+
+      <div className="p-5 flex flex-col gap-3.5 flex-1">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            {/* Company logo */}
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt={company}
+                className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-gray-100 bg-white"
+                onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
+              />
+            ) : null}
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg flex-shrink-0 border"
+              style={{ backgroundColor: bg, color: fg, borderColor: bg, display: logoUrl ? "none" : "flex" }}
+            >
+              {company.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 font-medium">{company}</p>
+              <h3 className="font-semibold text-gray-900 text-base leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
+                {title}
+              </h3>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 font-medium">{company}</p>
-            <h3 className="font-semibold text-gray-900 text-base leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
-              {title}
-            </h3>
+          {/* Bookmark placeholder */}
+          <div className="text-gray-300 group-hover:text-blue-400 transition-colors flex-shrink-0 mt-1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+            </svg>
           </div>
         </div>
-        {/* Bookmark placeholder */}
-        <div className="text-gray-300 group-hover:text-blue-400 transition-colors flex-shrink-0 mt-1">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
-          </svg>
-        </div>
-      </div>
 
-      {/* Tags */}
-      <div className="flex flex-wrap gap-2">
-        {isFeatured && (
-          <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-amber-50 text-amber-700 border-amber-200">
-            <Star size={10} className="fill-amber-500 text-amber-500" /> Featured
-          </span>
+        {preview && (
+          <p className="text-sm text-gray-500 leading-snug line-clamp-2">{preview}</p>
         )}
-        <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${TAG_COLORS[jobType] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
-          {jobType}
-        </span>
-        {isRemote && (
-          <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
-            <Wifi size={10} /> Remote
-          </span>
-        )}
-        {salary && (
-          <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-green-50 text-green-700 border-green-200">
-            <Banknote size={10} /> {salary}
-          </span>
-        )}
-        {source && (
-          <span className="text-xs text-gray-400 px-2.5 py-1 rounded-full border border-gray-100 bg-gray-50">
-            via {source}
-          </span>
-        )}
-      </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-        <div className="flex items-center gap-3 text-xs text-gray-400">
-          <span className="flex items-center gap-1"><MapPin size={11} />{location.split(",")[0]}</span>
-          <span className="flex items-center gap-1"><Clock size={11} />{posted}</span>
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2">
+          {isFeatured && (
+            <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-amber-50 text-amber-700 border-amber-200">
+              <Star size={10} className="fill-amber-500 text-amber-500" /> Featured
+            </span>
+          )}
+          <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${TAG_COLORS[jobType] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
+            {jobType}
+          </span>
+          {isRemote && (
+            <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+              <Wifi size={10} /> Remote
+            </span>
+          )}
+          {salary && (
+            <span className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-green-50 text-green-700 border-green-200">
+              <Banknote size={10} /> {salary}
+            </span>
+          )}
+          {source && (
+            <span className="text-xs text-gray-400 px-2.5 py-1 rounded-full border border-gray-100 bg-gray-50">
+              via {source}
+            </span>
+          )}
         </div>
-        <span className="text-xs font-semibold text-blue-600 flex items-center gap-1 group-hover:gap-2 transition-all">
-          View Job <ArrowRight size={12} />
-        </span>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-3 mt-auto border-t border-gray-100">
+          <div className="flex items-center gap-3 text-xs text-gray-400">
+            <span className="flex items-center gap-1"><MapPin size={11} />{location.split(",")[0]}</span>
+            <span className="flex items-center gap-1"><Clock size={11} />{posted}</span>
+          </div>
+          <span className="text-xs font-semibold text-blue-600 flex items-center gap-1 group-hover:gap-2 transition-all">
+            View Job <ArrowRight size={12} />
+          </span>
+        </div>
       </div>
     </Link>
   );
