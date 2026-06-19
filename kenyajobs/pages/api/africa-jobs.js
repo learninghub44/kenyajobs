@@ -59,7 +59,7 @@ function parseRSS(xml, source, defaultLocation) {
         type: "Full-time",
         date: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
         url: link,
-        description: description.replace(/<[^>]*>/g, "").trim().slice(0, 500),
+        description: description.replace(/<[^>]*>/g, "").trim(),
         source,
       });
     }
@@ -83,7 +83,7 @@ async function fetchRemotive() {
       type: j.job_type || "Full-time",
       date: j.publication_date,
       url: j.url,
-      description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 500),
+      description: (j.description || "").replace(/<[^>]*>/g, ""),
       source: "Remotive",
       companyLogo: j.company_logo_url || j.company_logo,
     }));
@@ -107,7 +107,7 @@ async function fetchJobicy() {
           type: j.jobType || "Full-time",
           date: j.pubDate,
           url: j.url,
-          description: (j.jobDescription || "").replace(/<[^>]*>/g, "").slice(0, 500),
+          description: (j.jobDescription || "").replace(/<[^>]*>/g, ""),
           source: "Jobicy",
           companyLogo: j.companyLogo,
         })))
@@ -133,7 +133,7 @@ async function fetchArbeitnow() {
       type: j.remote ? "Remote" : "Full-time",
       date: j.created_at ? new Date(j.created_at * 1000).toISOString() : new Date().toISOString(),
       url: j.url,
-      description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 500),
+      description: (j.description || "").replace(/<[^>]*>/g, ""),
       source: "Arbeitnow",
     }));
   } catch(e) { console.warn("[Arbeitnow]", e.message); return []; }
@@ -157,7 +157,7 @@ async function fetchTheMuse() {
       type: j.levels?.[0]?.name || "Full-time",
       date: j.publication_date || new Date().toISOString(),
       url: j.refs?.landing_page || `https://www.themuse.com/jobs/${j.id}`,
-      description: (j.contents || "").replace(/<[^>]*>/g, "").slice(0, 500),
+      description: (j.contents || "").replace(/<[^>]*>/g, ""),
       source: "The Muse",
     }));
   } catch(e) { console.warn("[TheMuse]", e.message); return []; }
@@ -179,7 +179,7 @@ async function fetchHimalayas() {
       type: j.employmentType || "Remote",
       date: j.pubDate || j.createdAt || new Date().toISOString(),
       url: j.applicationLink || `https://himalayas.app/jobs/${j.slug}`,
-      description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 500),
+      description: (j.description || "").replace(/<[^>]*>/g, ""),
       source: "Himalayas",
       companyLogo: j.company?.logo,
     }));
@@ -206,7 +206,7 @@ async function fetchReliefWeb() {
         type: f["job-type"]?.[0]?.name || "Full-time",
         date: f.date?.created || new Date().toISOString(),
         url: f.url || `https://reliefweb.int/job/${j.id}`,
-        description: (f.body || "").replace(/<[^>]*>/g, "").slice(0, 500),
+        description: (f.body || "").replace(/<[^>]*>/g, ""),
         source: "ReliefWeb",
       };
     });
@@ -239,7 +239,7 @@ async function fetchLinkedIn() {
             type: "Full-time",
             date: j.pubDate ? new Date(j.pubDate).toISOString() : new Date().toISOString(),
             url: j.link,
-            description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 500),
+            description: (j.description || "").replace(/<[^>]*>/g, ""),
             source: "LinkedIn",
           })).filter(j => j.title && j.url);
         })
@@ -275,7 +275,7 @@ async function fetchIndeed() {
             type: "Full-time",
             date: j.pubDate ? new Date(j.pubDate).toISOString() : new Date().toISOString(),
             url: j.link,
-            description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 500),
+            description: (j.description || "").replace(/<[^>]*>/g, ""),
             source: "Indeed",
           })).filter(j => j.title && j.url);
         })
@@ -314,7 +314,7 @@ async function fetchKenyaViaProxy() {
             type: "Full-time",
             date: j.pubDate ? new Date(j.pubDate).toISOString() : new Date().toISOString(),
             url: j.link || j.guid,
-            description: (j.description || "").replace(/<[^>]*>/g, "").slice(0, 500),
+            description: (j.description || "").replace(/<[^>]*>/g, ""),
             source,
           })).filter(j => j.title && j.url);
         })
