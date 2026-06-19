@@ -6,7 +6,7 @@ import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import AdSlot from "@/components/AdSlot";
 import SourcesMarquee from "@/components/SourcesMarquee";
-import { Search, Briefcase, Globe, ChevronRight, Wifi, GraduationCap, Home as HomeIcon, Rocket, RefreshCw, CheckCircle2, Building2 } from "lucide-react";
+import { Search, Briefcase, Globe, ChevronRight, Wifi, GraduationCap, Home as HomeIcon, Rocket, RefreshCw, CheckCircle2, Building2, BookOpen } from "lucide-react";
 
 const CATEGORIES = [
   { label: "All Jobs", value: "" },
@@ -86,6 +86,16 @@ const CAT_CARDS = [
     accentBg: "#fffbeb",
     photo: "https://images.unsplash.com/photo-1585421514738-01798e348b17?w=600&q=80&auto=format&fit=crop",
     alt: "Home office setup",
+  },
+  {
+    title: "Internships",
+    desc: "Paid & unpaid internship opportunities across Kenya and Africa — build real experience and kick-start your career.",
+    href: "/internships",
+    icon: BookOpen,
+    accent: "#7c3aed",
+    accentBg: "#f5f3ff",
+    photo: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&q=80&auto=format&fit=crop",
+    alt: "Internship and training",
   },
 ];
 

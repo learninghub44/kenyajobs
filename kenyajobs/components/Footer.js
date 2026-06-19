@@ -34,7 +34,7 @@ export default function Footer() {
 
       {/* Main footer content */}
       <div className="max-w-7xl mx-auto px-4 pt-12 pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-10 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-7 gap-8 mb-12">
 
           {/* Brand col */}
           <div className="col-span-2 md:col-span-2">
@@ -65,6 +65,7 @@ export default function Footer() {
                 ["Graduate Jobs", "/graduate-jobs"],
                 ["Work From Home", "/work-from-home"],
                 ["Internships", "/internships"],
+                ["Africa Jobs", "/africa-jobs"],
               ].map(([l, h]) => (
                 <li key={h}>
                   <Link href={h} className="hover:text-white transition-colors">{l}</Link>
@@ -73,9 +74,24 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Candidates */}
+          {/* Popular Roles */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Candidates</h3>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Popular Roles</h3>
+            <ul className="space-y-2.5 text-base">
+              {[
+                ["Software Engineer", "software engineer"],
+                ["Accountant", "accountant"],
+                ["Nurse", "nurse"],
+                ["Teacher", "teacher"],
+                ["Sales Manager", "sales manager"],
+                ["Customer Service", "customer service"],
+              ].map(([label, q]) => (
+                <li key={label}>
+                  <Link href={`/search?q=${encodeURIComponent(q)}`} className="hover:text-white transition-colors">{label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
             <ul className="space-y-2.5 text-base">
               {[
                 ["CV Tips", "/cv-tips"],

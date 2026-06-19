@@ -9,6 +9,7 @@ const NAV_LINKS = [
   ["Graduate", "/graduate-jobs"],
   ["Work From Home", "/work-from-home"],
   ["Internships", "/internships"],
+  ["Africa Jobs", "/africa-jobs"],
 ];
 
 export default function Navbar() {
