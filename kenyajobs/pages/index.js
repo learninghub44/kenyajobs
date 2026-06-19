@@ -448,6 +448,147 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── APP DOWNLOAD ──────────────────────────────────────────────────── */}
+      <section className="bg-[#0b2233] py-16 px-4 overflow-hidden relative">
+        {/* Background glow */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600 opacity-10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-500 opacity-10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-5xl mx-auto relative">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+
+            {/* Left — copy */}
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-5 uppercase tracking-wide">
+                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
+                Available on all devices
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
+                Job hunt on the go.<br />
+                <span className="text-amber-400">Add to your home screen.</span>
+              </h2>
+              <p className="text-slate-400 text-base mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed">
+                JobsWorldwide works as a full app on your phone — no download required.
+                Browse thousands of live jobs, get instant search, and apply in seconds.
+              </p>
+
+              {/* Feature pills */}
+              <div className="flex flex-wrap gap-2 justify-center lg:justify-start mb-8">
+                {["No sign-up needed", "Works offline", "Instant search", "Free forever"].map(f => (
+                  <span key={f} className="flex items-center gap-1.5 text-sm text-slate-300 bg-white/8 border border-white/10 px-3 py-1.5 rounded-full">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <circle cx="6" cy="6" r="5.5" stroke="#34d399" />
+                      <path d="M3.5 6l1.5 1.5 3-3" stroke="#34d399" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    {f}
+                  </span>
+                ))}
+              </div>
+
+              {/* Install buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                {/* iOS — Add to Home Screen */}
+                <div className="flex items-center gap-3 bg-white/10 hover:bg-white/15 border border-white/15 hover:border-white/25 rounded-xl px-5 py-3.5 transition-all cursor-pointer group"
+                  onClick={() => alert("On iPhone: tap the Share button (□↑) in Safari, then tap \"Add to Home Screen\"")}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                  </svg>
+                  <div className="text-left">
+                    <p className="text-white/60 text-[10px] leading-none mb-0.5">Download on</p>
+                    <p className="text-white font-bold text-sm">iPhone / iPad</p>
+                  </div>
+                </div>
+
+                {/* Android — Add to Home Screen */}
+                <div className="flex items-center gap-3 bg-white/10 hover:bg-white/15 border border-white/15 hover:border-white/25 rounded-xl px-5 py-3.5 transition-all cursor-pointer group"
+                  onClick={() => alert("On Android: tap the 3-dot menu in Chrome, then tap \"Add to Home screen\"")}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M17.523 0H6.477L2 4.477v15.046L6.477 24h11.046L22 19.523V4.477L17.523 0z" fill="#fff" fillOpacity=".1"/>
+                    <path d="M7 8.5a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z" fill="#34d399"/>
+                    <path d="M5 9.5h14a7 7 0 01-14 0z" fill="#fff" fillOpacity=".2"/>
+                    <path d="M3 8.5l-2 3m20-3l2 3M8 16.5l-1 3m10-3l1 3" stroke="#fff" strokeOpacity=".6" strokeWidth="1.5" strokeLinecap="round"/>
+                    <ellipse cx="12" cy="9.5" rx="7" ry="5" stroke="#4ade80" strokeWidth="1.2"/>
+                    <path d="M8 4L12 1l4 3" stroke="#4ade80" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <div className="text-left">
+                    <p className="text-white/60 text-[10px] leading-none mb-0.5">Get it on</p>
+                    <p className="text-white font-bold text-sm">Android</p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-slate-600 text-xs mt-4">
+                No app store needed · Works in your browser · Installable as a PWA
+              </p>
+            </div>
+
+            {/* Right — phone mockup */}
+            <div className="flex-shrink-0 relative">
+              <div className="relative w-56 h-auto mx-auto">
+                {/* Phone frame */}
+                <div className="bg-gray-900 rounded-[2.5rem] border-4 border-gray-700 shadow-2xl shadow-blue-900/40 p-3 relative">
+                  {/* Notch */}
+                  <div className="absolute top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-gray-900 rounded-full z-10" />
+                  {/* Screen */}
+                  <div className="bg-white rounded-[1.75rem] overflow-hidden">
+                    {/* Status bar */}
+                    <div className="bg-[#0b2233] px-4 pt-6 pb-4">
+                      <div className="flex items-center gap-1.5 mb-3">
+                        <div className="w-5 h-5 bg-blue-600 rounded-md flex items-center justify-center">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                            <circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="3.5" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/>
+                          </svg>
+                        </div>
+                        <span className="text-white text-[8px] font-bold">JobsWorldwide</span>
+                      </div>
+                      <div className="bg-white/15 rounded-lg px-2 py-1.5 flex items-center gap-1.5">
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <span className="text-white/60 text-[7px]">Search jobs...</span>
+                      </div>
+                    </div>
+                    {/* Job cards */}
+                    <div className="bg-gray-50 p-2 space-y-2">
+                      {[
+                        { title: "Product Designer", co: "Safaricom", loc: "Remote", color: "bg-purple-100 text-purple-700" },
+                        { title: "Software Engineer", co: "Google", loc: "Nairobi", color: "bg-blue-100 text-blue-700" },
+                        { title: "Marketing Manager", co: "Equity Bank", loc: "Hybrid", color: "bg-orange-100 text-orange-700" },
+                      ].map((j, i) => (
+                        <div key={i} className="bg-white rounded-xl p-2.5 shadow-sm border border-gray-100">
+                          <div className="flex items-start gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500 flex-shrink-0">
+                              {j.co[0]}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-gray-900 font-semibold text-[8px] leading-tight truncate">{j.title}</p>
+                              <p className="text-gray-400 text-[7px]">{j.co}</p>
+                              <span className={`text-[6px] font-semibold px-1.5 py-0.5 rounded-full ${j.color} mt-0.5 inline-block`}>{j.loc}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="text-center pt-1">
+                        <span className="text-blue-600 text-[7px] font-semibold">View 200+ more →</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating badges */}
+                <div className="absolute -right-8 top-8 bg-white rounded-xl shadow-xl border border-gray-100 px-3 py-2 text-center">
+                  <p className="text-green-500 font-extrabold text-sm">✓ Free</p>
+                  <p className="text-gray-400 text-[9px]">No sign-up</p>
+                </div>
+                <div className="absolute -left-8 bottom-12 bg-amber-400 rounded-xl shadow-xl px-3 py-2 text-center">
+                  <p className="text-gray-900 font-extrabold text-sm">New</p>
+                  <p className="text-gray-800 text-[9px]">Jobs daily</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* ── TRUST STRIP ───────────────────────────────────────────────────── */}
       <section className="bg-white border-t border-gray-100 py-10">
         <div className="max-w-6xl mx-auto px-4">

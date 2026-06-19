@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { Search, Menu, X, CheckCircle2 } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   ["Remote", "/remote-jobs"],
@@ -15,25 +15,6 @@ export default function Navbar() {
 
   return (
     <header>
-      {/* Trust bar */}
-      <div className="bg-[#0b2233] text-white/70 text-base py-2 px-4 hidden sm:block">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={10} className="text-emerald-400" />
-              Jobs verified from 15+ trusted sources
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={10} className="text-emerald-400" />
-              Updated multiple times daily
-            </span>
-          </div>
-          <a href="mailto:hello@jobsworldwide.online" className="hover:text-white transition-colors">
-            hello@jobsworldwide.online
-          </a>
-        </div>
-      </div>
-
       {/* Main nav */}
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
