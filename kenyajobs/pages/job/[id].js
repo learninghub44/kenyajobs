@@ -240,7 +240,7 @@ export default function JobDetail() {
     },
     "employmentType": jobType?.toUpperCase().replace("-", "_") || "FULL_TIME",
     "jobLocationType": isRemote ? "TELECOMMUTE" : undefined,
-    "url": `https://jobsworldwide.online/job/${jobId}`,
+    "url": `https://jobsworldwide.online/job/${id}`,
     "directApply": Boolean(applyUrl),
   };
 
@@ -252,7 +252,7 @@ export default function JobDetail() {
         <meta property="og:title"       content={`${title} at ${company}`} />
         <meta property="og:description" content={`${jobType} · ${location} — Apply now on JobsWorldwide`} />
         <meta property="og:type"        content="website" />
-        <meta property="og:url"         content={`https://jobsworldwide.online/job/${jobId}`} />
+        <meta property="og:url"         content={`https://jobsworldwide.online/job/${id}`} />
         <meta property="og:image"       content="https://jobsworldwide.online/og-image.jpg" />
         <meta name="twitter:card"       content="summary_large_image" />
         <meta name="twitter:title"      content={`${title} at ${company}`} />
