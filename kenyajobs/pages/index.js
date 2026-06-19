@@ -5,6 +5,7 @@ import Link from "next/link";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import AdSlot from "@/components/AdSlot";
+import SourcesMarquee from "@/components/SourcesMarquee";
 import { Search, Briefcase, Globe, ChevronRight, Wifi, GraduationCap, Home as HomeIcon, Rocket, RefreshCw, CheckCircle2, Building2 } from "lucide-react";
 
 const CATEGORIES = [
@@ -590,18 +591,7 @@ export default function Home() {
       </section>
 
       {/* ── TRUST STRIP ───────────────────────────────────────────────────── */}
-      <section className="bg-white border-t border-gray-100 py-10">
-        <div className="max-w-6xl mx-auto px-4">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest text-center mb-8">Trusted sources powering this site</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {["BrighterMonday", "LinkedIn", "Indeed", "Remotive", "Jobicy", "ReliefWeb", "The Muse", "Arbeitnow", "Himalayas", "Corporate Staffing", "MyJobMag", "Fuzu", "UNDP", "Devex"].map(s => (
-              <span key={s} className="bg-gray-50 border border-gray-200 text-gray-600 text-sm font-medium px-4 py-2 rounded-xl">
-                {s}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SourcesMarquee />
     </>
   );
 }
