@@ -205,8 +205,9 @@ export default function JobDetail() {
 
   const title = job.title || job.job_title || "Job Title";
   const company = job.company || job.company_name || job.employer_name || "Company";
-  const location = job.location || job.candidate_required_location || job.job_city || "Africa";
-  const jobType = job.type || job.job_type || job.employment_type || "Full-time";
+  const location = String(job.location || job.candidate_required_location || job.job_city || "Worldwide");
+  const jobType = String(job.type || job.job_type || job.employment_type || "Full-time");
+  const isRemote = location.toLowerCase().includes("remote") || jobType.toLowerCase().includes("remote");
   const description = job.description || job.job_description || "No description available.";
   const sanitizedDescription = typeof window !== "undefined"
     ? DOMPurify.sanitize(description, { ALLOWED_TAGS: ["p", "br", "ul", "ol", "li", "strong", "em", "b", "i", "h3", "h4", "a"], ALLOWED_ATTR: ["href", "target", "rel"] })
