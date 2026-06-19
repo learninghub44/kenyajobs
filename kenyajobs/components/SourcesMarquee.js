@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+
 
 // Every source with brand colour + SVG/letter logo
 const SOURCES = [
@@ -189,8 +189,8 @@ function MarqueeRow({ items, reverse = false, speed = 35 }) {
   return (
     <div className="overflow-hidden w-full">
       <div
-        className={`flex gap-3 w-max ${reverse ? "marquee-reverse" : "marquee"}`}
-        style={{ animationDuration: `${speed}s` }}
+        className={reverse ? "marquee-reverse flex gap-3 w-max" : "marquee flex gap-3 w-max"}
+        style={{ animationDuration: speed + "s" }}
       >
         {doubled.map((src, i) => (
           <div
@@ -212,27 +212,6 @@ function MarqueeRow({ items, reverse = false, speed = 35 }) {
           </div>
         ))}
       </div>
-
-      <style jsx>{`
-        .marquee {
-          animation: scroll-left linear infinite;
-        }
-        .marquee-reverse {
-          animation: scroll-right linear infinite;
-        }
-        @keyframes scroll-left {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-33.333%); }
-        }
-        @keyframes scroll-right {
-          0%   { transform: translateX(-33.333%); }
-          100% { transform: translateX(0); }
-        }
-        .marquee:hover,
-        .marquee-reverse:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </div>
   );
 }
