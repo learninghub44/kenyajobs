@@ -1,83 +1,55 @@
-<svg width="680" height="340" viewBox="0 0 680 340" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>JobsWorldwide logo</title>
-  <desc>Premium JobsWorldwide logo: a bold globe icon mark with a location pin, beside a two-tone wordmark</desc>
+<svg width="680" height="240" viewBox="0 0 680 240" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>JobsWorldwide</title>
+  <desc>JobsWorldwide logo — globe icon with location pin and bold wordmark</desc>
 
   <defs>
     <clipPath id="gc">
-      <circle cx="130" cy="170" r="72"/>
+      <circle cx="108" cy="120" r="84"/>
     </clipPath>
-    <linearGradient id="gBg" x1="0" y1="0" x2="0.4" y2="1">
-      <stop offset="0%" stop-color="#2563EB"/>
-      <stop offset="100%" stop-color="#1E3A8A"/>
-    </linearGradient>
-    <linearGradient id="pinG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#60A5FA"/>
-      <stop offset="100%" stop-color="#2563EB"/>
-    </linearGradient>
-    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-    </linearGradient>
   </defs>
 
-  <ellipse cx="130" cy="248" rx="58" ry="10" fill="#1E3A8A" opacity="0.18"/>
-  <circle cx="130" cy="170" r="72" fill="url(#gBg)"/>
+  <!-- Globe -->
+  <circle cx="108" cy="120" r="84" fill="#0b2233"/>
 
-  <g clip-path="url(#gc)" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.2">
-    <ellipse cx="130" cy="170" rx="72" ry="24"/>
-    <ellipse cx="130" cy="170" rx="72" ry="48"/>
-    <line x1="58" y1="170" x2="202" y2="170"/>
-    <line x1="58" y1="134" x2="202" y2="134"/>
-    <line x1="58" y1="206" x2="202" y2="206"/>
+  <!-- Latitude lines -->
+  <g clip-path="url(#gc)" fill="none" stroke="#1e4a6e" stroke-width="1.5">
+    <ellipse cx="108" cy="120" rx="84" ry="24"/>
+    <ellipse cx="108" cy="120" rx="84" ry="50"/>
+    <line x1="24" y1="120" x2="192" y2="120"/>
+    <line x1="24" y1="83" x2="192" y2="83"/>
+    <line x1="24" y1="157" x2="192" y2="157"/>
   </g>
 
-  <g clip-path="url(#gc)" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.2">
-    <ellipse cx="130" cy="170" rx="24" ry="72"/>
-    <ellipse cx="130" cy="170" rx="48" ry="72"/>
-    <line x1="130" y1="98" x2="130" y2="242"/>
+  <!-- Longitude lines -->
+  <g clip-path="url(#gc)" fill="none" stroke="#1e4a6e" stroke-width="1.5">
+    <ellipse cx="108" cy="120" rx="24" ry="84"/>
+    <ellipse cx="108" cy="120" rx="50" ry="84"/>
+    <line x1="108" y1="36" x2="108" y2="204"/>
   </g>
 
-  <g clip-path="url(#gc)" opacity="0.72">
-    <path d="M138 145 Q148 140 152 150 Q158 162 155 180 Q152 192 144 194 Q134 196 130 185 Q126 172 130 158 Q132 148 138 145Z" fill="#60A5FA"/>
-    <path d="M110 130 Q118 124 126 126 Q132 128 130 136 Q126 142 118 140 Q110 138 110 130Z" fill="#93C5FD"/>
-    <path d="M72 148 Q78 142 84 146 Q88 154 86 164 Q82 170 76 166 Q70 160 72 148Z" fill="#60A5FA"/>
-    <path d="M68 172 Q74 168 78 174 Q80 182 76 188 Q70 190 66 184 Q64 176 68 172Z" fill="#60A5FA"/>
-    <path d="M158 128 Q168 122 176 128 Q184 136 180 146 Q174 150 166 148 Q156 144 158 128Z" fill="#93C5FD"/>
-  </g>
+  <!-- Globe border -->
+  <circle cx="108" cy="120" r="84" fill="none" stroke="#1e4a6e" stroke-width="2"/>
 
-  <ellipse cx="110" cy="138" rx="46" ry="32" fill="url(#sheen)" clip-path="url(#gc)"/>
-  <circle cx="130" cy="170" r="72" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+  <!-- Location pin -->
+  <circle cx="108" cy="100" r="21" fill="#f2a93c"/>
+  <circle cx="108" cy="100" r="9" fill="#0b2233"/>
+  <path d="M108 122 L97 107 Q86 92 108 78 Q130 92 119 107 Z" fill="#f2a93c"/>
 
-  <circle cx="148" cy="152" r="14" fill="#ffffff"/>
-  <circle cx="148" cy="152" r="8" fill="#2563EB"/>
-  <circle cx="148" cy="152" r="4" fill="#ffffff"/>
-  <line x1="148" y1="166" x2="148" y2="182" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-  <circle cx="148" cy="184" r="3" fill="#ffffff"/>
+  <!-- "Jobs" wordmark -->
+  <text x="216" y="104"
+    font-family="'DM Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif"
+    font-size="70" font-weight="700" fill="#0b2233" letter-spacing="-2">Jobs</text>
 
-  <text x="226" y="158"
-        font-family="Georgia, 'Times New Roman', serif"
-        font-size="72"
-        font-weight="700"
-        fill="#0F172A"
-        letter-spacing="-2">Jobs</text>
+  <!-- Divider -->
+  <rect x="216" y="116" width="332" height="2" fill="#e2e8f0" rx="1"/>
 
-  <text x="229" y="202"
-        font-family="Arial, Helvetica, sans-serif"
-        font-size="28"
-        font-weight="400"
-        fill="#2563EB"
-        letter-spacing="6">Worldwide</text>
+  <!-- "Worldwide" wordmark -->
+  <text x="219" y="156"
+    font-family="'DM Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif"
+    font-size="36" font-weight="500" fill="#f2a93c" letter-spacing="5">Worldwide</text>
 
-  <line x1="229" y1="168" x2="574" y2="168" stroke="#E2E8F0" stroke-width="1"/>
-
-  <text x="229" y="236"
-        font-family="Arial, Helvetica, sans-serif"
-        font-size="12"
-        font-weight="400"
-        fill="#94A3B8"
-        letter-spacing="3">Find your next opportunity, anywhere</text>
-
-  <circle cx="229" cy="256" r="4" fill="#2563EB"/>
-  <circle cx="243" cy="256" r="4" fill="#93C5FD"/>
-  <circle cx="257" cy="256" r="4" fill="#DBEAFE"/>
+  <!-- Tagline -->
+  <text x="220" y="188"
+    font-family="'DM Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif"
+    font-size="13" font-weight="400" fill="#8b94a0" letter-spacing="2.5">Africa · Remote · Worldwide</text>
 </svg>
