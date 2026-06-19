@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIAssistant from "@/components/AIAssistant";
 import CookieBanner from "@/components/CookieBanner";
+import Analytics from "@/components/Analytics";
 
 export default function App({ Component, pageProps }) {
   return (
@@ -21,6 +22,7 @@ export default function App({ Component, pageProps }) {
       <Footer />
       <AIAssistant />
       <CookieBanner />
+      <Analytics />
     </div>
   );
 }
