@@ -160,8 +160,6 @@ export default function Footer() {
             <Link href="/about" className="hover:text-white transition-colors">About</Link>
             <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
           </div>
-        </div>
-      </div>
     </footer>
   );
 }
