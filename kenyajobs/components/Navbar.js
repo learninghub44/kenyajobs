@@ -16,7 +16,7 @@ export default function Navbar() {
   return (
     <header>
       {/* Trust bar */}
-      <div className="bg-[#0b2233] text-white/70 text-sm py-1.5 px-4 hidden sm:block">
+      <div className="bg-[#0b2233] text-white/70 text-base py-2 px-4 hidden sm:block">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
@@ -46,7 +46,7 @@ export default function Navbar() {
 
             {/* Desktop nav links */}
             <div className="hidden md:flex items-center gap-0.5">
-              <Link href="/" className="text-sm font-medium text-gray-500 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
+              <Link href="/" className="text-base font-medium text-gray-500 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
                 Home
               </Link>
               {NAV_LINKS.map(([label, href]) => (
@@ -65,12 +65,12 @@ export default function Navbar() {
               >
                 <Search size={17} />
               </Link>
-              <Link href="/about" className="text-sm text-gray-500 hover:text-gray-800 transition-colors px-2">
+              <Link href="/about" className="text-base text-gray-500 hover:text-gray-800 transition-colors px-2">
                 About
               </Link>
               <a
                 href="mailto:hello@jobsworldwide.online"
-                className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white text-base font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
               >
                 Post a Job
               </a>
@@ -98,7 +98,7 @@ export default function Navbar() {
             ))}
             <a
               href="mailto:hello@jobsworldwide.online"
-              className="mt-2 bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg text-center"
+              className="mt-2 bg-blue-600 text-white text-base font-semibold px-4 py-2.5 rounded-lg text-center"
             >
               Post a Job
             </a>

@@ -222,11 +222,44 @@ export default function JobDetail() {
   const tags = Array.isArray(job.tags) ? job.tags.slice(0, 8) : [];
   const highlights = job.highlights && typeof job.highlights === "object" ? job.highlights : null;
 
+  const jsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "JobPosting",
+    "title": title,
+    "description": String(job.description || job.job_description || "").replace(/<[^>]*>/g, " ").slice(0, 500),
+    "datePosted": job.date || job.publication_date || job.job_posted_at_datetime_utc || new Date().toISOString(),
+    "hiringOrganization": {
+      "@type": "Organization",
+      "name": company,
+      "logo": job.companyLogo || job.company_logo || job.employer_logo || "",
+    },
+    "jobLocation": {
+      "@type": "Place",
+      "address": { "@type": "PostalAddress", "addressLocality": location },
+    },
+    "employmentType": jobType?.toUpperCase().replace("-", "_") || "FULL_TIME",
+    "jobLocationType": isRemote ? "TELECOMMUTE" : undefined,
+    "url": `https://jobsworldwide.online/job/${jobId}`,
+    "directApply": Boolean(applyUrl),
+  };
+
   return (
     <>
       <Head>
         <title>{title} at {company} | JobsWorldwide</title>
         <meta name="description" content={`Apply for ${title} at ${company}. ${location}.`} />
+        <meta property="og:title"       content={`${title} at ${company}`} />
+        <meta property="og:description" content={`${jobType} · ${location} — Apply now on JobsWorldwide`} />
+        <meta property="og:type"        content="website" />
+        <meta property="og:url"         content={`https://jobsworldwide.online/job/${jobId}`} />
+        <meta property="og:image"       content="https://jobsworldwide.online/og-image.jpg" />
+        <meta name="twitter:card"       content="summary_large_image" />
+        <meta name="twitter:title"      content={`${title} at ${company}`} />
+        <meta name="twitter:description" content={`${jobType} · ${location} — Apply now on JobsWorldwide`} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </Head>
 
       <div className="bg-gray-50 min-h-screen">

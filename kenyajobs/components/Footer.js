@@ -47,10 +47,10 @@ export default function Footer() {
                 />
               </Link>
             </div>
-            <p className="text-sm leading-relaxed mb-5 text-slate-400">
+            <p className="text-base leading-relaxed mb-5 text-slate-400">
               We aggregate live job listings from 30+ reputable boards and post them in one place — so you spend less time searching and more time applying.
             </p>
-            <a href="mailto:hello@jobsworldwide.online" className="flex items-center gap-2 text-sm hover:text-white transition-colors mb-6">
+            <a href="mailto:hello@jobsworldwide.online" className="flex items-center gap-2 text-base hover:text-white transition-colors mb-6">
               <Mail size={13} /> hello@jobsworldwide.online
             </a>
           </div>
@@ -89,11 +89,11 @@ export default function Footer() {
             <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Our Sources</h3>
             <div className="flex flex-wrap gap-1.5 mb-5">
               {SOURCES.map(src => (
-                <span key={src} className="text-xs font-medium px-2 py-0.5 rounded bg-white/8 text-slate-400 border border-white/10">
+                <span key={src} className="text-sm font-medium px-2.5 py-1 rounded bg-white/8 text-slate-400 border border-white/10">
                   {src}
                 </span>
               ))}
-              <span className="text-xs font-medium px-2 py-0.5 rounded bg-white/8 text-slate-500 border border-white/10">
+              <span className="text-sm font-medium px-2.5 py-1 rounded bg-white/8 text-slate-500 border border-white/10">
                 +23 more
               </span>
             </div>

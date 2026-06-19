@@ -9,6 +9,7 @@ import "@fontsource/ibm-plex-mono/500.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIAssistant from "@/components/AIAssistant";
+import CookieBanner from "@/components/CookieBanner";
 
 export default function App({ Component, pageProps }) {
   return (
@@ -19,6 +20,7 @@ export default function App({ Component, pageProps }) {
       </main>
       <Footer />
       <AIAssistant />
+      <CookieBanner />
     </div>
   );
 }

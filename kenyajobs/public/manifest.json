@@ -1,0 +1,30 @@
+{
+  "name": "JobsWorldwide",
+  "short_name": "JobsWorldwide",
+  "description": "Find jobs worldwide — remote, entry level, graduate and work from home.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b2233",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-144.png",  "sizes": "144x144", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-152.png",  "sizes": "152x152", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Remote Jobs",    "url": "/remote-jobs",    "description": "Browse remote jobs worldwide"  },
+    { "name": "Entry Level",    "url": "/entry-level",    "description": "Entry level jobs for beginners" },
+    { "name": "Graduate Jobs",  "url": "/graduate-jobs",  "description": "Graduate jobs and programmes"  },
+    { "name": "Work From Home", "url": "/work-from-home", "description": "Work from home opportunities"  }
+  ]
+}
