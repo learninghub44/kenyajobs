@@ -5,7 +5,7 @@ import { CheckCircle2, Mail, Users, Globe, Zap, Send } from "lucide-react";
 const PACKAGES = [
   {
     name: "Standard",
-    price: "KES 3,500",
+    price: "KES 1,500",
     period: "per listing / 30 days",
     color: "border-gray-200",
     features: [
@@ -15,11 +15,10 @@ const PACKAGES = [
       "Listed under your company name",
     ],
     cta: "Get Started",
-    highlight: false,
   },
   {
     name: "Featured",
-    price: "KES 7,000",
+    price: "KES 3,000",
     period: "per listing / 30 days",
     color: "border-blue-500",
     features: [
@@ -30,11 +29,10 @@ const PACKAGES = [
       "Included in weekly email digest",
     ],
     cta: "Get Featured",
-    highlight: true,
   },
   {
     name: "Bundle",
-    price: "KES 18,000",
+    price: "KES 8,000",
     period: "5 listings / 60 days",
     color: "border-gray-200",
     features: [
@@ -45,7 +43,6 @@ const PACKAGES = [
       "Performance report",
     ],
     cta: "Talk to Us",
-    highlight: false,
   },
 ];
 
@@ -112,10 +109,7 @@ export default function Advertise() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Simple, transparent pricing</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {PACKAGES.map(pkg => (
-              <div key={pkg.name} className={`bg-white border-2 ${pkg.color} rounded-2xl p-6 flex flex-col ${pkg.highlight ? "shadow-md" : ""}`}>
-                {pkg.highlight && (
-                  <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full self-start mb-3">Most Popular</div>
-                )}
+              <div key={pkg.name} className={`bg-white border-2 ${pkg.color} rounded-2xl p-6 flex flex-col`}>
                 <h3 className="font-bold text-gray-900 text-lg mb-1">{pkg.name}</h3>
                 <div className="mb-1">
                   <span className="text-2xl font-black text-gray-900">{pkg.price}</span>
@@ -131,11 +125,7 @@ export default function Advertise() {
                 </ul>
                 <a
                   href={`mailto:hello@jobsworldwide.online?subject=${encodeURIComponent(`Advertise - ${pkg.name} Package`)}`}
-                  className={`text-center font-semibold text-sm py-2.5 px-4 rounded-xl transition-colors ${
-                    pkg.highlight
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "border border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className="text-center font-semibold text-sm py-2.5 px-4 rounded-xl transition-colors border border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   {pkg.cta}
                 </a>

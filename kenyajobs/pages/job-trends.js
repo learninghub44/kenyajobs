@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { TrendingUp, Briefcase, Globe, Zap, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { TrendingUp, Briefcase, Globe, Zap, ArrowUp, ArrowDown, Minus, Monitor, Landmark, HeartPulse, HandHeart, Package, BookOpen } from "lucide-react";
 
 const TRENDING_ROLES = [
   { title: "Data Analyst", trend: "up", change: "+34%", sector: "Tech / Finance", demand: "Very High" },
@@ -15,12 +15,12 @@ const TRENDING_ROLES = [
 ];
 
 const TOP_SECTORS = [
-  { sector: "Technology", icon: "💻", jobs: "1,200+", growth: "+31%", note: "Highest demand in Nairobi" },
-  { sector: "Banking & Finance", icon: "🏦", jobs: "850+", growth: "+14%", note: "Strong in Nairobi & Mombasa" },
-  { sector: "Healthcare", icon: "🏥", jobs: "620+", growth: "+22%", note: "County hospitals driving growth" },
-  { sector: "NGO / Development", icon: "🌍", jobs: "480+", growth: "+9%", note: "Donor-funded projects expanding" },
-  { sector: "Logistics & Supply Chain", icon: "📦", jobs: "390+", growth: "+19%", note: "E-commerce & exports rising" },
-  { sector: "Education", icon: "📚", jobs: "310+", growth: "+5%", note: "CBC rollout creating demand" },
+  { sector: "Technology", icon: Monitor, color: "text-blue-600", bg: "bg-blue-50", jobs: "1,200+", growth: "+31%", note: "Highest demand in Nairobi" },
+  { sector: "Banking & Finance", icon: Landmark, color: "text-indigo-600", bg: "bg-indigo-50", jobs: "850+", growth: "+14%", note: "Strong in Nairobi & Mombasa" },
+  { sector: "Healthcare", icon: HeartPulse, color: "text-rose-600", bg: "bg-rose-50", jobs: "620+", growth: "+22%", note: "County hospitals driving growth" },
+  { sector: "NGO / Development", icon: HandHeart, color: "text-emerald-600", bg: "bg-emerald-50", jobs: "480+", growth: "+9%", note: "Donor-funded projects expanding" },
+  { sector: "Logistics & Supply Chain", icon: Package, color: "text-amber-600", bg: "bg-amber-50", jobs: "390+", growth: "+19%", note: "E-commerce & exports rising" },
+  { sector: "Education", icon: BookOpen, color: "text-violet-600", bg: "bg-violet-50", jobs: "310+", growth: "+5%", note: "CBC rollout creating demand" },
 ];
 
 const INSIGHTS = [
@@ -129,7 +129,9 @@ export default function JobTrends() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {TOP_SECTORS.map(s => (
               <div key={s.sector} className="bg-white border border-gray-200 rounded-xl p-5">
-                <div className="text-2xl mb-3">{s.icon}</div>
+                <div className={`w-10 h-10 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
+                  <s.icon size={18} className={s.color} />
+                </div>
                 <h3 className="font-bold text-gray-900 mb-0.5">{s.sector}</h3>
                 <p className="text-xs text-gray-400 mb-3">{s.note}</p>
                 <div className="flex items-center justify-between">
