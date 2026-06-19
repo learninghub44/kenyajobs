@@ -8,6 +8,7 @@ const NAV_LINKS = [
   ["Entry Level", "/entry-level"],
   ["Graduate", "/graduate-jobs"],
   ["Work From Home", "/work-from-home"],
+  ["Internships", "/internships"],
 ];
 
 export default function Navbar() {

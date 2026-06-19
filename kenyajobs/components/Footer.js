@@ -34,10 +34,10 @@ export default function Footer() {
 
       {/* Main footer content */}
       <div className="max-w-7xl mx-auto px-4 pt-12 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-10 mb-12">
 
           {/* Brand col */}
-          <div className="md:col-span-1">
+          <div className="col-span-2 md:col-span-2">
             <div className="mb-4">
               <Link href="/">
                 <img
@@ -55,15 +55,16 @@ export default function Footer() {
             </a>
           </div>
 
-          {/* Categories */}
+          {/* Job Categories */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Job Categories</h3>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Browse Jobs</h3>
             <ul className="space-y-2.5 text-base">
               {[
                 ["Remote Jobs", "/remote-jobs"],
                 ["Entry Level", "/entry-level"],
                 ["Graduate Jobs", "/graduate-jobs"],
                 ["Work From Home", "/work-from-home"],
+                ["Internships", "/internships"],
               ].map(([l, h]) => (
                 <li key={h}>
                   <Link href={h} className="hover:text-white transition-colors">{l}</Link>
@@ -72,15 +73,43 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Popular roles */}
+          {/* Candidates */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Popular Roles</h3>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Candidates</h3>
             <ul className="space-y-2.5 text-base">
-              {["Software Engineer", "Accountant", "Nurse", "Teacher", "Sales Manager", "Customer Service"].map(r => (
-                <li key={r}>
-                  <span className="hover:text-white transition-colors cursor-pointer">{r}</span>
+              {[
+                ["CV Tips", "/cv-tips"],
+                ["Job Trends", "/job-trends"],
+                ["Companies Hiring", "/companies"],
+                ["Search Jobs", "/search"],
+                ["Help / FAQs", "/faq"],
+              ].map(([l, h]) => (
+                <li key={h}>
+                  <Link href={h} className="hover:text-white transition-colors">{l}</Link>
                 </li>
               ))}
+            </ul>
+          </div>
+
+          {/* Employers */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Employers</h3>
+            <ul className="space-y-2.5 text-base">
+              {[
+                ["Post a Job", "/advertise"],
+                ["Advertise", "/advertise"],
+                ["About Us", "/about"],
+                ["Contact Us", "/contact"],
+              ].map(([l, h]) => (
+                <li key={l}>
+                  <Link href={h} className="hover:text-white transition-colors">{l}</Link>
+                </li>
+              ))}
+              <li>
+                <a href="mailto:hello@jobsworldwide.online?subject=Post a Job" className="hover:text-white transition-colors">
+                  Email Us
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -98,10 +127,9 @@ export default function Footer() {
               </span>
             </div>
             <ul className="space-y-2.5 text-base">
-              {[["About Us", "/about"], ["Contact Us", "/contact"], ["Privacy Policy", "/privacy-policy"], ["Terms & Conditions", "/terms-and-conditions"]].map(([l, h]) => (
+              {[["Privacy Policy", "/privacy-policy"], ["Terms & Conditions", "/terms-and-conditions"]].map(([l, h]) => (
                 <li key={h}><Link href={h} className="hover:text-white transition-colors">{l}</Link></li>
               ))}
-              <li><a href="mailto:hello@jobsworldwide.online" className="hover:text-white transition-colors">Post a Job</a></li>
             </ul>
           </div>
         </div>
@@ -109,11 +137,12 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500">
           <p>© {new Date().getFullYear()} JobsWorldwide. All rights reserved.</p>
-          <div className="flex gap-5">
-            <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="/terms-and-conditions" className="hover:text-white transition-colors">Terms</a>
-            <a href="/about" className="hover:text-white transition-colors">About</a>
-            <a href="mailto:hello@jobsworldwide.online" className="hover:text-white transition-colors">Contact</a>
+          <div className="flex flex-wrap gap-5">
+            <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
+            <Link href="/about" className="hover:text-white transition-colors">About</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
           </div>
         </div>
       </div>
