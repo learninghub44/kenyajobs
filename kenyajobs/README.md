@@ -15,8 +15,23 @@ Copy `.env.example` to `.env.local` and fill in:
 | `ADMIN_SESSION_SECRET` | No | Used to sign the admin session cookie. Falls back to `ADMIN_PASSWORD` if unset. |
 | `NEXT_PUBLIC_ADSENSE_CLIENT` | No | Your AdSense publisher ID (`ca-pub-...`). When set, AdSense fills any ad slot that has no admin-managed sponsored listing. |
 | `RAPIDAPI_KEY`, `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` | No | Optional keys for the JSearch and Adzuna job sources — the site works without them, just with fewer sources. |
+| `CRON_SECRET` | No, but recommended | Shared secret that protects `/api/cron/refresh` from being called by anyone other than the scheduled job. See "Scheduled refresh" below. |
 
 Without `DATABASE_URL` set, the site still works exactly as before (live-pulled jobs only) — manual jobs and ads APIs fail soft and return empty results.
+
+### Scheduled refresh
+
+Job listings are cached at the edge for 30 minutes (`s-maxage=1800`). Without any extra setup, a fresh fetch only happens when a real visitor's request lands after that cache expires — meaning during low-traffic windows, listings can sit unchanged for hours until the next visitor triggers a refresh.
+
+To keep listings updating on a real clock regardless of traffic, this repo includes a GitHub Actions workflow (`.github/workflows/refresh-jobs.yml`) that pings `/api/cron/refresh` every 30 minutes. One-time setup:
+
+1. Set `CRON_SECRET` to any random string in your hosting provider's environment variables (Cloudflare Pages / Vercel / Render settings).
+2. In the GitHub repo, go to **Settings → Secrets and variables → Actions** and add two repository secrets:
+   - `SITE_URL` — your live site URL, e.g. `https://jobsworldwide.online` (no trailing slash)
+   - `CRON_SECRET` — the same value you set in step 1
+3. That's it — the workflow runs automatically every 30 minutes. You can also trigger it manually from the **Actions** tab → "Refresh job listings" → "Run workflow".
+
+If `CRON_SECRET` is left unset entirely, the endpoint allows unauthenticated calls (useful for local testing), but this is not recommended in production since anyone could call it repeatedly and hammer the upstream RSS feeds and APIs.
 
 ### Admin area
 
