@@ -47,7 +47,13 @@ function parseRSS(xml, source, defaultLocation) {
     const title = get("title");
     const link  = get("link") || get("guid");
     const pubDate = get("pubDate");
-    const description = get("description");
+    // Many WordPress-based job sites (Jobweb Kenya, VacancyKenya, Corporate Staffing,
+    // Kenya Current, etc.) emit a short auto-generated excerpt in <description> but
+    // publish the FULL job posting body in <content:encoded>. Prefer that when present,
+    // since <description> alone was the cause of incomplete job details for these feeds.
+    const fullContent = get("content:encoded");
+    const shortDescription = get("description");
+    const description = fullContent.length > shortDescription.length ? fullContent : shortDescription;
     const company = get("author") || get("dc:creator") || source;
     const location = get("location") || defaultLocation || "Africa";
     if (title && link) {
