@@ -25,6 +25,26 @@ const STATS = [
 
 const POPULAR_SEARCHES = ["Software Engineer", "Accountant", "Nurse", "Teacher", "Sales", "Driver", "Customer Service", "Marketing"];
 
+const HERO_SOURCES = [
+  { name: "LinkedIn",          abbr: "in",   color: "#0A66C2" },
+  { name: "Indeed",            abbr: "IN",   color: "#003A9B" },
+  { name: "BrighterMonday",    abbr: "BM",   color: "#E8A000" },
+  { name: "Remotive",          abbr: "RM",   color: "#6C3FC5" },
+  { name: "Jobicy",            abbr: "JB",   color: "#FF5733" },
+  { name: "ReliefWeb",         abbr: "RW",   color: "#0072BC" },
+  { name: "The Muse",          abbr: "TM",   color: "#00B186" },
+  { name: "Arbeitnow",         abbr: "AN",   color: "#4F46E5" },
+  { name: "Himalayas",         abbr: "HM",   color: "#3B5BDB" },
+  { name: "MyJobMag",          abbr: "MJ",   color: "#C0392B" },
+  { name: "Fuzu",              abbr: "FZ",   color: "#F97316" },
+  { name: "UNDP",              abbr: "UN",   color: "#009EDB" },
+  { name: "Devex",             abbr: "DX",   color: "#2E86AB" },
+  { name: "Corporate Staffing",abbr: "CS",   color: "#1B4332" },
+  { name: "NGO Jobs",          abbr: "NG",   color: "#7B2FBE" },
+  { name: "Ajira (Govt KE)",   abbr: "AJ",   color: "#006600" },
+];
+
+
 // Category cards with Unsplash photo URLs (fetched by the browser, no server needed)
 const CAT_CARDS = [
   {
@@ -250,7 +270,8 @@ export default function Home() {
               Find Jobs
             </button>
           </div>
-          <div className="flex flex-wrap justify-center gap-2 items-center">
+          {/* Trending searches */}
+          <div className="flex flex-wrap justify-center gap-2 items-center mb-10">
             <span className="text-slate-500 text-xs uppercase tracking-wide font-medium">Trending:</span>
             {POPULAR_SEARCHES.map(s => (
               <button key={s} onClick={() => setSearch(s)}
@@ -258,6 +279,22 @@ export default function Home() {
                 {s}
               </button>
             ))}
+          </div>
+
+          {/* Source logos marquee inside hero */}
+          <div className="w-full overflow-hidden border-t border-white/10 pt-6">
+            <p className="text-xs text-slate-500 uppercase tracking-widest mb-4">Pulling live jobs from</p>
+            <div className="overflow-hidden w-full">
+              <div className="marquee flex gap-3 w-max" style={{ animationDuration: "22s" }}>
+                {[...HERO_SOURCES, ...HERO_SOURCES, ...HERO_SOURCES].map((src, i) => (
+                  <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg flex-shrink-0"
+                    style={{ backgroundColor: src.color + "22", border: "1px solid " + src.color + "44" }}>
+                    <span className="text-xs font-bold" style={{ color: src.color }}>{src.abbr}</span>
+                    <span className="text-xs text-white/60 font-medium">{src.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
