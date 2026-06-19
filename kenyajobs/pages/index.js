@@ -227,10 +227,6 @@ export default function Home() {
         <div className="absolute inset-0 opacity-[0.04]" style={{backgroundImage:"linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",backgroundSize:"40px 40px"}} />
 
         <div className="relative max-w-5xl mx-auto px-6 py-24 text-center w-full">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 text-xs font-medium px-4 py-1.5 rounded-full mb-6">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Live jobs from 30+ sources · Updated daily
-          </div>
           <h1 className="text-4xl md:text-6xl font-extrabold leading-[1.1] tracking-tight text-white mb-5">
             Real Jobs.<br />
             <span className="text-amber-400">No Sign-Up.</span> Updated Daily.
