@@ -6,6 +6,7 @@ import Link from "next/link";
 import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
 import AdSlot from "@/components/AdSlot";
+import ShareBar from "@/components/ShareBar";
 import { MapPin, Briefcase, ArrowUpRight, Building2, Clock, Share2, ChevronRight, Banknote, Link as LinkIcon, Tag, ListChecks, CheckCircle2, Gift, Search } from "lucide-react";
 
 function timeAgo(dateStr) {
@@ -305,11 +306,11 @@ export default function JobDetail() {
                           <h1 className="text-2xl font-extrabold text-gray-900 leading-tight">{title}</h1>
                           {source && <p className="text-xs text-gray-400 mt-1">via {source}</p>}
                         </div>
-                        <button onClick={handleShare}
-                          className="flex-shrink-0 p-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:text-blue-600 transition-all text-gray-400"
-                          title="Copy link">
-                          <Share2 size={16} />
-                        </button>
+                        <ShareBar
+                          url={typeof window !== "undefined" ? window.location.href : ""}
+                          text={`${title} at ${company} — apply now!`}
+                          variant="dropdown"
+                        />
                       </div>
                     </div>
                   </div>
@@ -351,7 +352,16 @@ export default function JobDetail() {
                     className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-sm text-base">
                     Apply on {source} <ArrowUpRight size={17} />
                   </a>
-                  {copied && <span className="ml-3 text-sm text-green-600 font-medium">Link copied!</span>}
+
+                  {/* Share bar */}
+                  <div className="mt-5 pt-5 border-t border-gray-100">
+                    <ShareBar
+                      url={typeof window !== "undefined" ? window.location.href : ""}
+                      text={`${title} at ${company} — apply now!`}
+                      variant="bar"
+                      label="Share this job"
+                    />
+                  </div>
                 </div>
               </div>
 

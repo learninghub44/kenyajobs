@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import JobCard from "@/components/JobCard";
 import JobSkeleton from "@/components/JobSkeleton";
 import AdSlot from "@/components/AdSlot";
+import ShareBar from "@/components/ShareBar";
 import {
   Building2, MapPin, Globe, Briefcase, ChevronRight,
   RefreshCw, ExternalLink, Search, ArrowLeft,
@@ -228,13 +229,20 @@ export default function CompanyProfile() {
               </div>
             </div>
 
-            {/* Back link — mobile-friendly */}
-            <Link
-              href="/companies"
-              className="hidden sm:flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors flex-shrink-0"
-            >
-              <ArrowLeft size={14} /> All companies
-            </Link>
+            {/* Back + Share */}
+            <div className="hidden sm:flex flex-col items-end gap-2 flex-shrink-0">
+              <Link
+                href="/companies"
+                className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors"
+              >
+                <ArrowLeft size={14} /> All companies
+              </Link>
+              <ShareBar
+                url={typeof window !== "undefined" ? window.location.href : ""}
+                text={`Jobs at ${companyName} — see all open roles!`}
+                variant="dropdown"
+              />
+            </div>
           </div>
         </div>
       </div>
