@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { Building2, Search, ExternalLink, Briefcase, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { Building2, Search, ArrowRight } from "lucide-react";
 
 function companySlug(name = "") {
   return name
@@ -11,19 +11,58 @@ function companySlug(name = "") {
     .replace(/\s+/g, "-");
 }
 
+// Logo fetched via Google's S2 favicon service (reliable, no API key, works for any domain)
+// Falls back to coloured initials avatar if the logo fails to load.
+function CompanyLogo({ domain, name, color, initials, size = 48 }) {
+  const [failed, setFailed] = useState(false);
+  const logoUrl = `https://logo.dev/img/${domain}?size=128&format=png`;
+  const fallbackUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+
+  if (failed) {
+    return (
+      <div
+        className="rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold text-sm"
+        style={{ width: size, height: size, backgroundColor: color }}
+      >
+        {initials}
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={logoUrl}
+      alt={name}
+      width={size}
+      height={size}
+      className="rounded-xl object-contain border border-gray-100 bg-white p-1 flex-shrink-0"
+      style={{ width: size, height: size }}
+      onError={(e) => {
+        // Try Google favicon as first fallback
+        if (e.currentTarget.src !== fallbackUrl) {
+          e.currentTarget.src = fallbackUrl;
+        } else {
+          setFailed(true);
+        }
+      }}
+    />
+  );
+}
+
 const FEATURED_COMPANIES = [
-  { name: "Safaricom", sector: "Telecoms", location: "Nairobi", openRoles: "Multiple", query: "safaricom", color: "#16a34a", initials: "SA" },
-  { name: "KCB Bank", sector: "Banking & Finance", location: "Nairobi", openRoles: "Multiple", query: "kcb", color: "#1d4ed8", initials: "KC" },
-  { name: "Equity Bank", sector: "Banking & Finance", location: "Nairobi", openRoles: "Multiple", query: "equity bank", color: "#b91c1c", initials: "EQ" },
-  { name: "Nation Media Group", sector: "Media", location: "Nairobi", openRoles: "Multiple", query: "nation media", color: "#0891b2", initials: "NM" },
-  { name: "Kenya Airways", sector: "Aviation", location: "Nairobi", openRoles: "Multiple", query: "kenya airways", color: "#dc2626", initials: "KQ" },
-  { name: "Jubilee Insurance", sector: "Insurance", location: "Nairobi", openRoles: "Multiple", query: "jubilee insurance", color: "#7c3aed", initials: "JI" },
-  { name: "East African Breweries", sector: "FMCG", location: "Nairobi", openRoles: "Multiple", query: "eabl", color: "#d97706", initials: "EA" },
-  { name: "Co-op Bank", sector: "Banking & Finance", location: "Nairobi", openRoles: "Multiple", query: "co-op bank kenya", color: "#059669", initials: "CB" },
-  { name: "Twiga Foods", sector: "AgriTech", location: "Nairobi", openRoles: "Multiple", query: "twiga foods", color: "#16a34a", initials: "TW" },
-  { name: "M-KOPA", sector: "FinTech / Energy", location: "Nairobi", openRoles: "Multiple", query: "m-kopa", color: "#f59e0b", initials: "MK" },
-  { name: "Andela", sector: "Tech", location: "Remote / Africa", openRoles: "Multiple", query: "andela", color: "#2563eb", initials: "AN" },
-  { name: "UNICEF Kenya", sector: "NGO / UN", location: "Nairobi", openRoles: "Multiple", query: "unicef kenya", color: "#0ea5e9", initials: "UN" },
+  { name: "Safaricom",              domain: "safaricom.co.ke",        sector: "Telecoms",           location: "Nairobi",         color: "#16a34a", initials: "SA" },
+  { name: "KCB Bank",               domain: "kcbgroup.com",            sector: "Banking & Finance",  location: "Nairobi",         color: "#1d4ed8", initials: "KC" },
+  { name: "Equity Bank",            domain: "equitybank.co.ke",        sector: "Banking & Finance",  location: "Nairobi",         color: "#b91c1c", initials: "EQ" },
+  { name: "Nation Media Group",     domain: "nationmedia.com",         sector: "Media",              location: "Nairobi",         color: "#0891b2", initials: "NM" },
+  { name: "Kenya Airways",          domain: "kenya-airways.com",       sector: "Aviation",           location: "Nairobi",         color: "#dc2626", initials: "KQ" },
+  { name: "Jubilee Insurance",      domain: "jubileeinsurance.com",    sector: "Insurance",          location: "Nairobi",         color: "#7c3aed", initials: "JI" },
+  { name: "East African Breweries", domain: "eabl.com",                sector: "FMCG",               location: "Nairobi",         color: "#d97706", initials: "EA" },
+  { name: "Co-op Bank",             domain: "co-opbank.co.ke",         sector: "Banking & Finance",  location: "Nairobi",         color: "#059669", initials: "CB" },
+  { name: "Twiga Foods",            domain: "twigafoods.com",          sector: "AgriTech",           location: "Nairobi",         color: "#16a34a", initials: "TW" },
+  { name: "M-KOPA",                 domain: "m-kopa.com",              sector: "FinTech / Energy",   location: "Nairobi",         color: "#f59e0b", initials: "MK" },
+  { name: "Andela",                 domain: "andela.com",              sector: "Tech",               location: "Remote / Africa", color: "#2563eb", initials: "AN" },
+  { name: "UNICEF Kenya",           domain: "unicef.org",              sector: "NGO / UN",           location: "Nairobi",         color: "#0ea5e9", initials: "UN" },
 ];
 
 const SECTORS = ["All", "Tech", "Banking & Finance", "NGO / UN", "FMCG", "Telecoms", "AgriTech", "FinTech / Energy", "Media", "Insurance", "Aviation"];
@@ -52,7 +91,7 @@ export default function Companies() {
           <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">Employers</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Companies Hiring Now</h1>
           <p className="text-base text-gray-500 max-w-xl">
-            Explore roles at Kenya's leading employers — from banks and telcos to NGOs and tech startups. Click any company to search their open jobs.
+            Explore roles at Kenya&apos;s leading employers — from banks and telcos to NGOs and tech startups. Click any company to see their open jobs.
           </p>
         </div>
       </div>
@@ -91,13 +130,13 @@ export default function Companies() {
                 href={`/company/${companySlug(c.name)}?name=${encodeURIComponent(c.name)}`}
                 className="group flex items-start gap-4 bg-white border border-gray-200 hover:border-blue-300 rounded-xl p-5 hover:shadow-md transition-all duration-200"
               >
-                {/* Avatar */}
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold text-sm"
-                  style={{ backgroundColor: c.color }}
-                >
-                  {c.initials}
-                </div>
+                <CompanyLogo
+                  domain={c.domain}
+                  name={c.name}
+                  color={c.color}
+                  initials={c.initials}
+                  size={48}
+                />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors text-sm truncate">{c.name}</h3>
                   <p className="text-xs text-gray-400 mt-0.5">{c.sector}</p>

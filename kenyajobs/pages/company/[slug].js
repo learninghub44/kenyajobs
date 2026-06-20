@@ -14,6 +14,59 @@ import {
   RefreshCw, ExternalLink, Search, ArrowLeft,
 } from "lucide-react";
 
+// Known domains for featured companies — used for logo resolution
+const KNOWN_DOMAINS = {
+  "safaricom":              "safaricom.co.ke",
+  "kcb-bank":               "kcbgroup.com",
+  "equity-bank":            "equitybank.co.ke",
+  "nation-media-group":     "nationmedia.com",
+  "kenya-airways":          "kenya-airways.com",
+  "jubilee-insurance":      "jubileeinsurance.com",
+  "east-african-breweries": "eabl.com",
+  "co-op-bank":             "co-opbank.co.ke",
+  "twiga-foods":            "twigafoods.com",
+  "m-kopa":                 "m-kopa.com",
+  "andela":                 "andela.com",
+  "unicef-kenya":           "unicef.org",
+};
+
+// Smart logo: tries logo.dev → Google favicon → coloured initials
+function CompanyLogo({ domain, name, palette, initials, size = 80 }) {
+  const [src, setSrc] = useState(domain ? `https://logo.dev/img/${domain}?size=256&format=png` : null);
+  const [failed, setFailed] = useState(!domain);
+
+  if (failed || !src) {
+    return (
+      <div
+        className="rounded-2xl flex items-center justify-center text-2xl font-bold border shadow-sm flex-shrink-0"
+        style={{ width: size, height: size, backgroundColor: palette.bg, color: palette.text, borderColor: palette.border }}
+      >
+        {initials}
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={name}
+      width={size}
+      height={size}
+      className="rounded-2xl object-contain border border-gray-100 bg-white p-1.5 shadow-sm flex-shrink-0"
+      style={{ width: size, height: size }}
+      onError={() => {
+        if (src.includes("logo.dev")) {
+          // Fallback to Google favicon
+          setSrc(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`);
+        } else {
+          setFailed(true);
+        }
+      }}
+    />
+  );
+}
+
 // Colour palette for avatar (same as JobCard)
 function companyPalette(name = "") {
   const palettes = [
@@ -66,6 +119,7 @@ export default function CompanyProfile() {
 
   const palette  = companyPalette(companyName);
   const initials = companyInitials(companyName);
+  const domain   = KNOWN_DOMAINS[slug] || (data?.website ? new URL(data.website).hostname.replace("www.", "") : null);
 
   const jobs = data?.jobs || [];
 
@@ -126,26 +180,13 @@ export default function CompanyProfile() {
           <div className="flex items-start gap-6">
             {/* Logo / avatar */}
             <div className="flex-shrink-0">
-              {data?.logo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={data.logo}
-                  alt={companyName}
-                  className="w-20 h-20 rounded-2xl object-contain border border-gray-100 bg-white p-1 shadow-sm"
-                  onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
-                />
-              ) : null}
-              <div
-                className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold border shadow-sm"
-                style={{
-                  backgroundColor: palette.bg,
-                  color: palette.text,
-                  borderColor: palette.border,
-                  display: data?.logo ? "none" : "flex",
-                }}
-              >
-                {initials}
-              </div>
+              <CompanyLogo
+                domain={domain}
+                name={companyName}
+                palette={palette}
+                initials={initials}
+                size={80}
+              />
             </div>
 
             {/* Meta */}
