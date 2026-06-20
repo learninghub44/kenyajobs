@@ -15,11 +15,13 @@ export default function CookieBanner() {
   function accept() {
     try { localStorage.setItem("jw_cookie_consent", "accepted"); } catch {}
     setVisible(false);
+    window.dispatchEvent(new Event("jw-cookie-consent-changed"));
   }
 
   function decline() {
     try { localStorage.setItem("jw_cookie_consent", "declined"); } catch {}
     setVisible(false);
+    window.dispatchEvent(new Event("jw-cookie-consent-changed"));
   }
 
   if (!visible) return null;

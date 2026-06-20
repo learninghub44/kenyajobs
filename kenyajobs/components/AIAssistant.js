@@ -1,12 +1,21 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { X, Send, Loader, ChevronDown, FileText, MessageSquare, Mic, BookOpen, Volume2, VolumeX, MicOff } from "lucide-react";
 
-function SparkleIcon({ size = 20, className = "" }) {
+function AIBotIcon({ size = 20, className = "" }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M12 2.5l1.545 5.954L19.5 10l-5.955 1.545L12 17.5l-1.545-5.955L4.5 10l5.955-1.546L12 2.5z" opacity="0.95"/>
-      <path d="M19.5 17l.8 1.7 1.7.8-1.7.8-.8 1.7-.8-1.7-1.7-.8 1.7-.8.8-1.7z" opacity="0.75"/>
-      <path d="M5 3.5l.6 1.4 1.4.6-1.4.6L5 7.5l-.6-1.4L3 5.5l1.4-.6L5 3.5z" opacity="0.6"/>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      {/* antenna */}
+      <circle cx="12" cy="2.6" r="1.1" fill="currentColor" />
+      <line x1="12" y1="3.7" x2="12" y2="5.6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      {/* head */}
+      <rect x="4" y="5.6" width="16" height="13" rx="4.5" fill="currentColor" opacity="0.16" />
+      <rect x="4" y="5.6" width="16" height="13" rx="4.5" stroke="currentColor" strokeWidth="1.5" />
+      {/* eyes */}
+      <circle cx="9" cy="12" r="1.5" fill="currentColor" />
+      <circle cx="15" cy="12" r="1.5" fill="currentColor" />
+      {/* side nodes */}
+      <line x1="2.4" y1="11" x2="4" y2="11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="20" y1="11" x2="21.6" y2="11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
     </svg>
   );
 }
@@ -14,7 +23,7 @@ function SparkleIcon({ size = 20, className = "" }) {
 function BotAvatar() {
   return (
     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm">
-      <SparkleIcon size={15} className="text-white" />
+      <AIBotIcon size={17} className="text-white" />
     </div>
   );
 }
@@ -107,6 +116,18 @@ export default function AIAssistant() {
   const [pulse, setPulse]       = useState(false);
   const [rateInfo, setRateInfo] = useState({ remaining: 10, limited: false });
   const [copied, setCopied]     = useState(false);
+
+  // Avoid overlapping the cookie consent banner (fixed bottom-0, full-width) on first visit
+  const [cookieBannerVisible, setCookieBannerVisible] = useState(false);
+  useEffect(() => {
+    try {
+      setCookieBannerVisible(!localStorage.getItem("jw_cookie_consent"));
+    } catch {}
+    const onChange = () => setCookieBannerVisible(false);
+    window.addEventListener("jw-cookie-consent-changed", onChange);
+    return () => window.removeEventListener("jw-cookie-consent-changed", onChange);
+  }, []);
+  const dockOffset = cookieBannerVisible ? "bottom-[150px] sm:bottom-[170px]" : "bottom-6";
 
   // Voice states
   const [isListening, setIsListening]   = useState(false);
@@ -322,7 +343,7 @@ export default function AIAssistant() {
       {(!open || minimized) && (
         <button
           onClick={() => { setOpen(true); setMinimized(false); setPulse(false); }}
-          className="fixed bottom-6 right-6 z-50 group flex items-center gap-3"
+          className={`fixed ${dockOffset} right-6 z-50 group flex items-center gap-3 transition-all duration-300`}
           aria-label="Open AI Assistant"
         >
           <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0 bg-gray-900 text-white text-xs font-semibold px-3 py-2 rounded-xl whitespace-nowrap shadow-xl pointer-events-none">
@@ -331,7 +352,7 @@ export default function AIAssistant() {
           <div className="relative">
             {pulse && <span className="absolute inset-0 rounded-full bg-blue-400 opacity-25 animate-ping" />}
             <div className="relative w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center hover:scale-105">
-              <SparkleIcon size={26} className="text-white" />
+              <AIBotIcon size={26} className="text-white" />
             </div>
             {pulse && <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white" />}
           </div>
@@ -340,13 +361,13 @@ export default function AIAssistant() {
 
       {/* ── Chat window ── */}
       {open && (
-        <div className={`fixed bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-16px)] bg-white rounded-2xl shadow-2xl border border-gray-200/80 flex flex-col overflow-hidden transition-all duration-200 ${minimized ? "h-[64px]" : "h-[620px]"}`}>
+        <div className={`fixed ${dockOffset} right-6 z-50 w-[400px] max-w-[calc(100vw-16px)] bg-white rounded-2xl shadow-2xl border border-gray-200/80 flex flex-col overflow-hidden transition-all duration-300 ${minimized ? "h-[64px]" : "h-[620px]"}`}>
 
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center shadow-inner">
-                <SparkleIcon size={19} className="text-white" />
+                <AIBotIcon size={19} className="text-white" />
                 {isSpeaking && (
                   <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border border-white animate-pulse" />
                 )}
