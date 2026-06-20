@@ -4,4 +4,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/admin/
 
-Sitemap: https://kenyajobs.vercel.app/api/sitemap.xml
+Sitemap: https://kenyajobs.vercel.app/sitemap.xml
