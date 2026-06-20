@@ -178,6 +178,7 @@ export default function Footer() {
                 ["About Us", "/about"],
                 ["Contact Us", "/contact"],
                 ["Developers", "/developers"],
+                ["Documentation", "/developers"],
               ].map(([l, h]) => (
                 <li key={l}>
                   <Link
