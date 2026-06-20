@@ -2,14 +2,15 @@
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
 import { cachedFetch } from "@/lib/apiResponseCache";
+import { attachSalaries } from "@/utils/extractSalary";
 
 async function fetchAll(category) {
   const results = await Promise.allSettled([
     // 1. Remotive
     fetchWithTimeout(
       category
-        ? `https://remotive.com/api/remote-jobs?category=${category}&limit=20`
-        : `https://remotive.com/api/remote-jobs?limit=20`
+        ? `https://remotive.com/api/remote-jobs?category=${category}&limit=60`
+        : `https://remotive.com/api/remote-jobs?limit=60`
     )
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
@@ -29,7 +30,7 @@ async function fetchAll(category) {
       .catch(err => { console.error("Remotive error:", err.message); return []; }),
 
     // 2. Jobicy (free, no key)
-    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=20&geo=worldwide&industry=&tag=", {}, 5000)
+    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=60&geo=worldwide&industry=&tag=", {}, 5000)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `jobicy-${j.id}`,
@@ -46,13 +47,16 @@ async function fetchAll(category) {
         annualSalaryMin: j.annualSalaryMin || undefined,
         annualSalaryMax: j.annualSalaryMax || undefined,
         salaryCurrency: j.salaryCurrency || undefined,
+        salary: (j.annualSalaryMin && j.annualSalaryMax)
+          ? `${j.salaryCurrency || "USD"} ${j.annualSalaryMin} - ${j.annualSalaryMax} per year`
+          : undefined,
       })))
       .catch(err => { console.error("Jobicy error:", err.message); return []; }),
 
     // 3. Arbeitnow (free, no key)
     fetchWithTimeout("https://www.arbeitnow.com/api/job-board-api", {}, 5000)
       .then(r => r.json())
-      .then(d => (d.data || []).slice(0, 20).map(j => ({
+      .then(d => (d.data || []).slice(0, 60).map(j => ({
         id: `arbeitnow-${j.slug}`,
         title: j.title,
         company: j.company_name,
@@ -68,9 +72,11 @@ async function fetchAll(category) {
       .catch(err => { console.error("Arbeitnow error:", err.message); return []; }),
   ]);
 
-  return results
-    .filter(r => r.status === "fulfilled")
-    .flatMap(r => r.value);
+  return attachSalaries(
+    results
+      .filter(r => r.status === "fulfilled")
+      .flatMap(r => r.value)
+  );
 }
 
 export default async function handler(req, res) {

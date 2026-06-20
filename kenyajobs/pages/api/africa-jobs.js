@@ -1,5 +1,6 @@
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cachedFetch } from "@/lib/apiResponseCache";
+import { attachSalaries } from "@/utils/extractSalary";
 import crypto from "crypto";
 
 function hashId(input) {
@@ -15,6 +16,19 @@ const RSS_FEEDS = [
   { url: "https://www.jobwebkenya.com/feed/",                     source: "Jobweb Kenya",       location: "Kenya" },
   { url: "https://www.corporatestaffing.co.ke/feed/",             source: "Corporate Staffing", location: "Kenya" },
   { url: "https://kenyacurrent.com/category/jobs/feed/",          source: "Kenya Current",      location: "Kenya" },
+  // Kenya — additional sources (WordPress-based job boards, fail soft if down)
+  { url: "https://www.careerpointkenya.co.ke/feed/",              source: "Career Point Kenya", location: "Kenya" },
+  { url: "https://kenyanvacancies.com/feed/",                     source: "Kenyan Vacancies",   location: "Kenya" },
+  { url: "https://jobzilla.co.ke/feed/",                          source: "Jobzilla Kenya",     location: "Kenya" },
+  { url: "https://www.kazi254.com/feed/",                         source: "Kazi254",            location: "Kenya" },
+  { url: "https://elimu.co.ke/feed/",                             source: "Elimu Jobs",         location: "Kenya" },
+  { url: "https://www.careerassociated.com/feed/",                source: "Career Associated",  location: "Kenya" },
+  { url: "https://www.kenyanjobsforum.com/feed/",                 source: "Kenyan Jobs Forum",  location: "Kenya" },
+  { url: "https://kenyanlife.com/feed/",                          source: "Kenyan Life Jobs",   location: "Kenya" },
+  { url: "https://www.jobsbeba.com/feed/",                        source: "JobsBeba",           location: "Kenya" },
+  { url: "https://www.unjobs.org/rss/kenya",                      source: "UN Jobs Kenya",      location: "Kenya" },
+  { url: "https://opportunitydesk.org/feed/",                     source: "Opportunity Desk",   location: "Africa" },
+  { url: "https://www.youthopportunitieshub.com/feed/",           source: "Youth Opportunities Hub", location: "Africa" },
   // East Africa
   { url: "https://www.brightermonday.co.ug/listings.rss",         source: "BrighterMonday UG",  location: "Uganda" },
   { url: "https://www.brightermonday.co.tz/listings.rss",         source: "BrighterMonday TZ",  location: "Tanzania" },
@@ -77,7 +91,7 @@ function parseRSS(xml, source, defaultLocation) {
 // ── Remotive — free JSON API, no key ─────────────────────────────────────────
 async function fetchRemotive() {
   try {
-    const r = await fetchWithTimeout("https://remotive.com/api/remote-jobs?limit=40", {
+    const r = await fetchWithTimeout("https://remotive.com/api/remote-jobs?limit=100", {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; JobsWorldwide/1.0)" }
     }, 8000);
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -99,10 +113,10 @@ async function fetchRemotive() {
 
 // ── Jobicy — free JSON API, no key ───────────────────────────────────────────
 async function fetchJobicy() {
-  const geos = ["kenya", "nigeria", "south-africa", "ghana", "egypt", "worldwide"];
+  const geos = ["kenya", "nigeria", "south-africa", "ghana", "egypt", "morocco", "ethiopia", "tanzania", "uganda", "worldwide"];
   const results = await Promise.allSettled(
     geos.map(geo =>
-      fetchWithTimeout(`https://jobicy.com/api/v2/remote-jobs?count=15&geo=${geo}`, {
+      fetchWithTimeout(`https://jobicy.com/api/v2/remote-jobs?count=30&geo=${geo}`, {
         headers: { "User-Agent": "Mozilla/5.0 (compatible; JobsWorldwide/1.0)" }
       }, 7000)
         .then(r => r.ok ? r.json() : { jobs: [] })
@@ -132,7 +146,7 @@ async function fetchArbeitnow() {
     }, 7000);
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const d = await r.json();
-    return (d.data || []).slice(0, 30).map(j => ({
+    return (d.data || []).slice(0, 60).map(j => ({
       id: `arbeitnow-${j.slug}`,
       title: j.title,
       company: j.company_name,
@@ -197,7 +211,7 @@ async function fetchHimalayas() {
 async function fetchReliefWeb() {
   try {
     const r = await fetchWithTimeout(
-      "https://api.reliefweb.int/v1/jobs?appname=jobsworldwide&profile=list&slim=1&limit=30&sort[]=date:desc&filter[field]=country&filter[value][]=Kenya&filter[value][]=Uganda&filter[value][]=Tanzania&filter[value][]=Nigeria&filter[value][]=Ethiopia",
+      "https://api.reliefweb.int/v1/jobs?appname=jobsworldwide&profile=list&slim=1&limit=60&sort[]=date:desc&filter[field]=country&filter[value][]=Kenya&filter[value][]=Uganda&filter[value][]=Tanzania&filter[value][]=Nigeria&filter[value][]=Ethiopia&filter[value][]=Rwanda&filter[value][]=Somalia&filter[value][]=South Sudan",
       { headers: { "User-Agent": "Mozilla/5.0 (compatible; JobsWorldwide/1.0)" } },
       8000
     );
@@ -296,6 +310,14 @@ const KE_RSS_DIRECT = [
   { url: "https://nafasiwork.com/feed/",               source: "Nafasi Work",        location: "East Africa" },
   { url: "https://eastafricajobs.com/feed/",           source: "East Africa Jobs",   location: "East Africa" },
   { url: "https://www.developmentaid.org/rss/jobs/kenya", source: "DevelopmentAid", location: "Kenya" },
+  { url: "https://www.brightermondaykenya.com/feed/",  source: "BrighterMonday Direct", location: "Kenya" },
+  { url: "https://hrkenya.org/feed/",                  source: "HR Kenya",           location: "Kenya" },
+  { url: "https://www.kenyahrjobs.com/feed/",          source: "Kenya HR Jobs",      location: "Kenya" },
+  { url: "https://www.eaglehr.co.ke/feed/",            source: "Eagle HR",           location: "Kenya" },
+  { url: "https://www.gradnet.co.ke/feed/",            source: "GradNet Kenya",      location: "Kenya" },
+  { url: "https://www.kenyacareers.com/feed/",         source: "Kenya Careers",      location: "Kenya" },
+  { url: "https://psckjobs.go.ke/feed/",               source: "PSC Kenya",          location: "Kenya" },
+  { url: "https://www.ihub.co.ke/jobs/feed/",          source: "iHub Jobs",          location: "Kenya" },
 ];
 
 async function fetchKenyaDirect() {
@@ -372,11 +394,13 @@ async function fetchAll() {
 
   unique.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  const sourceCounts = {};
-  unique.forEach(j => { sourceCounts[j.source] = (sourceCounts[j.source] || 0) + 1; });
-  console.log(`[africa-jobs] Total: ${unique.length} | Sources:`, JSON.stringify(sourceCounts));
+  const withSalaries = attachSalaries(unique);
 
-  return unique;
+  const sourceCounts = {};
+  withSalaries.forEach(j => { sourceCounts[j.source] = (sourceCounts[j.source] || 0) + 1; });
+  console.log(`[africa-jobs] Total: ${withSalaries.length} | Sources:`, JSON.stringify(sourceCounts));
+
+  return withSalaries;
 }
 
 export default async function handler(req, res) {
@@ -388,7 +412,7 @@ export default async function handler(req, res) {
   const unique = await cachedFetch("africa-jobs", fetchAll, {
     freshMs: 20 * 60 * 1000,   // 20 min fully fresh
     staleMs: 2 * 60 * 60 * 1000, // up to 2h stale-while-revalidate
-    minLength: 40, // below this, treat as a degraded/partial fetch and retry sooner
+    minLength: 150, // below this, treat as a degraded/partial fetch and retry sooner
   });
 
   res.status(200).json(unique);

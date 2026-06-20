@@ -2,6 +2,7 @@
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
 import { cachedFetch } from "@/lib/apiResponseCache";
+import { attachSalaries } from "@/utils/extractSalary";
 
 async function fetchAll(page) {
   const sources = [
@@ -22,7 +23,7 @@ async function fetchAll(page) {
       .catch(err => { console.error("TheMuse graduate error:", err.message); return []; }),
 
     // 2. Jobicy — marketing/business as graduate proxy
-    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=15&industry=marketing", {}, 5000)
+    fetchWithTimeout("https://jobicy.com/api/v2/remote-jobs?count=40&industry=marketing", {}, 5000)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `jobicy-grad-${j.id}`,
@@ -72,9 +73,11 @@ async function fetchAll(page) {
   ];
 
   const results = await Promise.allSettled(sources);
-  return results
-    .filter(r => r.status === "fulfilled")
-    .flatMap(r => r.value);
+  return attachSalaries(
+    results
+      .filter(r => r.status === "fulfilled")
+      .flatMap(r => r.value)
+  );
 }
 
 export default async function handler(req, res) {

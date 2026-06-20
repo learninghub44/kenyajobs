@@ -2,6 +2,7 @@
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
 import { cachedFetch } from "@/lib/apiResponseCache";
+import { attachSalaries } from "@/utils/extractSalary";
 
 async function fetchAll(page) {
   const sources = [
@@ -22,7 +23,7 @@ async function fetchAll(page) {
       .catch(err => { console.error("TheMuse error:", err.message); return []; }),
 
     // 2. Remotive — software-dev as entry-level proxy
-    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=software-dev&limit=15", {}, 5000)
+    fetchWithTimeout("https://remotive.com/api/remote-jobs?category=software-dev&limit=40", {}, 5000)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `remotive-${j.id}`,
@@ -70,9 +71,11 @@ async function fetchAll(page) {
   ];
 
   const results = await Promise.allSettled(sources);
-  return results
-    .filter(r => r.status === "fulfilled")
-    .flatMap(r => r.value);
+  return attachSalaries(
+    results
+      .filter(r => r.status === "fulfilled")
+      .flatMap(r => r.value)
+  );
 }
 
 export default async function handler(req, res) {

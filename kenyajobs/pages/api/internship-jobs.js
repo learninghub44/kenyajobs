@@ -1,6 +1,7 @@
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
 import { cachedFetch } from "@/lib/apiResponseCache";
+import { attachSalaries } from "@/utils/extractSalary";
 
 async function fetchAll(page) {
   const sources = [
@@ -21,7 +22,7 @@ async function fetchAll(page) {
       .catch(() => []),
 
     // 2. Remotive — internship tagged roles
-    fetchWithTimeout("https://remotive.com/api/remote-jobs?search=intern&limit=15", {}, 5000)
+    fetchWithTimeout("https://remotive.com/api/remote-jobs?search=intern&limit=40", {}, 5000)
       .then(r => r.json())
       .then(d => (d.jobs || []).map(j => ({
         id: `remotive-intern-${j.id}`,
@@ -63,9 +64,11 @@ async function fetchAll(page) {
   ];
 
   const results = await Promise.allSettled(sources);
-  return results
-    .filter(r => r.status === "fulfilled")
-    .flatMap(r => r.value);
+  return attachSalaries(
+    results
+      .filter(r => r.status === "fulfilled")
+      .flatMap(r => r.value)
+  );
 }
 
 export default async function handler(req, res) {
