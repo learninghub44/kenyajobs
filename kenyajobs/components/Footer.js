@@ -6,53 +6,6 @@ const SOURCES = ["Remotive", "Jobicy", "Arbeitnow", "ReliefWeb", "BrighterMonday
 export default function Footer() {
   return (
     <footer className="bg-[#0b2233] text-slate-400">
-      {/* Trust strip */}
-      <div className="border-b border-white/10 py-5">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 justify-center md:justify-between">
-            <div className="text-base">
-              <span className="text-slate-300 font-semibold">
-                Verified job listings
-              </span>
-              <span className="text-slate-500">
-                {" "}
-                — from 30+ trusted global sources
-              </span>
-            </div>
-
-            <div className="text-base">
-              <span className="text-slate-300 font-semibold">
-                Live aggregation
-              </span>
-              <span className="text-slate-500">
-                {" "}
-                — updated multiple times daily
-              </span>
-            </div>
-
-            <div className="text-base">
-              <span className="text-slate-300 font-semibold">
-                30+ countries
-              </span>
-              <span className="text-slate-500">
-                {" "}
-                — Africa, Europe, Americas &amp; more
-              </span>
-            </div>
-
-            <div className="text-base">
-              <span className="text-slate-300 font-semibold">
-                No fake listings
-              </span>
-              <span className="text-slate-500">
-                {" "}
-                — sourced from reputable boards only
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main footer content */}
       <div className="max-w-7xl mx-auto px-4 pt-12 pb-8">
         <div className="grid grid-cols-2 md:grid-cols-7 gap-8 mb-12">

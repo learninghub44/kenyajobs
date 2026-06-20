@@ -5,7 +5,7 @@ import { Mail, Send, CheckCircle2 } from "lucide-react";
 const SOCIALS = [
   {
     name: "Instagram",
-    handle: "@jobsworldwideke",
+    handle: "Follow us",
     href: "https://instagram.com/jobsworldwideke",
     color: "#E1306C",
     icon: (
@@ -16,7 +16,7 @@ const SOCIALS = [
   },
   {
     name: "Facebook",
-    handle: "@jobsworldwideke",
+    handle: "Follow us",
     href: "https://facebook.com/jobsworldwideke",
     color: "#1877F2",
     icon: (
@@ -27,7 +27,7 @@ const SOCIALS = [
   },
   {
     name: "Twitter / X",
-    handle: "@jobsworldwideke",
+    handle: "Follow us",
     href: "https://twitter.com/jobsworldwideke",
     color: "#000000",
     icon: (
@@ -38,7 +38,7 @@ const SOCIALS = [
   },
   {
     name: "TikTok",
-    handle: "@jobsworldwideke",
+    handle: "Follow us",
     href: "https://tiktok.com/@jobsworldwideke",
     color: "#010101",
     icon: (
