@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Loader, ChevronDown, FileText, MessageSquare, Mic, BookOpen, Volume2, VolumeX, MicOff } from "lucide-react";
+import { X, Send, Loader, ChevronDown, FileText, MessageSquare, Mic, BookOpen, Volume2, VolumeX, MicOff, Sparkles, Briefcase, Star, ExternalLink, AlertCircle } from "lucide-react";
 
 function AIBotIcon({ size = 20, className = "" }) {
   return (
@@ -40,6 +40,7 @@ function UserAvatar() {
 
 const TABS = [
   { id: "chat",      label: "Chat",        Icon: MessageSquare, placeholder: "Ask about jobs, career advice...",   hint: "General career assistant" },
+  { id: "match",     label: "Job Match",   Icon: Sparkles,      placeholder: "Paste your CV or list your skills...", hint: "AI job matching" },
   { id: "cv",        label: "CV Writer",   Icon: FileText,      placeholder: "Tell me your job title & skills...", hint: "Generate a full CV" },
   { id: "cover",     label: "Cover Letter",Icon: BookOpen,      placeholder: "Job title and company name...",      hint: "Write a cover letter" },
   { id: "interview", label: "Interview",   Icon: Mic,           placeholder: "Ask any interview question...",      hint: "Interview coaching" },
@@ -47,6 +48,7 @@ const TABS = [
 
 const SUGGESTED = {
   chat:      ["How do I find remote jobs?", "What skills are most in demand?", "How to negotiate salary?", "Tips for career change"],
+  match:     ["Software Engineer with 3 years React & Node.js", "Accountant with CPA, Excel, QuickBooks", "Marketing Manager with SEO & social media", "Fresh graduate in Business Administration"],
   cv:        ["Write a CV for a Software Engineer", "CV for an Accountant with 3 years experience", "Graduate CV with no experience", "Marketing Manager CV"],
   cover:     ["Cover letter for a Sales Manager role", "Cover letter for remote customer service", "Graduate cover letter", "Cover letter for career change"],
   interview: ["Common interview questions & answers", "Tell me about yourself — best answer", "How to answer salary questions", "Questions to ask the interviewer"],
@@ -54,6 +56,7 @@ const SUGGESTED = {
 
 const WELCOME = {
   chat:      "Hi! I'm your AI career assistant.\n\nAsk me anything about job searching, salaries, career advice, or the job market. You can also speak to me using the mic button!",
+  match:     "🎯 AI Job Matching\n\nTell me your skills, experience, or paste your CV — I'll scan live job listings and find your best matches right now!\n\nTip: The more detail you give, the better the matches.",
   cv:        "I'll write you a professional, ATS-friendly CV.\n\nJust tell me your job title, years of experience, and key skills — or paste your existing CV and I'll improve it.",
   cover:     "I'll write a compelling cover letter that gets interviews.\n\nTell me the job title, company name (optional), and anything about your background.",
   interview: "Let's get you interview-ready!\n\nAsk me for common interview questions, how to answer specific questions, salary negotiation scripts, or mock interview practice.",
@@ -101,21 +104,110 @@ function SoundWave() {
   );
 }
 
+// ── Job Match Results UI ───────────────────────────────────────────────────
+function ScoreBadge({ score }) {
+  const color =
+    score >= 85 ? "bg-green-100 text-green-700 border-green-200" :
+    score >= 70 ? "bg-blue-100 text-blue-700 border-blue-200" :
+                  "bg-amber-100 text-amber-700 border-amber-200";
+  return (
+    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${color}`}>
+      {score}% match
+    </span>
+  );
+}
+
+function JobMatchResults({ results, onClose }) {
+  if (!results) return null;
+  return (
+    <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 bg-gray-50/60">
+      {/* Summary banner */}
+      {results.summary && (
+        <div className="bg-blue-50 border border-blue-100 rounded-xl px-3.5 py-3 flex items-start gap-2">
+          <Sparkles size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-blue-700 leading-relaxed">{results.summary}</p>
+        </div>
+      )}
+
+      {/* Match cards */}
+      {results.matches.map((m, i) => (
+        <div key={i} className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
+          {/* Card header */}
+          <div className="px-3.5 py-3 flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[11px] font-bold text-gray-400">#{i + 1}</span>
+                <ScoreBadge score={m.matchScore} />
+              </div>
+              <p className="font-semibold text-sm text-gray-900 mt-1 leading-tight">{m.job.title}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{m.job.company} · {m.job.location}</p>
+              {m.job.salary && (
+                <p className="text-xs text-green-600 font-medium mt-0.5">{m.job.salary}</p>
+              )}
+            </div>
+            <span className="text-[10px] text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">{m.job.source}</span>
+          </div>
+
+          {/* Reason & tips */}
+          <div className="px-3.5 pb-3 space-y-2">
+            <div className="flex items-start gap-1.5">
+              <Star size={11} className="text-amber-400 mt-0.5 flex-shrink-0" />
+              <p className="text-[11px] text-gray-600 leading-relaxed">{m.reason}</p>
+            </div>
+            {m.tips && (
+              <div className="flex items-start gap-1.5">
+                <AlertCircle size={11} className="text-blue-400 mt-0.5 flex-shrink-0" />
+                <p className="text-[11px] text-blue-600 leading-relaxed">{m.tips}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Apply button */}
+          {m.job.url && (
+            <div className="px-3.5 pb-3">
+              <a
+                href={m.job.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <Briefcase size={11} />
+                Apply Now
+                <ExternalLink size={10} />
+              </a>
+            </div>
+          )}
+        </div>
+      ))}
+
+      {/* Search again nudge */}
+      <button
+        onClick={onClose}
+        className="w-full text-xs text-gray-400 hover:text-blue-600 py-2 transition-colors"
+      >
+        ↩ Search with different skills
+      </button>
+    </div>
+  );
+}
+
 export default function AIAssistant() {
   const [open, setOpen]           = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [activeTab, setActiveTab] = useState("chat");
   const [allMessages, setAllMessages] = useState({
     chat:      [{ role: "assistant", content: WELCOME.chat }],
+    match:     [{ role: "assistant", content: WELCOME.match }],
     cv:        [{ role: "assistant", content: WELCOME.cv }],
     cover:     [{ role: "assistant", content: WELCOME.cover }],
     interview: [{ role: "assistant", content: WELCOME.interview }],
   });
-  const [input, setInput]       = useState("");
-  const [loading, setLoading]   = useState(false);
-  const [pulse, setPulse]       = useState(false);
-  const [rateInfo, setRateInfo] = useState({ remaining: 10, limited: false });
-  const [copied, setCopied]     = useState(false);
+  const [input, setInput]             = useState("");
+  const [loading, setLoading]         = useState(false);
+  const [pulse, setPulse]             = useState(false);
+  const [rateInfo, setRateInfo]       = useState({ remaining: 10, limited: false });
+  const [copied, setCopied]           = useState(false);
+  const [matchResults, setMatchResults] = useState(null); // { summary, matches[] }
 
   // Avoid overlapping the cookie consent banner (fixed bottom-0, full-width) on first visit
   const [cookieBannerVisible, setCookieBannerVisible] = useState(false);
@@ -301,6 +393,40 @@ export default function AIAssistant() {
     setInput("");
     stopSpeaking();
 
+    // ── Job Match tab: call /api/job-match instead ──────────────────────────
+    if (activeTab === "match") {
+      setMatchResults(null);
+      const updated = [...messages, { role: "user", content: msg }];
+      setAllMessages(prev => ({ ...prev, match: updated }));
+      setLoading(true);
+      try {
+        const res = await fetch("/api/job-match", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userProfile: msg }),
+        });
+        const data = await res.json();
+        if (res.status === 429) {
+          setRateInfo({ remaining: 0, limited: true });
+          setAllMessages(prev => ({ ...prev, match: [...updated, { role: "assistant", content: data.error || "Rate limit reached." }] }));
+        } else {
+          if (data.remaining !== undefined) setRateInfo(prev => ({ ...prev, remaining: data.remaining }));
+          if (data.matches && data.matches.length > 0) {
+            setMatchResults({ summary: data.summary, matches: data.matches });
+            setAllMessages(prev => ({ ...prev, match: [...updated, { role: "assistant", content: `✅ Found ${data.matches.length} job matches for you! See results below.` }] }));
+          } else {
+            setAllMessages(prev => ({ ...prev, match: [...updated, { role: "assistant", content: data.reply || data.error || "No matches found. Try adding more detail to your profile." }] }));
+          }
+        }
+      } catch {
+        setAllMessages(prev => ({ ...prev, match: [...updated, { role: "assistant", content: "Connection error. Please try again." }] }));
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // ── Other tabs: existing behaviour ───────────────────────────────────────
     const updated = [...messages, { role: "user", content: msg }];
     setAllMessages(prev => ({ ...prev, [activeTab]: updated }));
     setLoading(true);
@@ -337,6 +463,7 @@ export default function AIAssistant() {
 
   function clearChat() {
     stopSpeaking();
+    setMatchResults(null);
     setAllMessages(prev => ({ ...prev, [activeTab]: [{ role: "assistant", content: WELCOME[activeTab] }] }));
   }
 
@@ -381,7 +508,7 @@ export default function AIAssistant() {
                 <p className="text-white font-bold text-sm leading-tight">AI Career Assistant</p>
                 <p className="text-blue-100/80 text-xs flex items-center gap-1.5 mt-0.5">
                   <span className={`w-1.5 h-1.5 rounded-full inline-block ${isSpeaking ? "bg-green-400 animate-pulse" : "bg-green-400"}`}></span>
-                  {isSpeaking ? "Speaking..." : isListening ? "Listening..." : `${tab?.hint} · ${rateInfo.remaining} msgs left`}
+                  {isSpeaking ? "Speaking..." : isListening ? "Listening..." : activeTab === "match" ? `Job Matcher · ${rateInfo.remaining} scans left` : `${tab?.hint} · ${rateInfo.remaining} msgs left`}
                 </p>
               </div>
             </div>
@@ -448,7 +575,10 @@ export default function AIAssistant() {
                 </div>
               )}
 
-              {/* Messages */}
+              {/* Messages OR Job Match Results */}
+              {activeTab === "match" && matchResults ? (
+                <JobMatchResults results={matchResults} onClose={() => setMatchResults(null)} />
+              ) : (
               <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-gray-50/60">
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex items-start gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
@@ -478,15 +608,19 @@ export default function AIAssistant() {
                 {loading && (
                   <div className="flex items-start gap-2.5">
                     <BotAvatar />
-                    <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm flex items-center gap-1.5">
+                    <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm flex items-center gap-2">
                       <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                       <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "120ms" }} />
                       <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "240ms" }} />
+                      {activeTab === "match" && (
+                        <span className="text-xs text-gray-400 ml-1">Scanning live jobs…</span>
+                      )}
                     </div>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
               </div>
+              )}
 
               {/* Suggested chips */}
               {messages.length === 1 && !loading && (
@@ -534,6 +668,7 @@ export default function AIAssistant() {
                     placeholder={
                       isListening ? "Listening…" :
                       rateInfo.limited ? "Rate limit reached. Please wait..." :
+                      activeTab === "match" ? "Paste your CV or list your skills & experience…" :
                       tab?.placeholder
                     }
                     disabled={rateInfo.limited || isListening}
