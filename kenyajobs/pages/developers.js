@@ -3,7 +3,8 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import {
   Code2, Copy, Check, Terminal, Zap, Globe, ShieldCheck, Mail,
-  Play, ChevronRight, Hash, BookOpen, AlertTriangle,
+  Play, ChevronRight, Hash, BookOpen, AlertTriangle, Lock,
+  Clock, Package, AlertCircle, GitBranch,
 } from "lucide-react";
 
 const ENDPOINTS = [
@@ -82,6 +83,47 @@ const FIELDS = [
   ["url", "string", "Direct link to the original listing — always send applicants here."],
   ["description", "string", "Plain-text job description, HTML stripped."],
   ["source", "string", "Originating board, e.g. \"Remotive\", \"BrighterMonday\"."],
+];
+
+const ERROR_CODES = [
+  ["200", "OK", "Request succeeded, JSON array returned (may be empty)."],
+  ["400", "Bad Request", "A required parameter is missing, e.g. ?query= on /api/search-jobs."],
+  ["429", "Too Many Requests", "You're polling faster than fair use allows. Back off and retry with backoff."],
+  ["500", "Upstream Error", "All upstream sources failed for this request. We still try to serve last-known-good cached data before returning this."],
+];
+
+const CACHE_TIERS = [
+  ["africa-jobs", "20 min", "2 hr", "Heaviest fan-out (RSS + proxy calls), longest fresh window to protect rate limits."],
+  ["remote-jobs / entry-level-jobs / graduate-jobs / wfh-jobs / internship-jobs", "10 min", "1 hr", "Standard aggregator cache."],
+  ["search-jobs", "5 min", "—", "Shorter window since results depend on the query string."],
+];
+
+const SDK_SNIPPET = `// lib/jobsworldwide.js — tiny zero-dependency client
+const BASE = "https://jobsworldwide.online/api";
+
+async function get(path) {
+  const res = await fetch(\`\${BASE}\${path}\`);
+  if (!res.ok) throw new Error(\`JobsWorldwide API error: \${res.status}\`);
+  return res.json();
+}
+
+export const JobsWorldwide = {
+  africaJobs:    ()        => get("/africa-jobs"),
+  remoteJobs:    (category) => get(\`/remote-jobs\${category ? \`?category=\${category}\` : ""}\`),
+  entryLevel:    (page)     => get(\`/entry-level-jobs\${page ? \`?page=\${page}\` : ""}\`),
+  graduateJobs:  ()        => get("/graduate-jobs"),
+  internships:   ()        => get("/internship-jobs"),
+  wfhJobs:       ()        => get("/wfh-jobs"),
+  search:        (query)    => get(\`/search-jobs?query=\${encodeURIComponent(query)}\`),
+};
+
+// Usage:
+// const jobs = await JobsWorldwide.search("react developer");`;
+
+const CHANGELOG = [
+  ["2026-06-20", "Added live in-browser request tester and multi-language code samples to these docs."],
+  ["2026-06-19", "Public API docs published. All aggregator endpoints opened for external read access."],
+  ["2026-06-12", "Fixed truncated job descriptions on WordPress-based feeds by preferring content:encoded over description in RSS parsing."],
 ];
 
 function codeSamples(path) {
@@ -334,6 +376,7 @@ export default function Developers() {
               <p className="text-xs font-mono uppercase tracking-widest text-gray-400 mb-2">On this page</p>
               <nav className="space-y-1 text-sm">
                 <a href="#quickstart" className="block text-gray-500 hover:text-gray-900 py-1">Quickstart</a>
+                <a href="#authentication" className="block text-gray-500 hover:text-gray-900 py-1">Authentication</a>
                 <a href="#response-shape" className="block text-gray-500 hover:text-gray-900 py-1">Response shape</a>
                 <a href="#endpoints" className="block text-gray-500 hover:text-gray-900 py-1 font-semibold text-gray-900">Endpoints</a>
                 <div className="pl-3 border-l border-gray-200 space-y-1 mt-1">
@@ -350,6 +393,10 @@ export default function Developers() {
                     </a>
                   ))}
                 </div>
+                <a href="#caching" className="block text-gray-500 hover:text-gray-900 py-1 mt-1">Rate limits &amp; caching</a>
+                <a href="#errors" className="block text-gray-500 hover:text-gray-900 py-1">Errors</a>
+                <a href="#sdk" className="block text-gray-500 hover:text-gray-900 py-1">Client snippet</a>
+                <a href="#changelog" className="block text-gray-500 hover:text-gray-900 py-1">Changelog</a>
                 <a href="#fair-use" className="block text-gray-500 hover:text-gray-900 py-1 mt-1">Fair use</a>
               </nav>
             </div>
@@ -388,6 +435,23 @@ export default function Developers() {
               just make a GET request to any URL below.
             </p>
             <CodeBlock code={`curl https://jobsworldwide.online/api/remote-jobs`} />
+          </section>
+
+          {/* Authentication */}
+          <section id="authentication" ref={(el) => (sectionRefs.current["authentication"] = el)}>
+            <div className="flex items-center gap-2 mb-4">
+              <Lock size={16} className="text-blue-500" />
+              <h2 className="text-lg font-bold text-gray-900">Authentication</h2>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed mb-3">
+              The public tier requires no API key, no signup, and no auth headers — every
+              endpoint listed below is open for read access right now.
+            </p>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              If your use case needs higher volume than fair use allows (see below),
+              reach out via the contact section at the bottom of this page — we're open
+              to issuing dedicated keys with higher limits for serious integrations.
+            </p>
           </section>
 
           {/* Response shape */}
@@ -469,6 +533,108 @@ export default function Developers() {
 
                     <TryIt endpoint={e} />
                   </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Rate limits & caching */}
+          <section id="caching" ref={(el) => (sectionRefs.current["caching"] = el)}>
+            <div className="flex items-center gap-2 mb-4">
+              <Clock size={16} className="text-blue-500" />
+              <h2 className="text-lg font-bold text-gray-900">Rate limits &amp; caching</h2>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed mb-4">
+              Every endpoint sits behind a server-side stale-while-revalidate cache, plus a
+              CDN-level <code className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">Cache-Control</code> header.
+              Inside the fresh window you get an instant cached response with zero upstream
+              calls; once stale, you still get an instant response while we refresh in the
+              background — you should never see a slow request because an upstream board is slow.
+            </p>
+            <div className="border border-gray-200 rounded-2xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="text-left px-4 py-2.5 font-mono text-xs uppercase tracking-wide text-gray-500">Endpoint group</th>
+                    <th className="text-left px-4 py-2.5 font-mono text-xs uppercase tracking-wide text-gray-500">Fresh window</th>
+                    <th className="text-left px-4 py-2.5 font-mono text-xs uppercase tracking-wide text-gray-500">Stale window</th>
+                    <th className="text-left px-4 py-2.5 font-mono text-xs uppercase tracking-wide text-gray-500">Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {CACHE_TIERS.map(([group, fresh, stale, notes], i) => (
+                    <tr key={group} className={i !== CACHE_TIERS.length - 1 ? "border-b border-gray-100" : ""}>
+                      <td className="px-4 py-2.5 font-mono text-xs text-gray-900">{group}</td>
+                      <td className="px-4 py-2.5 text-xs text-gray-600">{fresh}</td>
+                      <td className="px-4 py-2.5 text-xs text-gray-600">{stale}</td>
+                      <td className="px-4 py-2.5 text-xs text-gray-500">{notes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-gray-400 mt-3">
+              Practical guidance: cache responses on your own side for at least 5–10 minutes.
+              Polling more frequently than that just re-hits our cache and wastes your own requests.
+            </p>
+          </section>
+
+          {/* Errors */}
+          <section id="errors" ref={(el) => (sectionRefs.current["errors"] = el)}>
+            <div className="flex items-center gap-2 mb-4">
+              <AlertCircle size={16} className="text-blue-500" />
+              <h2 className="text-lg font-bold text-gray-900">Errors</h2>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed mb-4">
+              Errors are returned as standard HTTP status codes. There's no custom error
+              envelope — check the status code first.
+            </p>
+            <div className="border border-gray-200 rounded-2xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="text-left px-4 py-2.5 font-mono text-xs uppercase tracking-wide text-gray-500">Status</th>
+                    <th className="text-left px-4 py-2.5 font-mono text-xs uppercase tracking-wide text-gray-500">Meaning</th>
+                    <th className="text-left px-4 py-2.5 font-mono text-xs uppercase tracking-wide text-gray-500">What to do</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ERROR_CODES.map(([code, label, desc], i) => (
+                    <tr key={code} className={i !== ERROR_CODES.length - 1 ? "border-b border-gray-100" : ""}>
+                      <td className="px-4 py-2.5 font-mono text-xs font-bold text-gray-900">{code}</td>
+                      <td className="px-4 py-2.5 text-xs font-semibold text-gray-700">{label}</td>
+                      <td className="px-4 py-2.5 text-xs text-gray-500">{desc}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* SDK / client snippet */}
+          <section id="sdk" ref={(el) => (sectionRefs.current["sdk"] = el)}>
+            <div className="flex items-center gap-2 mb-4">
+              <Package size={16} className="text-blue-500" />
+              <h2 className="text-lg font-bold text-gray-900">Drop-in client snippet</h2>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed mb-4">
+              No official SDK package yet — but the whole API surface is small enough to wrap
+              in one file. Copy this into your project:
+            </p>
+            <CodeBlock code={SDK_SNIPPET} lang="javascript" />
+          </section>
+
+          {/* Changelog */}
+          <section id="changelog" ref={(el) => (sectionRefs.current["changelog"] = el)}>
+            <div className="flex items-center gap-2 mb-4">
+              <GitBranch size={16} className="text-blue-500" />
+              <h2 className="text-lg font-bold text-gray-900">Changelog</h2>
+            </div>
+            <div className="space-y-4">
+              {CHANGELOG.map(([date, note]) => (
+                <div key={date + note} className="flex gap-4 text-sm">
+                  <span className="font-mono text-xs text-gray-400 flex-shrink-0 w-24 pt-0.5">{date}</span>
+                  <span className="text-gray-600">{note}</span>
                 </div>
               ))}
             </div>
