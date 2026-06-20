@@ -1,77 +1,160 @@
 @import "tailwindcss";
 
+/* ──────────────────────────────────────────────────────────────────────
+   DESIGN TOKENS — "Daily Edition"
+   An East African business-journal aesthetic: warm parchment paper,
+   ink instead of grey, hairline rules instead of cards-on-cards,
+   oxblood / ochre / forest as the only accent colors.
+   ────────────────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #12161c;
+  --background: #EEEBE0;
+  --foreground: #1B1812;
 
-  --color-navy: #0b2233;
-  --color-navy-soft: #16344a;
-  --color-navy-line: #25455c;
-  --color-paper: #ffffff;
-  --color-paper-dim: #f4f5f3;
-  --color-ink: #12161c;
-  --color-ink-soft: #5b6472;
-  --color-ink-faint: #8b94a0;
-  --color-amber: #f2a93c;
-  --color-amber-dark: #c97c12;
-  --color-signal: #3f8f5f;
-  --color-signal-dim: #e7f1ea;
-  --color-line: #e2e5e8;
+  /* Paper */
+  --color-paper:       #EEEBE0;
+  --color-paper-dim:   #E4DFCE;
+  --color-paper-deep:  #1B1812; /* masthead / footer ground */
+
+  /* Ink */
+  --color-ink:         #1B1812;
+  --color-ink-soft:    #5B564A;
+  --color-ink-faint:   #8C8674;
+  --color-ink-on-deep: #F2EFE5;
+
+  /* Rules */
+  --color-rule:        #CFC8B0;
+  --color-rule-strong: #B0A684;
+
+  /* Accents */
+  --color-crimson:      #A32B1F;
+  --color-crimson-dark: #7E2117;
+  --color-crimson-tint: #F4E4DF;
+  --color-ochre:        #B9802A;
+  --color-ochre-tint:   #F4E9D4;
+  --color-forest:       #2B4A37;
+  --color-forest-tint:  #E1E8DE;
+
+  /* Legacy aliases kept so untouched components/pages don't break */
+  --color-navy: var(--color-paper-deep);
+  --color-navy-soft: #2A261D;
+  --color-navy-line: #3A3528;
+  --color-amber: var(--color-ochre);
+  --color-amber-dark: var(--color-crimson-dark);
+  --color-signal: var(--color-forest);
+  --color-signal-dim: var(--color-forest-tint);
+  --color-line: var(--color-rule);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-navy: var(--color-navy);
-  --color-navy-soft: var(--color-navy-soft);
-  --color-navy-line: var(--color-navy-line);
+
   --color-paper: var(--color-paper);
   --color-paper-dim: var(--color-paper-dim);
+  --color-paper-deep: var(--color-paper-deep);
   --color-ink: var(--color-ink);
   --color-ink-soft: var(--color-ink-soft);
   --color-ink-faint: var(--color-ink-faint);
+  --color-ink-on-deep: var(--color-ink-on-deep);
+  --color-rule: var(--color-rule);
+  --color-rule-strong: var(--color-rule-strong);
+  --color-crimson: var(--color-crimson);
+  --color-crimson-dark: var(--color-crimson-dark);
+  --color-crimson-tint: var(--color-crimson-tint);
+  --color-ochre: var(--color-ochre);
+  --color-ochre-tint: var(--color-ochre-tint);
+  --color-forest: var(--color-forest);
+  --color-forest-tint: var(--color-forest-tint);
+
+  --color-navy: var(--color-navy);
+  --color-navy-soft: var(--color-navy-soft);
+  --color-navy-line: var(--color-navy-line);
   --color-amber: var(--color-amber);
   --color-amber-dark: var(--color-amber-dark);
   --color-signal: var(--color-signal);
   --color-signal-dim: var(--color-signal-dim);
   --color-line: var(--color-line);
 
-  /* DM Sans as the single font — clean, geometric, very readable */
-  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* DM Sans stays as the single typeface — display weight (900) for editorial
+     headline scale, IBM Plex Mono for meta/bylines/datelines. */
   --font-display: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 }
 
 html {
-  /* 18px base — comfortable reading size, especially on mobile */
   font-size: 18px;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 1rem;      /* 18px */
-  line-height: 1.65;
-  letter-spacing: -0.01em; /* DM Sans looks best slightly tightened */
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
-/* Headings use DM Sans too — tighten tracking for large sizes */
 h1, h2, h3, h4, h5, h6 {
-  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-display);
+  font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.08;
 }
 
-/* Tabular figures for data/numbers */
+/* ── Editorial utility classes ──────────────────────────────────────── */
+
+/* Small tracked caps label — section eyebrows, bylines, tags */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Hairline rule, the primary structural device instead of cards/shadows */
+.rule {
+  border-color: var(--color-rule);
+}
+.rule-strong {
+  border-color: var(--color-rule-strong);
+}
+
+/* Drop cap for long-form intro paragraphs */
+.drop-cap::first-letter {
+  font-family: var(--font-display);
+  font-weight: 900;
+  float: left;
+  font-size: 3.2em;
+  line-height: 0.78;
+  padding-right: 0.07em;
+  padding-top: 0.05em;
+  color: var(--color-crimson);
+}
+
+/* Tabular figures for stats/datelines */
 .tabular {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
 }
 
-/* Split-flap reveal */
+/* Masthead live dot */
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-crimson);
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* Split-flap reveal (kept from previous design, used by listings) */
 @keyframes flap-reveal {
   0%   { opacity: 0; transform: translateY(-6px); filter: blur(1px); }
   60%  { opacity: 1; transform: translateY(0);    filter: blur(0);   }
@@ -83,9 +166,10 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (prefers-reduced-motion: reduce) {
   .flap-row { animation: none; }
+  .live-dot { animation: none; }
 }
 
-/* ── Sources marquee ── */
+/* ── Wire ticker (sources marquee) ── */
 @keyframes scroll-left {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-33.333%); }
@@ -103,4 +187,15 @@ h1, h2, h3, h4, h5, h6 {
 .marquee:hover,
 .marquee-reverse:hover {
   animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee, .marquee-reverse { animation: none; }
+}
+
+/* Focus visibility, kept accessible against flat ink-on-paper design */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-crimson);
+  outline-offset: 2px;
 }

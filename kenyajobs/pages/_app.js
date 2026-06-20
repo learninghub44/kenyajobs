@@ -4,6 +4,7 @@ import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/500.css";
 import "@fontsource/dm-sans/600.css";
 import "@fontsource/dm-sans/700.css";
+import "@fontsource/dm-sans/900.css";
 import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
 import Navbar from "@/components/Navbar";
@@ -14,7 +15,7 @@ import Analytics from "@/components/Analytics";
 
 export default function App({ Component, pageProps }) {
   return (
-    <div className="min-h-screen bg-paper flex flex-col">
+    <div className="min-h-screen bg-paper text-ink flex flex-col">
       <Navbar />
       <main className="flex-1">
         <Component {...pageProps} />
