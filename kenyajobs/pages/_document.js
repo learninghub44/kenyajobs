@@ -14,6 +14,7 @@ export default function Document() {
       <Head>
         {/* ── Viewport & theme ── */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="google-site-verification" content="ce0cfe900ace0afe" />
         <meta name="theme-color" content="#0b2233" />
         <meta name="color-scheme" content="light" />
 
