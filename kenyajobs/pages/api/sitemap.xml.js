@@ -21,25 +21,19 @@ const STATIC_PAGES = [
   { path: "/terms-and-conditions", priority: "0.4", changefreq: "monthly" },
 ];
 
-function generateSitemap(pages) {
+export default function handler(req, res) {
   const today = new Date().toISOString().split("T")[0];
-  return `<?xml version="1.0" encoding="UTF-8"?>
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pages.map(({ path, priority, changefreq }) => `  <url>
+${STATIC_PAGES.map(({ path, priority, changefreq }) => `  <url>
     <loc>${SITE_URL}${path}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`).join("\n")}
 </urlset>`;
-}
 
-export default function Sitemap() { return null; }
-
-export async function getServerSideProps({ res }) {
   res.setHeader("Content-Type", "text/xml; charset=utf-8");
   res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
-  res.write(generateSitemap(STATIC_PAGES));
-  res.end();
-  return { props: {} };
+  res.status(200).send(xml);
 }

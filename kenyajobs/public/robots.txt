@@ -2,6 +2,6 @@ User-agent: *
 Allow: /
 
 Disallow: /admin/
-Disallow: /api/
+Disallow: /api/admin/
 
-Sitemap: https://jobsworldwide.online/sitemap.xml
+Sitemap: https://kenyajobs.vercel.app/api/sitemap.xml
