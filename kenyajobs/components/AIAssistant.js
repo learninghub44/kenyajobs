@@ -128,6 +128,11 @@ export default function AIAssistant() {
     return () => window.removeEventListener("jw-cookie-consent-changed", onChange);
   }, []);
   const dockOffset = cookieBannerVisible ? "bottom-[150px] sm:bottom-[170px]" : "bottom-6";
+  const winHeight = minimized
+    ? "h-[64px]"
+    : cookieBannerVisible
+      ? "h-[min(560px,calc(100vh-200px))]"
+      : "h-[min(620px,calc(100vh-100px))]";
 
   // Voice states
   const [isListening, setIsListening]   = useState(false);
@@ -361,7 +366,7 @@ export default function AIAssistant() {
 
       {/* ── Chat window ── */}
       {open && (
-        <div className={`fixed ${dockOffset} right-6 z-50 w-[400px] max-w-[calc(100vw-16px)] bg-white rounded-2xl shadow-2xl border border-gray-200/80 flex flex-col overflow-hidden transition-all duration-300 ${minimized ? "h-[64px]" : "h-[620px]"}`}>
+        <div className={`fixed ${dockOffset} right-6 z-50 w-[400px] max-w-[calc(100vw-16px)] bg-white rounded-2xl shadow-2xl border border-gray-200/80 flex flex-col overflow-hidden transition-all duration-300 ${winHeight}`}>
 
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 flex-shrink-0">
