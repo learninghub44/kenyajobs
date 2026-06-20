@@ -6,26 +6,48 @@ const SOURCES = ["Remotive", "Jobicy", "Arbeitnow", "ReliefWeb", "BrighterMonday
 export default function Footer() {
   return (
     <footer className="bg-[#0b2233] text-slate-400">
-
       {/* Trust strip */}
       <div className="border-b border-white/10 py-5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 justify-center md:justify-between">
             <div className="text-base">
-              <span className="text-slate-300 font-semibold">Verified job listings</span>
-              <span className="text-slate-500"> — from 30+ trusted global sources</span>
+              <span className="text-slate-300 font-semibold">
+                Verified job listings
+              </span>
+              <span className="text-slate-500">
+                {" "}
+                — from 30+ trusted global sources
+              </span>
             </div>
+
             <div className="text-base">
-              <span className="text-slate-300 font-semibold">Live aggregation</span>
-              <span className="text-slate-500"> — updated multiple times daily</span>
+              <span className="text-slate-300 font-semibold">
+                Live aggregation
+              </span>
+              <span className="text-slate-500">
+                {" "}
+                — updated multiple times daily
+              </span>
             </div>
+
             <div className="text-base">
-              <span className="text-slate-300 font-semibold">30+ countries</span>
-              <span className="text-slate-500"> — Africa, Europe, Americas &amp; more</span>
+              <span className="text-slate-300 font-semibold">
+                30+ countries
+              </span>
+              <span className="text-slate-500">
+                {" "}
+                — Africa, Europe, Americas &amp; more
+              </span>
             </div>
+
             <div className="text-base">
-              <span className="text-slate-300 font-semibold">No fake listings</span>
-              <span className="text-slate-500"> — sourced from reputable boards only</span>
+              <span className="text-slate-300 font-semibold">
+                No fake listings
+              </span>
+              <span className="text-slate-500">
+                {" "}
+                — sourced from reputable boards only
+              </span>
             </div>
           </div>
         </div>
@@ -42,21 +64,36 @@ export default function Footer() {
                 <img
                   src="/logo-nav.svg"
                   alt="JobsWorldwide"
-                  style={{ height: "44px", width: "auto", filter: "brightness(0) invert(1)" }}
+                  style={{
+                    height: "44px",
+                    width: "auto",
+                    filter: "brightness(0) invert(1)",
+                  }}
                 />
               </Link>
             </div>
+
             <p className="text-base leading-relaxed mb-5 text-slate-400">
-              We aggregate live job listings from 30+ reputable boards and post them in one place — so you spend less time searching and more time applying.
+              We aggregate live job listings from 30+ reputable boards and post
+              them in one place — so you spend less time searching and more time
+              applying.
             </p>
-            <a href="mailto:hello@jobsworldwide.online" className="flex items-center gap-2 text-base hover:text-white transition-colors mb-6">
-              <Mail size={13} /> hello@jobsworldwide.online
+
+            <a
+              href="mailto:hello@jobsworldwide.online"
+              className="flex items-center gap-2 text-base hover:text-white transition-colors mb-6"
+            >
+              <Mail size={13} />
+              hello@jobsworldwide.online
             </a>
           </div>
 
           {/* Browse Jobs */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Browse Jobs</h3>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">
+              Browse Jobs
+            </h3>
+
             <ul className="space-y-2.5 text-base">
               {[
                 ["Remote Jobs", "/remote-jobs"],
@@ -67,7 +104,12 @@ export default function Footer() {
                 ["Africa Jobs", "/africa-jobs"],
               ].map(([l, h]) => (
                 <li key={h}>
-                  <Link href={h} className="hover:text-white transition-colors">{l}</Link>
+                  <Link
+                    href={h}
+                    className="hover:text-white transition-colors"
+                  >
+                    {l}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -75,7 +117,10 @@ export default function Footer() {
 
           {/* Popular Roles */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Popular Roles</h3>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">
+              Popular Roles
+            </h3>
+
             <ul className="space-y-2.5 text-base">
               {[
                 ["Software Engineer", "software engineer"],
@@ -86,7 +131,12 @@ export default function Footer() {
                 ["Customer Service", "customer service"],
               ].map(([label, q]) => (
                 <li key={label}>
-                  <Link href={`/search?q=${encodeURIComponent(q)}`} className="hover:text-white transition-colors">{label}</Link>
+                  <Link
+                    href={`/search?q=${encodeURIComponent(q)}`}
+                    className="hover:text-white transition-colors"
+                  >
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -104,7 +154,12 @@ export default function Footer() {
                 ["Help / FAQs", "/faq"],
               ].map(([l, h]) => (
                 <li key={h}>
-                  <Link href={h} className="hover:text-white transition-colors">{l}</Link>
+                  <Link
+                    href={h}
+                    className="hover:text-white transition-colors"
+                  >
+                    {l}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -112,7 +167,10 @@ export default function Footer() {
 
           {/* Employers */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Employers</h3>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">
+              Employers
+            </h3>
+
             <ul className="space-y-2.5 text-base">
               {[
                 ["Post a Job", "/advertise"],
@@ -121,11 +179,20 @@ export default function Footer() {
                 ["Contact Us", "/contact"],
               ].map(([l, h]) => (
                 <li key={l}>
-                  <Link href={h} className="hover:text-white transition-colors">{l}</Link>
+                  <Link
+                    href={h}
+                    className="hover:text-white transition-colors"
+                  >
+                    {l}
+                  </Link>
                 </li>
               ))}
+
               <li>
-                <a href="mailto:hello@jobsworldwide.online?subject=Post a Job" className="hover:text-white transition-colors">
+                <a
+                  href="mailto:hello@jobsworldwide.online?subject=Post a Job"
+                  className="hover:text-white transition-colors"
+                >
                   Email Us
                 </a>
               </li>
@@ -134,17 +201,25 @@ export default function Footer() {
 
           {/* Our Sources */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Our Sources</h3>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">
+              Our Sources
+            </h3>
+
             <div className="flex flex-wrap gap-1.5 mb-5">
-              {SOURCES.map(src => (
-                <span key={src} className="text-sm font-medium px-2.5 py-1 rounded bg-white/8 text-slate-400 border border-white/10">
+              {SOURCES.map((src) => (
+                <span
+                  key={src}
+                  className="text-sm font-medium px-2.5 py-1 rounded bg-white/10 text-slate-400 border border-white/10"
+                >
                   {src}
                 </span>
               ))}
-              <span className="text-sm font-medium px-2.5 py-1 rounded bg-white/8 text-slate-500 border border-white/10">
+
+              <span className="text-sm font-medium px-2.5 py-1 rounded bg-white/10 text-slate-500 border border-white/10">
                 +23 more
               </span>
             </div>
+
             <ul className="space-y-2.5 text-base">
               {[
                 ["Privacy Policy", "/privacy-policy"],
@@ -161,13 +236,39 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500">
-          <p>© {new Date().getFullYear()} JobsWorldwide. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} JobsWorldwide. All rights reserved.
+          </p>
+
           <div className="flex flex-wrap gap-5">
-            <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
-            <Link href="/about" className="hover:text-white transition-colors">About</Link>
-            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+            <Link
+              href="/privacy-policy"
+              className="hover:text-white transition-colors"
+            >
+              Privacy Policy
+            </Link>
+
+            <Link
+              href="/terms-and-conditions"
+              className="hover:text-white transition-colors"
+            >
+              Terms
+            </Link>
+
+            <Link href="/faq" className="hover:text-white transition-colors">
+              FAQ
+            </Link>
+
+            <Link href="/about" className="hover:text-white transition-colors">
+              About
+            </Link>
+
+            <Link
+              href="/contact"
+              className="hover:text-white transition-colors"
+            >
+              Contact
+            </Link>
           </div>
         </div>
       </div>
