@@ -26,7 +26,7 @@ const SECTIONS = [
     bg: "bg-emerald-50",
     links: [
       ["CV Tips & Career Advice", "/cv-tips"],
-      ["Job Trends in Kenya", "/job-trends"],
+      ["Job Trends & Market Insights", "/job-trends"],
       ["Companies Hiring", "/companies"],
       ["Help / FAQs", "/faq"],
     ],

@@ -26,7 +26,7 @@ const TOP_SECTORS = [
 const INSIGHTS = [
   {
     title: "Remote work is here to stay",
-    body: "Over 40% of tech job listings in Kenya now offer full remote or hybrid arrangements. Global remote boards like Remotive and Jobicy show Kenyan applicants gaining ground in competitive roles.",
+    body: "Over 40% of tech job listings now offer full remote or hybrid arrangements. Global remote boards like Remotive and Jobicy show African applicants gaining ground in competitive roles.",
     icon: Globe,
     color: "text-blue-600",
     bg: "bg-blue-50",
@@ -47,7 +47,7 @@ const INSIGHTS = [
   },
   {
     title: "Internships converting to full-time",
-    body: "More Kenyan companies are using internships as a pipeline, with conversion rates to full-time employment rising above 60% at tech companies and banks.",
+    body: "More companies worldwide are using internships as a pipeline, with conversion rates to full-time employment rising above 60% at tech companies and banks.",
     icon: Briefcase,
     color: "text-amber-600",
     bg: "bg-amber-50",
@@ -64,17 +64,17 @@ export default function JobTrends() {
   return (
     <>
       <Head>
-        <title>Job Trends in Kenya 2025 | JobsWorldwide</title>
-        <meta name="description" content="Explore the latest job market trends in Kenya — trending roles, top hiring sectors, salary insights, and what employers are looking for in 2025." />
+        <title>Job Trends & Market Insights 2025 | JobsWorldwide</title>
+        <meta name="description" content="Explore the latest job market trends worldwide — trending roles, top hiring sectors, salary insights, and what employers are looking for in 2025." />
       </Head>
 
       {/* Header */}
       <div className="bg-gray-50 border-b border-gray-200 py-12">
         <div className="max-w-5xl mx-auto px-4">
           <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">Market Intelligence</p>
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">Job Trends in Kenya</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">Job Trends & Market Insights</h1>
           <p className="text-base text-gray-500 max-w-xl">
-            Based on live job listings across our aggregated sources. Updated regularly to reflect the current Kenyan and African job market.
+            Based on live job listings across our aggregated sources. Updated regularly to reflect the current global job market.
           </p>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function JobTrends() {
         {/* CTA */}
         <section className="bg-blue-600 text-white rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-2">Ready to apply?</h2>
-          <p className="text-blue-100 text-sm mb-6 max-w-md mx-auto">Browse thousands of live jobs across Kenya, East Africa, and global remote boards — updated daily.</p>
+          <p className="text-blue-100 text-sm mb-6 max-w-md mx-auto">Browse thousands of live jobs across Africa, Europe, Asia and global remote boards — updated daily.</p>
           <div className="flex flex-wrap justify-center gap-3">
             <a href="/" className="bg-white text-blue-700 font-semibold px-6 py-2.5 rounded-xl text-sm hover:bg-blue-50 transition-colors">Browse All Jobs</a>
             <a href="/remote-jobs" className="border border-white/30 text-white font-semibold px-6 py-2.5 rounded-xl text-sm hover:bg-blue-500 transition-colors">Remote Jobs</a>
