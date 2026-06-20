@@ -1,12 +1,9 @@
 // Providers: The Muse (free) + Remotive (free) + JSearch (if key set)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
+import { cachedFetch } from "@/lib/apiResponseCache";
 
-export default async function handler(req, res) {
-  const { page = 1 } = req.query;
-
-  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
-
+async function fetchAll(page) {
   const sources = [
     // 1. The Muse — free, no key, has entry level filter
     fetchWithTimeout(`https://www.themuse.com/api/public/jobs?level=Entry+Level&page=${page}&descending=true`, {}, 5000)
@@ -73,9 +70,17 @@ export default async function handler(req, res) {
   ];
 
   const results = await Promise.allSettled(sources);
-  const jobs = results
+  return results
     .filter(r => r.status === "fulfilled")
     .flatMap(r => r.value);
+}
+
+export default async function handler(req, res) {
+  const { page = 1 } = req.query;
+
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
+
+  const jobs = await cachedFetch(`entry-level-jobs:${page}`, () => fetchAll(page));
 
   cacheJobs(jobs);
   res.status(200).json(jobs);

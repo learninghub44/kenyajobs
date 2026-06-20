@@ -1,12 +1,9 @@
 // Providers: Remotive + Jobicy + Arbeitnow (all free, no key)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
+import { cachedFetch } from "@/lib/apiResponseCache";
 
-export default async function handler(req, res) {
-  const { category = "", limit = 30 } = req.query;
-
-  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
-
+async function fetchAll(category) {
   const results = await Promise.allSettled([
     // 1. Remotive
     fetchWithTimeout(
@@ -71,9 +68,17 @@ export default async function handler(req, res) {
       .catch(err => { console.error("Arbeitnow error:", err.message); return []; }),
   ]);
 
-  const jobs = results
+  return results
     .filter(r => r.status === "fulfilled")
     .flatMap(r => r.value);
+}
+
+export default async function handler(req, res) {
+  const { category = "", limit = 30 } = req.query;
+
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
+
+  const jobs = await cachedFetch(`remote-jobs:${category}`, () => fetchAll(category));
 
   cacheJobs(jobs);
   res.status(200).json(jobs);

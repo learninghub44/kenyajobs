@@ -4,11 +4,9 @@
 //          Sources used here must NOT duplicate /api/remote-jobs fetch calls
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
+import { cachedFetch } from "@/lib/apiResponseCache";
 
-export default async function handler(req, res) {
-  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
-  const { page = 1 } = req.query;
-
+async function fetchAll(page) {
   const sources = [
     // 1. Remotive — customer-support (home-based friendly category, not in remote-jobs general call)
     fetchWithTimeout("https://remotive.com/api/remote-jobs?category=customer-support&limit=10", {}, 5000)
@@ -94,9 +92,16 @@ export default async function handler(req, res) {
   ];
 
   const results = await Promise.allSettled(sources);
-  const jobs = results
+  return results
     .filter(r => r.status === "fulfilled")
     .flatMap(r => r.value);
+}
+
+export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
+  const { page = 1 } = req.query;
+
+  const jobs = await cachedFetch(`wfh-jobs:${page}`, () => fetchAll(page));
 
   cacheJobs(jobs);
   res.status(200).json(jobs);

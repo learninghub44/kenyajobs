@@ -1,11 +1,9 @@
 // Providers: JSearch (if key) + The Muse (free) + Jobicy (free)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
+import { cachedFetch } from "@/lib/apiResponseCache";
 
-export default async function handler(req, res) {
-  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
-  const { page = 1 } = req.query;
-
+async function fetchAll(page) {
   const sources = [
     // 1. The Muse — internship/associate level
     fetchWithTimeout(`https://www.themuse.com/api/public/jobs?level=Internship&page=${page}&descending=true`, {}, 5000)
@@ -74,9 +72,16 @@ export default async function handler(req, res) {
   ];
 
   const results = await Promise.allSettled(sources);
-  const jobs = results
+  return results
     .filter(r => r.status === "fulfilled")
     .flatMap(r => r.value);
+}
+
+export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
+  const { page = 1 } = req.query;
+
+  const jobs = await cachedFetch(`graduate-jobs:${page}`, () => fetchAll(page));
 
   cacheJobs(jobs);
   res.status(200).json(jobs);

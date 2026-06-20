@@ -158,7 +158,7 @@ export default function Home() {
     setSources({ loaded: 0, total: 6 });
     const fetchSource = async (url, sliceCount, label) => {
       try {
-        const res = await fetch(url + "?bust=" + Date.now());
+        const res = await fetch(url);
         if (!res.ok) return;
         const data = await res.json();
         const raw = Array.isArray(data) ? data : [];

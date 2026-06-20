@@ -1,4 +1,5 @@
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
+import { cachedFetch } from "@/lib/apiResponseCache";
 import crypto from "crypto";
 
 function hashId(input) {
@@ -223,8 +224,6 @@ async function fetchReliefWeb() {
 async function fetchLinkedIn() {
   const searches = [
     { q: "jobs+in+kenya",       label: "Kenya" },
-    { q: "jobs+in+nairobi",     label: "Nairobi, Kenya" },
-    { q: "remote+jobs+africa",  label: "Africa (Remote)" },
   ];
   const results = await Promise.allSettled(
     searches.map(({ q, label }) => {
@@ -259,8 +258,6 @@ async function fetchLinkedIn() {
 async function fetchIndeed() {
   const searches = [
     { q: "jobs", l: "Nairobi,+Kenya",  label: "Nairobi, Kenya" },
-    { q: "jobs", l: "Mombasa,+Kenya",  label: "Mombasa, Kenya" },
-    { q: "jobs", l: "Lagos,+Nigeria",  label: "Lagos, Nigeria" },
   ];
   const results = await Promise.allSettled(
     searches.map(({ q, l, label }) => {
@@ -331,9 +328,7 @@ async function fetchKenyaViaProxy() {
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────
-export default async function handler(req, res) {
-  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
-
+async function fetchAll() {
   const headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     "Accept": "application/rss+xml, application/xml, text/xml, */*",
@@ -392,6 +387,20 @@ export default async function handler(req, res) {
   const sourceCounts = {};
   unique.forEach(j => { sourceCounts[j.source] = (sourceCounts[j.source] || 0) + 1; });
   console.log(`[africa-jobs] Total: ${unique.length} | Sources:`, JSON.stringify(sourceCounts));
+
+  return unique;
+}
+
+export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
+
+  // This route is the heaviest fan-out (RSS feeds + rss2json.com proxy calls for
+  // LinkedIn/Indeed/Kenya feeds), so it gets a longer fresh window than the other
+  // job routes to minimize how often we hit the free rss2json.com rate limit.
+  const unique = await cachedFetch("africa-jobs", fetchAll, {
+    freshMs: 20 * 60 * 1000,   // 20 min fully fresh
+    staleMs: 2 * 60 * 60 * 1000, // up to 2h stale-while-revalidate
+  });
 
   res.status(200).json(unique);
 }

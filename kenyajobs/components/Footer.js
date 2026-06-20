@@ -3,7 +3,6 @@ import { Mail } from "lucide-react";
 
 const SOURCES = ["Remotive", "Jobicy", "Arbeitnow", "ReliefWeb", "BrighterMonday", "MyJobMag", "Adzuna"];
 
-
 export default function Footer() {
   return (
     <footer className="bg-[#0b2233] text-slate-400">
@@ -36,7 +35,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 pt-12 pb-8">
         <div className="grid grid-cols-2 md:grid-cols-7 gap-8 mb-12">
 
-          {/* Brand col */}
+          {/* Brand */}
           <div className="col-span-2 md:col-span-2">
             <div className="mb-4">
               <Link href="/">
@@ -55,7 +54,7 @@ export default function Footer() {
             </a>
           </div>
 
-          {/* Job Categories */}
+          {/* Browse Jobs */}
           <div>
             <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Browse Jobs</h3>
             <ul className="space-y-2.5 text-base">
@@ -92,6 +91,10 @@ export default function Footer() {
               ))}
             </ul>
           </div>
+
+          {/* Candidates */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Candidates</h3>
             <ul className="space-y-2.5 text-base">
               {[
                 ["CV Tips", "/cv-tips"],
@@ -129,7 +132,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Job sources */}
+          {/* Our Sources */}
           <div>
             <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Our Sources</h3>
             <div className="flex flex-wrap gap-1.5 mb-5">
@@ -143,11 +146,17 @@ export default function Footer() {
               </span>
             </div>
             <ul className="space-y-2.5 text-base">
-              {[["Privacy Policy", "/privacy-policy"], ["Terms & Conditions", "/terms-and-conditions"]].map(([l, h]) => (
-                <li key={h}><Link href={h} className="hover:text-white transition-colors">{l}</Link></li>
+              {[
+                ["Privacy Policy", "/privacy-policy"],
+                ["Terms & Conditions", "/terms-and-conditions"],
+              ].map(([l, h]) => (
+                <li key={h}>
+                  <Link href={h} className="hover:text-white transition-colors">{l}</Link>
+                </li>
               ))}
             </ul>
           </div>
+
         </div>
 
         {/* Bottom bar */}
