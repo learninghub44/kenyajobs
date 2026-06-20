@@ -2,6 +2,14 @@ import { MapPin, Clock, Building2, ArrowRight, Wifi, Banknote, Star } from "luci
 import Link from "next/link";
 import { saveJob } from "@/utils/jobCache";
 
+function companySlug(name = "") {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
 const TYPE_STYLES = {
   "Full-time":  { pill: "bg-emerald-50 text-emerald-800 border-emerald-200", dot: "bg-emerald-500" },
   "Part-time":  { pill: "bg-amber-50 text-amber-800 border-amber-200",       dot: "bg-amber-400"  },
@@ -109,10 +117,14 @@ export default function JobCard({ job }) {
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-500 truncate mb-0.5 flex items-center gap-1.5">
+            <Link
+              href={`/company/${companySlug(company)}?name=${encodeURIComponent(company)}`}
+              onClick={e => e.stopPropagation()}
+              className="text-sm font-medium text-gray-500 truncate mb-0.5 flex items-center gap-1.5 hover:text-blue-600 transition-colors w-fit"
+            >
               <Building2 size={13} className="flex-shrink-0" />
               {company}
-            </p>
+            </Link>
             <h3 className="font-semibold text-gray-900 text-lg leading-snug group-hover:text-blue-700 transition-colors line-clamp-2">
               {title}
             </h3>

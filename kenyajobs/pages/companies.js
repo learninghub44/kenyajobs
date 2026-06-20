@@ -1,7 +1,15 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Building2, Search, ExternalLink } from "lucide-react";
+import { Building2, Search, ExternalLink, Briefcase, ArrowRight } from "lucide-react";
+
+function companySlug(name = "") {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
 
 const FEATURED_COMPANIES = [
   { name: "Safaricom", sector: "Telecoms", location: "Nairobi", openRoles: "Multiple", query: "safaricom", color: "#16a34a", initials: "SA" },
@@ -80,8 +88,8 @@ export default function Companies() {
             {filtered.map(c => (
               <Link
                 key={c.name}
-                href={`/search?q=${encodeURIComponent(c.query)}`}
-                className="group flex items-start gap-4 bg-white border border-gray-200 hover:border-gray-300 rounded-xl p-5 hover:shadow-md transition-all duration-200"
+                href={`/company/${companySlug(c.name)}?name=${encodeURIComponent(c.name)}`}
+                className="group flex items-start gap-4 bg-white border border-gray-200 hover:border-blue-300 rounded-xl p-5 hover:shadow-md transition-all duration-200"
               >
                 {/* Avatar */}
                 <div
@@ -95,7 +103,7 @@ export default function Companies() {
                   <p className="text-xs text-gray-400 mt-0.5">{c.sector}</p>
                   <p className="text-xs text-gray-400">{c.location}</p>
                   <span className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-blue-600">
-                    View open roles <ExternalLink size={10} />
+                    View open roles <ArrowRight size={10} />
                   </span>
                 </div>
               </Link>
