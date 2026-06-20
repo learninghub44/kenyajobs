@@ -288,8 +288,8 @@ async function fetchIndeed() {
   return results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
 }
 
-// ── Kenya RSS via rss2json proxy ──────────────────────────────────────────────
-const KE_RSS_VIA_PROXY = [
+// ── Kenya RSS — parsed directly (no proxy), same reliable method as RSS_FEEDS ──
+const KE_RSS_DIRECT = [
   { url: "https://www.ngojobskenya.com/feed/",         source: "NGO Jobs Kenya",     location: "Kenya" },
   { url: "https://turinjobs.com/feed/",                source: "TurinJobs",          location: "Kenya" },
   { url: "https://kenyajobalert.com/feed/",            source: "Kenya Job Alert",    location: "Kenya" },
@@ -298,30 +298,18 @@ const KE_RSS_VIA_PROXY = [
   { url: "https://www.developmentaid.org/rss/jobs/kenya", source: "DevelopmentAid", location: "Kenya" },
 ];
 
-async function fetchKenyaViaProxy() {
+async function fetchKenyaDirect() {
+  const headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "application/rss+xml, application/xml, text/xml, */*",
+    "Accept-Language": "en-US,en;q=0.9",
+  };
   const results = await Promise.allSettled(
-    KE_RSS_VIA_PROXY.map(({ url, source, location }) =>
-      fetchWithTimeout(
-        `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=20`,
-        { headers: { "User-Agent": "Mozilla/5.0 (compatible; JobsWorldwide/1.0)" } },
-        7000
-      )
-        .then(r => r.ok ? r.json() : { status: "error", items: [] })
-        .then(d => {
-          if (d.status !== "ok") return [];
-          return (d.items || []).map(j => ({
-            id: `proxy-${hashId(source + (j.link || j.title))}`,
-            title: (j.title || "").replace(/<[^>]*>/g, ""),
-            company: j.author || source,
-            location,
-            type: "Full-time",
-            date: j.pubDate ? new Date(j.pubDate).toISOString() : new Date().toISOString(),
-            url: j.link || j.guid,
-            description: (j.description || "").replace(/<[^>]*>/g, ""),
-            source,
-          })).filter(j => j.title && j.url);
-        })
-        .catch(e => { console.warn(`[${source}]`, e.message); return []; })
+    KE_RSS_DIRECT.map(({ url, source, location }) =>
+      fetchWithTimeout(url, { headers }, 7000)
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+        .then(xml => parseRSS(xml, source, location))
+        .catch(e => { console.warn(`[RSS:${source}]`, e.message); return []; })
     )
   );
   return results.filter(r => r.status === "fulfilled").flatMap(r => r.value);
@@ -338,7 +326,7 @@ async function fetchAll() {
   const [
     remotiveRes, jobicyRes, arbeitnowRes, museRes,
     himalayasRes, reliefWebRes, linkedinRes, indeedRes,
-    kenyaProxyRes,
+    kenyaDirectRes,
     ...rssResults
   ] = await Promise.allSettled([
     fetchRemotive(),
@@ -349,7 +337,7 @@ async function fetchAll() {
     fetchReliefWeb(),
     fetchLinkedIn(),
     fetchIndeed(),
-    fetchKenyaViaProxy(),
+    fetchKenyaDirect(),
     // Direct RSS feeds
     ...RSS_FEEDS.map(({ url, source, location }) =>
       fetchWithTimeout(url, { headers }, 7000)
@@ -362,7 +350,7 @@ async function fetchAll() {
   const getValue = r => r.status === "fulfilled" ? r.value : [];
 
   const jobs = [
-    ...getValue(kenyaProxyRes),   // Kenya-specific first
+    ...getValue(kenyaDirectRes),  // Kenya-specific first
     ...getValue(linkedinRes),
     ...getValue(indeedRes),
     ...getValue(reliefWebRes),
@@ -400,6 +388,7 @@ export default async function handler(req, res) {
   const unique = await cachedFetch("africa-jobs", fetchAll, {
     freshMs: 20 * 60 * 1000,   // 20 min fully fresh
     staleMs: 2 * 60 * 60 * 1000, // up to 2h stale-while-revalidate
+    minLength: 40, // below this, treat as a degraded/partial fetch and retry sooner
   });
 
   res.status(200).json(unique);

@@ -34,18 +34,23 @@ const DEFAULT_STALE_MS = 60 * 60 * 1000;   // serve + revalidate in background
  * Get-or-fetch with stale-while-revalidate semantics.
  * @param {string} key - cache key, e.g. "remote-jobs"
  * @param {() => Promise<any[]>} fetcher - async function that does the real upstream fan-out
- * @param {{freshMs?: number, staleMs?: number}} [opts]
+ * @param {{freshMs?: number, staleMs?: number, minLength?: number}} [opts]
+ *   minLength: if a fresh fetch returns fewer than this many items, treat it as a
+ *   degraded/partial result — still return it, but don't let it sit in the "fresh"
+ *   window for the full freshMs; retry sooner instead of trusting it for a long time.
  */
 export async function cachedFetch(key, fetcher, opts = {}) {
   const freshMs = opts.freshMs ?? DEFAULT_FRESH_MS;
   const staleMs = opts.staleMs ?? DEFAULT_STALE_MS;
+  const minLength = opts.minLength ?? 0;
   const entry = store.get(key);
   const now = Date.now();
 
   if (entry) {
     const age = now - entry.fetchedAt;
+    const effectiveFreshMs = entry.degraded ? Math.min(freshMs, 3 * 60 * 1000) : freshMs;
 
-    if (age < freshMs) {
+    if (age < effectiveFreshMs) {
       return entry.data;
     }
 
@@ -56,7 +61,12 @@ export async function cachedFetch(key, fetcher, opts = {}) {
         fetcher()
           .then((fresh) => {
             if (Array.isArray(fresh) && fresh.length > 0) {
-              store.set(key, { data: fresh, fetchedAt: Date.now(), refreshing: false });
+              store.set(key, {
+                data: fresh,
+                fetchedAt: Date.now(),
+                refreshing: false,
+                degraded: fresh.length < minLength,
+              });
             } else {
               entry.refreshing = false; // keep old data, try again next time
             }
@@ -71,7 +81,12 @@ export async function cachedFetch(key, fetcher, opts = {}) {
   try {
     const fresh = await fetcher();
     if (Array.isArray(fresh) && fresh.length > 0) {
-      store.set(key, { data: fresh, fetchedAt: now, refreshing: false });
+      store.set(key, {
+        data: fresh,
+        fetchedAt: now,
+        refreshing: false,
+        degraded: fresh.length < minLength,
+      });
       return fresh;
     }
     // Upstream returned nothing — fall back to old data if we have any, rather than [].
