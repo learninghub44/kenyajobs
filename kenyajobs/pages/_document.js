@@ -6,7 +6,8 @@ const OG_DESC   = "Find your dream job worldwide. Thousands of opportunities acr
 const OG_IMAGE  = `${SITE_URL}/og-image.jpg`;
 
 export default function Document() {
-  const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+  const ADSENSE_CLIENT = "ca-pub-5486110003135324";
+  const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || ADSENSE_CLIENT;
 
   return (
     <Html lang="en">
@@ -44,14 +45,13 @@ export default function Document() {
         <meta name="twitter:description" content={OG_DESC} />
         <meta name="twitter:image"       content={OG_IMAGE} />
 
-        {/* ── AdSense ── */}
-        {adsenseClient && (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
-            crossOrigin="anonymous"
-          />
-        )}
+        {/* ── Google AdSense ── */}
+        <meta name="google-adsense-account" content={adsenseClient} />
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+          crossOrigin="anonymous"
+        />
       </Head>
       <body className="antialiased">
         <Main />
