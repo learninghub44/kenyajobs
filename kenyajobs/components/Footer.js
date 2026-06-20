@@ -177,6 +177,7 @@ export default function Footer() {
                 ["Advertise", "/advertise"],
                 ["About Us", "/about"],
                 ["Contact Us", "/contact"],
+                ["Developers", "/developers"],
               ].map(([l, h]) => (
                 <li key={l}>
                   <Link
