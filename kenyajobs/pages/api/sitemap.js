@@ -1,13 +1,13 @@
-const SITE_URL = "https://jobsworldwide.online";
+const SITE_URL = "https://kenyajobs.vercel.app";
 
-const STATIC_PAGES = [
-  { path: "/",                     priority: "1.0", changefreq: "hourly"  },
-  { path: "/remote-jobs",          priority: "0.9", changefreq: "hourly"  },
-  { path: "/entry-level",          priority: "0.9", changefreq: "hourly"  },
-  { path: "/graduate-jobs",        priority: "0.9", changefreq: "hourly"  },
-  { path: "/work-from-home",       priority: "0.9", changefreq: "hourly"  },
-  { path: "/internships",          priority: "0.9", changefreq: "hourly"  },
-  { path: "/africa-jobs",          priority: "0.9", changefreq: "hourly"  },
+const PAGES = [
+  { path: "/",                     priority: "1.0", changefreq: "daily"   },
+  { path: "/remote-jobs",          priority: "0.9", changefreq: "daily"   },
+  { path: "/entry-level",          priority: "0.9", changefreq: "daily"   },
+  { path: "/graduate-jobs",        priority: "0.9", changefreq: "daily"   },
+  { path: "/work-from-home",       priority: "0.9", changefreq: "daily"   },
+  { path: "/internships",          priority: "0.9", changefreq: "daily"   },
+  { path: "/africa-jobs",          priority: "0.9", changefreq: "daily"   },
   { path: "/search",               priority: "0.8", changefreq: "daily"   },
   { path: "/companies",            priority: "0.7", changefreq: "weekly"  },
   { path: "/job-trends",           priority: "0.7", changefreq: "weekly"  },
@@ -25,7 +25,7 @@ export default function handler(req, res) {
   const today = new Date().toISOString().split("T")[0];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${STATIC_PAGES.map(({ path, priority, changefreq }) => `  <url>
+${PAGES.map(({ path, priority, changefreq }) => `  <url>
     <loc>${SITE_URL}${path}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${changefreq}</changefreq>
@@ -33,7 +33,7 @@ ${STATIC_PAGES.map(({ path, priority, changefreq }) => `  <url>
   </url>`).join("\n")}
 </urlset>`;
 
-  res.setHeader("Content-Type", "text/xml; charset=utf-8");
-  res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
-  res.status(200).send(xml);
+  res.setHeader("Content-Type", "application/xml");
+  res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=3600");
+  return res.status(200).send(xml);
 }
