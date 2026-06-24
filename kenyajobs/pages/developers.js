@@ -99,7 +99,7 @@ const CACHE_TIERS = [
 ];
 
 const SDK_SNIPPET = `// lib/jobsworldwide.js — tiny zero-dependency client
-const BASE = "https://jobsworldwide.online/api";
+const BASE = "https://kenyajobs.vercel.app/api";
 
 async function get(path) {
   const res = await fetch(\`\${BASE}\${path}\`);
@@ -127,7 +127,7 @@ const CHANGELOG = [
 ];
 
 function codeSamples(path) {
-  const full = `https://jobsworldwide.online${path}`;
+  const full = `https://kenyajobs.vercel.app${path}`;
   return {
     curl: `curl "${full}"`,
     javascript: `const res = await fetch("${full}");
@@ -434,7 +434,7 @@ export default function Developers() {
               Every endpoint returns a JSON array of job objects. No headers or auth required —
               just make a GET request to any URL below.
             </p>
-            <CodeBlock code={`curl https://jobsworldwide.online/api/remote-jobs`} />
+            <CodeBlock code={`curl https://kenyajobs.vercel.app/api/remote-jobs`} />
           </section>
 
           {/* Authentication */}

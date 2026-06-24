@@ -1,6 +1,6 @@
 import { Html, Head, Main, NextScript } from "next/document";
 
-const SITE_URL  = "https://jobsworldwide.online";
+const SITE_URL  = "https://kenyajobs.vercel.app";
 const SITE_NAME = "JobsWorldwide";
 const OG_DESC   = "Find your dream job worldwide. Thousands of opportunities across Africa, Europe, Asia and beyond — remote, entry level, graduate and work from home.";
 const OG_IMAGE  = `${SITE_URL}/og-image.jpg`;
