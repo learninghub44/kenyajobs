@@ -127,6 +127,7 @@ export default function Footer() {
             <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Candidates</h3>
             <ul className="space-y-2.5 text-base">
               {[
+                ["Career Blog", "/blog"],
                 ["CV Tips", "/cv-tips"],
                 ["Job Trends", "/job-trends"],
                 ["Companies Hiring", "/companies"],
