@@ -16,78 +16,80 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header>
+    <header className="sticky top-0 z-50 bg-white border-b border-border">
       {/* Main nav */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-15 py-2">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-16">
 
-            {/* Logo */}
-            <Link href="/" className="flex items-center flex-shrink-0">
-              <Image src="/logo-nav.svg" alt="JobsWorldwide" width={260} height={44} className="h-10 w-auto" priority />
+          {/* Logo */}
+          <Link href="/" className="flex items-center flex-shrink-0">
+            <Image src="/logo-nav.svg" alt="JobsWorldwide" width={220} height={36} className="h-9 w-auto" priority />
+          </Link>
+
+          {/* Desktop nav links */}
+          <div className="hidden lg:flex items-center gap-1">
+            <Link href="/" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-full hover:bg-surface transition-colors">
+              Home
             </Link>
-
-            {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-0.5">
-              <Link href="/" className="text-base font-medium text-gray-500 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
-                Home
-              </Link>
-              {NAV_LINKS.map(([label, href]) => (
-                <Link key={href} href={href} className="text-base font-medium text-gray-500 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
-                  {label}
-                </Link>
-              ))}
-            </div>
-
-            {/* Desktop CTA */}
-            <div className="hidden md:flex items-center gap-2">
-              <Link
-                href="/search"
-                className="text-gray-500 hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-50"
-                aria-label="Search jobs"
-              >
-                <Search size={17} />
-              </Link>
-              <Link href="/about" className="text-base text-gray-500 hover:text-gray-800 transition-colors px-2">
-                About
-              </Link>
-              <a
-                href="mailto:hello@jobsworldwide.online"
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
-              >
-                Post a Job
-              </a>
-            </div>
-
-            {/* Mobile burger */}
-            <button className="md:hidden p-2 text-gray-600 rounded-lg hover:bg-gray-50" onClick={() => setMenuOpen(!menuOpen)}>
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 flex flex-col gap-1 shadow-lg">
-            {[["Home", "/"], ["Search Jobs", "/search"], ...NAV_LINKS, ["About", "/about"]].map(([label, href]) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setMenuOpen(false)}
-                className="text-base font-medium text-gray-700 px-3 py-2.5 rounded-lg hover:bg-gray-50 hover:text-gray-900"
-              >
+            {NAV_LINKS.map(([label, href]) => (
+              <Link key={href} href={href} className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-full hover:bg-surface transition-colors">
                 {label}
               </Link>
             ))}
+          </div>
+
+          {/* Desktop CTA */}
+          <div className="hidden lg:flex items-center gap-3">
+            <Link
+              href="/search"
+              className="text-text-secondary hover:text-text-primary transition-colors p-2 rounded-full hover:bg-surface"
+              aria-label="Search jobs"
+            >
+              <Search size={18} />
+            </Link>
+            <Link href="/about" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-full hover:bg-surface transition-colors">
+              About
+            </Link>
             <a
               href="mailto:hello@jobsworldwide.online"
-              className="mt-2 bg-blue-600 text-white text-base font-semibold px-4 py-2.5 rounded-lg text-center"
+              className="bg-primary hover:bg-primary-hover text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
             >
               Post a Job
             </a>
           </div>
-        )}
+
+          {/* Mobile burger */}
+          <button
+            className="lg:hidden p-2 text-text-secondary rounded-full hover:bg-surface transition-colors"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </nav>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="lg:hidden bg-white border-t border-border px-4 py-3 flex flex-col gap-1">
+          {[["Home", "/"], ["Search Jobs", "/search"], ...NAV_LINKS, ["About", "/about"]].map(([label, href]) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+              className="text-sm font-medium text-text-secondary px-4 py-3 rounded-full hover:bg-surface hover:text-text-primary transition-colors"
+            >
+              {label}
+            </Link>
+          ))}
+          <a
+            href="mailto:hello@jobsworldwide.online"
+            className="mt-2 bg-primary text-white text-sm font-medium px-4 py-3 rounded-full text-center"
+          >
+            Post a Job
+          </a>
+        </div>
+      )}
     </header>
   );
 }

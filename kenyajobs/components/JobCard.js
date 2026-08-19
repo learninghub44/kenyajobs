@@ -11,11 +11,11 @@ function companySlug(name = "") {
 }
 
 const TYPE_STYLES = {
-  "Full-time":  { pill: "bg-emerald-50 text-emerald-800 border-emerald-200", dot: "bg-emerald-500" },
-  "Part-time":  { pill: "bg-amber-50 text-amber-800 border-amber-200",       dot: "bg-amber-400"  },
-  "Contract":   { pill: "bg-violet-50 text-violet-800 border-violet-200",    dot: "bg-violet-500" },
-  "Remote":     { pill: "bg-sky-50 text-sky-800 border-sky-200",             dot: "bg-sky-500"    },
-  "Internship": { pill: "bg-rose-50 text-rose-800 border-rose-200",          dot: "bg-rose-400"   },
+  "Full-time":  { pill: "bg-success-light text-success border-success/20", dot: "bg-success" },
+  "Part-time":  { pill: "bg-warning-light text-[#E8710A] border-[#E8710A]/20", dot: "bg-warning" },
+  "Contract":   { pill: "bg-[#F3E8FD] text-[#9334E6] border-[#9334E6]/20", dot: "bg-[#9334E6]" },
+  "Remote":     { pill: "bg-primary-light text-primary border-primary/20", dot: "bg-primary" },
+  "Internship": { pill: "bg-[#FCE8E6] text-error border-error/20", dot: "bg-error" },
 };
 
 function timeAgo(dateStr) {
@@ -35,14 +35,14 @@ function companyInitials(name) {
 
 function companyPalette(name) {
   const palettes = [
-    { bg: "#EEF2FF", text: "#3730A3", border: "#C7D2FE" },
-    { bg: "#F0FDF4", text: "#166534", border: "#BBF7D0" },
-    { bg: "#FDF4FF", text: "#6B21A8", border: "#E9D5FF" },
-    { bg: "#FFF7ED", text: "#9A3412", border: "#FED7AA" },
-    { bg: "#F0F9FF", text: "#075985", border: "#BAE6FD" },
-    { bg: "#FFF1F2", text: "#9F1239", border: "#FECDD3" },
-    { bg: "#F7FEE7", text: "#3F6212", border: "#D9F99D" },
-    { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" },
+    { bg: "#E8F0FE", text: "#1967D2", border: "#C2DAFF" },
+    { bg: "#E6F4EA", text: "#137333", border: "#A8DAB5" },
+    { bg: "#F3E8FD", text: "#7627BB", border: "#D9B8F0" },
+    { bg: "#FEF7E0", text: "#E37400", border: "#FDDE88" },
+    { bg: "#E8F0FE", text: "#1967D2", border: "#C2DAFF" },
+    { bg: "#FCE8E6", text: "#C5221F", border: "#F4B4B0" },
+    { bg: "#E6F4EA", text: "#137333", border: "#A8DAB5" },
+    { bg: "#FEF7E0", text: "#E37400", border: "#FDDE88" },
   ];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -54,7 +54,7 @@ function formatSalary(job) {
   const min = job.annualSalaryMin ?? job.job_min_salary ?? job.salary_min;
   const max = job.annualSalaryMax ?? job.job_max_salary ?? job.salary_max;
   const currency = job.salaryCurrency || job.job_salary_currency || "";
-  if (min && max) return `${currency} ${Number(min).toLocaleString()} – ${Number(max).toLocaleString()}`.trim();
+  if (min && max) return `${currency} ${Number(min).toLocaleString()} - ${Number(max).toLocaleString()}`.trim();
   if (min) return `${currency} ${Number(min).toLocaleString()}+`.trim();
   return null;
 }
@@ -62,7 +62,7 @@ function formatSalary(job) {
 function excerpt(text, max = 120) {
   if (!text) return "";
   const plain = String(text).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-  return plain.length <= max ? plain : plain.slice(0, max).trim() + "…";
+  return plain.length <= max ? plain : plain.slice(0, max).trim() + "...";
 }
 
 export default function JobCard({ job }) {
@@ -79,24 +79,22 @@ export default function JobCard({ job }) {
   const salary    = formatSalary(job);
   const isFeatured = Boolean(job.featured);
   const preview   = excerpt(job.description || job.job_description);
-  const typeStyle = TYPE_STYLES[jobType] || { pill: "bg-gray-50 text-gray-700 border-gray-200", dot: "bg-gray-400" };
+  const typeStyle = TYPE_STYLES[jobType] || { pill: "bg-surface text-text-secondary border-border", dot: "bg-text-tertiary" };
   const initials  = companyInitials(company);
 
   return (
     <Link
       href={`/job/${jobId}`}
       onClick={() => saveJob(jobId, job)}
-      className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-blue-300 hover:shadow-[0_4px_24px_rgba(59,130,246,0.10)] transition-all duration-200 flex flex-col"
+      className="group relative bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/30 hover:shadow-md transition-all duration-200 flex flex-col"
     >
-      {/* Featured ribbon */}
       {isFeatured && (
-        <div className="absolute top-3.5 right-3.5 z-10 flex items-center gap-1.5 bg-amber-400 text-amber-900 text-sm font-bold px-2.5 py-1 rounded-full shadow-sm">
-          <Star size={12} className="fill-amber-900" /> Featured
+        <div className="absolute top-3.5 right-3.5 z-10 flex items-center gap-1.5 bg-warning text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+          <Star size={12} className="fill-white" /> Featured
         </div>
       )}
 
       <div className="p-5 flex flex-col gap-4 flex-1">
-
         {/* Company row */}
         <div className="flex items-start gap-3.5">
           <div className="flex-shrink-0 relative">
@@ -104,12 +102,12 @@ export default function JobCard({ job }) {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={logoUrl} alt={company}
-                className="w-12 h-12 rounded-lg object-contain border border-gray-100 bg-white p-0.5"
+                className="w-12 h-12 rounded-xl object-contain border border-border bg-white p-1"
                 onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
               />
             ) : null}
             <div
-              className="w-12 h-12 rounded-lg flex items-center justify-center text-base font-bold border flex-shrink-0"
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold border flex-shrink-0"
               style={{ backgroundColor: palette.bg, color: palette.text, borderColor: palette.border, display: logoUrl ? "none" : "flex" }}
             >
               {initials}
@@ -120,12 +118,12 @@ export default function JobCard({ job }) {
             <Link
               href={`/company/${companySlug(company)}?name=${encodeURIComponent(company)}`}
               onClick={e => e.stopPropagation()}
-              className="text-sm font-medium text-gray-500 truncate mb-0.5 flex items-center gap-1.5 hover:text-blue-600 transition-colors w-fit"
+              className="text-xs font-medium text-text-secondary truncate mb-0.5 flex items-center gap-1.5 hover:text-primary transition-colors w-fit"
             >
-              <Building2 size={13} className="flex-shrink-0" />
+              <Building2 size={12} className="flex-shrink-0" />
               {company}
             </Link>
-            <h3 className="font-semibold text-gray-900 text-lg leading-snug group-hover:text-blue-700 transition-colors line-clamp-2">
+            <h3 className="font-semibold text-text-primary text-base leading-snug group-hover:text-primary transition-colors line-clamp-2">
               {title}
             </h3>
           </div>
@@ -133,53 +131,52 @@ export default function JobCard({ job }) {
 
         {/* Description preview */}
         {preview && (
-          <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 -mt-1">{preview}</p>
+          <p className="text-sm text-text-secondary leading-relaxed line-clamp-2 -mt-1">{preview}</p>
         )}
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2">
-          <span className={`inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1 rounded-full border ${typeStyle.pill}`}>
+          <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border ${typeStyle.pill}`}>
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${typeStyle.dot}`} />
             {jobType}
           </span>
 
           {isRemote && !jobType.toLowerCase().includes("remote") && (
-            <span className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1 rounded-full border bg-sky-50 text-sky-800 border-sky-200">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border bg-primary-light text-primary border-primary/20">
               <Wifi size={12} /> Remote
             </span>
           )}
 
           {salary && (
-            <span className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1 rounded-full border bg-emerald-50 text-emerald-800 border-emerald-200">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border bg-success-light text-success border-success/20">
               <Banknote size={12} /> {salary}
             </span>
           )}
         </div>
 
         {/* Footer row */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
-          <div className="flex items-center gap-3 text-sm text-gray-500">
+        <div className="flex items-center justify-between pt-3 border-t border-border mt-auto">
+          <div className="flex items-center gap-3 text-xs text-text-secondary">
             <span className="flex items-center gap-1.5 font-medium">
-              <MapPin size={13} />
+              <MapPin size={12} />
               {location.split(",")[0]}
             </span>
-            <span className="w-1 h-1 rounded-full bg-gray-300" />
+            <span className="w-1 h-1 rounded-full bg-border" />
             <span className="flex items-center gap-1.5">
-              <Clock size={13} />
+              <Clock size={12} />
               {posted}
             </span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 group-hover:text-blue-700 transition-colors">
-            Apply <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary group-hover:gap-2 transition-all">
+            Apply <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
           </span>
         </div>
       </div>
 
-      {/* Source strip */}
       {source && (
         <div className="px-5 pb-3 -mt-1">
-          <span className="text-sm text-gray-400 font-medium">via {source}</span>
+          <span className="text-xs text-text-tertiary font-medium">via {source}</span>
         </div>
       )}
     </Link>

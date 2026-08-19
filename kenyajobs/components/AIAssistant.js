@@ -56,7 +56,7 @@ const SUGGESTED = {
 
 const WELCOME = {
   chat:      "Hi! I'm your AI career assistant.\n\nAsk me anything about job searching, salaries, career advice, or the job market. You can also speak to me using the mic button!",
-  match:     "🎯 AI Job Matching\n\nTell me your skills, experience, or paste your CV — I'll scan live job listings and find your best matches right now!\n\nTip: The more detail you give, the better the matches.",
+  match:     "AI Job Matching\n\nTell me your skills, experience, or paste your CV — I'll scan live job listings and find your best matches right now!\n\nTip: The more detail you give, the better the matches.",
   cv:        "I'll write you a professional, ATS-friendly CV.\n\nJust tell me your job title, years of experience, and key skills — or paste your existing CV and I'll improve it.",
   cover:     "I'll write a compelling cover letter that gets interviews.\n\nTell me the job title, company name (optional), and anything about your background.",
   interview: "Let's get you interview-ready!\n\nAsk me for common interview questions, how to answer specific questions, salary negotiation scripts, or mock interview practice.",
@@ -413,7 +413,7 @@ export default function AIAssistant() {
           if (data.remaining !== undefined) setRateInfo(prev => ({ ...prev, remaining: data.remaining }));
           if (data.matches && data.matches.length > 0) {
             setMatchResults({ summary: data.summary, matches: data.matches });
-            setAllMessages(prev => ({ ...prev, match: [...updated, { role: "assistant", content: `✅ Found ${data.matches.length} job matches for you! See results below.` }] }));
+            setAllMessages(prev => ({ ...prev, match: [...updated, { role: "assistant", content: `Found ${data.matches.length} job matches for you. See results below.` }] }));
           } else {
             setAllMessages(prev => ({ ...prev, match: [...updated, { role: "assistant", content: data.reply || data.error || "No matches found. Try adding more detail to your profile." }] }));
           }
