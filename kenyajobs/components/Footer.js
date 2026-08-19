@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Globe, ExternalLink } from "lucide-react";
+import { Mail, Globe, ExternalLink, Briefcase, MapPin, Phone } from "lucide-react";
 
 const SOURCES = ["Remotive", "Jobicy", "Arbeitnow", "ReliefWeb", "BrighterMonday", "MyJobMag", "Adzuna"];
 
@@ -39,7 +39,7 @@ const FOOTER_LINKS = {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#202124] text-[#9AA0A6]">
+    <footer className="bg-text-primary text-gray-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-8">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
 
@@ -55,17 +55,26 @@ export default function Footer() {
               </Link>
             </div>
 
-            <p className="text-sm leading-relaxed mb-5 text-[#9AA0A6]">
+            <p className="text-sm leading-relaxed mb-5 text-gray-400">
               Aggregating live job listings from 30+ boards so you spend less time searching and more time applying.
             </p>
 
-            <a
-              href="mailto:hello@jobsworldwide.online"
-              className="flex items-center gap-2 text-sm hover:text-white transition-colors mb-5"
-            >
-              <Mail size={14} />
-              hello@jobsworldwide.online
-            </a>
+            <div className="space-y-2 mb-5">
+              <a
+                href="mailto:hello@jobsworldwide.online"
+                className="flex items-center gap-2 text-sm hover:text-white transition-colors"
+              >
+                <Mail size={14} />
+                hello@jobsworldwide.online
+              </a>
+              <a
+                href="tel:+254701059192"
+                className="flex items-center gap-2 text-sm hover:text-white transition-colors"
+              >
+                <Phone size={14} />
+                +254 701 059 192
+              </a>
+            </div>
 
             <div className="flex items-center gap-2">
               <a
@@ -73,18 +82,18 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Telegram channel"
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
               >
-                <Globe size={15} className="text-[#9AA0A6]" />
+                <Globe size={15} className="text-gray-400" />
               </a>
               <a
                 href="https://wa.me/254701059192"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
               >
-                <ExternalLink size={15} className="text-[#9AA0A6]" />
+                <ExternalLink size={15} className="text-gray-400" />
               </a>
             </div>
           </div>
@@ -114,11 +123,11 @@ export default function Footer() {
             </h3>
             <div className="flex flex-wrap gap-1.5 mb-5">
               {SOURCES.map((src) => (
-                <span key={src} className="text-xs font-medium px-2.5 py-1 rounded-full bg-white/10 text-[#9AA0A6]">
+                <span key={src} className="text-xs font-medium px-2.5 py-1 rounded bg-white/10 text-gray-400">
                   {src}
                 </span>
               ))}
-              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-white/10 text-[#6B7280]">
+              <span className="text-xs font-medium px-2.5 py-1 rounded bg-white/10 text-gray-500">
                 +23 more
               </span>
             </div>
@@ -135,7 +144,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B7280]">
+        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
           <p>{new Date().getFullYear()} JobsWorldwide. All rights reserved.</p>
           <div className="flex flex-wrap gap-5">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>

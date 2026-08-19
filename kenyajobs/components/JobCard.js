@@ -13,9 +13,9 @@ function companySlug(name = "") {
 const TYPE_STYLES = {
   "Full-time":  { pill: "bg-success-light text-success border-success/20", dot: "bg-success" },
   "Part-time":  { pill: "bg-warning-light text-[#E8710A] border-[#E8710A]/20", dot: "bg-warning" },
-  "Contract":   { pill: "bg-[#F3E8FD] text-[#9334E6] border-[#9334E6]/20", dot: "bg-[#9334E6]" },
-  "Remote":     { pill: "bg-primary-light text-primary border-primary/20", dot: "bg-primary" },
-  "Internship": { pill: "bg-[#FCE8E6] text-error border-error/20", dot: "bg-error" },
+  "Contract":   { pill: "bg-purple-100 text-purple-700 border-purple-200", dot: "bg-purple-500" },
+  "Remote":     { pill: "bg-info-light text-info border-info/20", dot: "bg-info" },
+  "Internship": { pill: "bg-error-light text-error border-error/20", dot: "bg-error" },
 };
 
 function timeAgo(dateStr) {
@@ -35,14 +35,14 @@ function companyInitials(name) {
 
 function companyPalette(name) {
   const palettes = [
-    { bg: "#E8F0FE", text: "#1967D2", border: "#C2DAFF" },
-    { bg: "#E6F4EA", text: "#137333", border: "#A8DAB5" },
-    { bg: "#F3E8FD", text: "#7627BB", border: "#D9B8F0" },
-    { bg: "#FEF7E0", text: "#E37400", border: "#FDDE88" },
-    { bg: "#E8F0FE", text: "#1967D2", border: "#C2DAFF" },
-    { bg: "#FCE8E6", text: "#C5221F", border: "#F4B4B0" },
-    { bg: "#E6F4EA", text: "#137333", border: "#A8DAB5" },
-    { bg: "#FEF7E0", text: "#E37400", border: "#FDDE88" },
+    { bg: "#EEF2FF", text: "#3730A3", border: "#C7D2FE" },
+    { bg: "#F0FDF4", text: "#166534", border: "#BBF7D0" },
+    { bg: "#FDF4FF", text: "#6B21A8", border: "#E9D5FF" },
+    { bg: "#FFF7ED", text: "#9A3412", border: "#FED7AA" },
+    { bg: "#F0F9FF", text: "#075985", border: "#BAE6FD" },
+    { bg: "#FFF1F2", text: "#9F1239", border: "#FECDD3" },
+    { bg: "#F7FEE7", text: "#3F6212", border: "#D9F99D" },
+    { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" },
   ];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -79,35 +79,35 @@ export default function JobCard({ job }) {
   const salary    = formatSalary(job);
   const isFeatured = Boolean(job.featured);
   const preview   = excerpt(job.description || job.job_description);
-  const typeStyle = TYPE_STYLES[jobType] || { pill: "bg-surface text-text-secondary border-border", dot: "bg-text-tertiary" };
+  const typeStyle = TYPE_STYLES[jobType] || { pill: "bg-surface-muted text-text-secondary border-border", dot: "bg-text-tertiary" };
   const initials  = companyInitials(company);
 
   return (
     <Link
       href={`/job/${jobId}`}
       onClick={() => saveJob(jobId, job)}
-      className="group relative bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/30 hover:shadow-md transition-all duration-200 flex flex-col"
+      className="group relative bg-white border border-border rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-md transition-all duration-200 flex flex-col"
     >
       {isFeatured && (
-        <div className="absolute top-3.5 right-3.5 z-10 flex items-center gap-1.5 bg-warning text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-accent text-white text-xs font-semibold px-2.5 py-1 rounded">
           <Star size={12} className="fill-white" /> Featured
         </div>
       )}
 
-      <div className="p-5 flex flex-col gap-4 flex-1">
+      <div className="p-5 flex flex-col gap-3 flex-1">
         {/* Company row */}
-        <div className="flex items-start gap-3.5">
+        <div className="flex items-start gap-3">
           <div className="flex-shrink-0 relative">
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={logoUrl} alt={company}
-                className="w-12 h-12 rounded-xl object-contain border border-border bg-white p-1"
+                className="w-12 h-12 rounded-lg object-contain border border-border bg-white p-1"
                 onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
               />
             ) : null}
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold border flex-shrink-0"
+              className="w-12 h-12 rounded-lg flex items-center justify-center text-sm font-bold border flex-shrink-0"
               style={{ backgroundColor: palette.bg, color: palette.text, borderColor: palette.border, display: logoUrl ? "none" : "flex" }}
             >
               {initials}
@@ -131,24 +131,24 @@ export default function JobCard({ job }) {
 
         {/* Description preview */}
         {preview && (
-          <p className="text-sm text-text-secondary leading-relaxed line-clamp-2 -mt-1">{preview}</p>
+          <p className="text-sm text-text-secondary leading-relaxed line-clamp-2">{preview}</p>
         )}
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2">
-          <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border ${typeStyle.pill}`}>
+          <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded border ${typeStyle.pill}`}>
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${typeStyle.dot}`} />
             {jobType}
           </span>
 
           {isRemote && !jobType.toLowerCase().includes("remote") && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border bg-primary-light text-primary border-primary/20">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded border bg-info-light text-info border-info/20">
               <Wifi size={12} /> Remote
             </span>
           )}
 
           {salary && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border bg-success-light text-success border-success/20">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded border bg-success-light text-success border-success/20">
               <Banknote size={12} /> {salary}
             </span>
           )}
