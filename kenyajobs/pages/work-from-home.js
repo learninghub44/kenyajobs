@@ -58,7 +58,7 @@ export default function WorkFromHome() {
   return (
     <>
       <Head>
-        <title>Work From Home Jobs - Legitimate Online Jobs | JobsWorldwide</title>
+        <title>Work From Home Jobs - Legitimate Online Jobs | Online Jobs</title>
         <meta name="description" content="Find legitimate work from home jobs. Data entry, virtual assistant and more." />
       </Head>
 
