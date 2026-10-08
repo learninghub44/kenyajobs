@@ -29,7 +29,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-8 text-xs">
           <p className="text-gray-300">The future of work gets decided by you. Tell us what matters to your career.</p>
           <div className="hidden sm:flex items-center gap-4">
-            <a href="mailto:support@christech.co.ke" className="text-gray-300 hover:text-white transition-colors">hello@onlinejobs.christech.co.ke</a>
+            <a href="mailto:support@christech.co.ke" className="text-gray-300 hover:text-white transition-colors">support@christech.co.ke</a>
             <span className="text-gray-500">|</span>
             <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link>
           </div>
