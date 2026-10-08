@@ -32,8 +32,8 @@ export default function Terms() {
   return (
     <>
       <Head>
-        <title>Terms & Conditions | JobsWorldwide</title>
-        <meta name="description" content="Terms and Conditions for JobsWorldwide — the rules and guidelines for using our job aggregation platform." />
+        <title>Terms & Conditions | Online Jobs</title>
+        <meta name="description" content="Terms and Conditions for Online Jobs — the rules and guidelines for using our job aggregation platform." />
       </Head>
 
       {/* Page header */}
@@ -51,7 +51,7 @@ export default function Terms() {
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-10 text-gray-700 leading-relaxed">
           <p className="font-semibold text-gray-900 mb-2">Please read these terms carefully</p>
           <p className="text-sm">
-            By accessing or using <strong>jobsworldwide.online</strong> ("the Site", "JobsWorldwide", "we", "us", or "our"),
+            By accessing or using <strong>onlinejobs.christech.co.ke</strong> ("the Site", "Online Jobs", "we", "us", or "our"),
             you confirm that you have read, understood, and agree to be bound by these Terms and Conditions
             and our <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
             If you do not agree with any part of these terms, you must not use our Site.
@@ -60,15 +60,15 @@ export default function Terms() {
 
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm divide-y divide-gray-100 overflow-hidden">
 
-          <Section number="1" title="About JobsWorldwide">
+          <Section number="1" title="About Online Jobs">
             <p>
-              JobsWorldwide is a free online job aggregation platform that collects, indexes, and displays
+              Online Jobs is a free online job aggregation platform that collects, indexes, and displays
               job listings sourced from established third-party job boards, company career pages, employer
               websites, and public RSS feeds. We bring together opportunities from multiple sources into a
               single, searchable platform to help job seekers discover roles more efficiently.
             </p>
             <p>
-              JobsWorldwide is <strong>not</strong> an employer, recruiter, staffing agency, or employment
+              Online Jobs is <strong>not</strong> an employer, recruiter, staffing agency, or employment
               service. We do not post original job listings on behalf of employers and we are not party to
               any employment relationship or negotiation between a job seeker and an employer.
             </p>
@@ -97,7 +97,7 @@ export default function Terms() {
 
           <Section number="3" title="Nature of Job Listings">
             <p>
-              All job listings displayed on JobsWorldwide are aggregated from third-party sources. By using
+              All job listings displayed on Online Jobs are aggregated from third-party sources. By using
               our Site, you acknowledge and agree that:
             </p>
             <ul className="space-y-2">
@@ -107,7 +107,7 @@ export default function Terms() {
                 you view them.
               </Bullet>
               <Bullet>
-                JobsWorldwide does not endorse any employer, job listing, product, service, or organisation
+                Online Jobs does not endorse any employer, job listing, product, service, or organisation
                 featured or linked to on our Site.
               </Bullet>
               <Bullet>
@@ -119,7 +119,7 @@ export default function Terms() {
                 be identified as such.
               </Bullet>
               <Bullet>
-                When you click "Apply Now" or "View Job", you leave JobsWorldwide and are directed to
+                When you click "Apply Now" or "View Job", you leave Online Jobs and are directed to
                 an external website. That site's own terms and privacy policy govern your interaction.
               </Bullet>
             </ul>
@@ -127,7 +127,7 @@ export default function Terms() {
 
           <Section number="4" title="No Employment Relationship or Guarantee">
             <p>
-              JobsWorldwide makes no representation or warranty that:
+              Online Jobs makes no representation or warranty that:
             </p>
             <ul className="space-y-2">
               <Bullet>Any job listing will result in employment</Bullet>
@@ -181,12 +181,12 @@ export default function Terms() {
 
           <Section number="6" title="Intellectual Property">
             <p>
-              The following intellectual property rights apply to content on JobsWorldwide:
+              The following intellectual property rights apply to content on Online Jobs:
             </p>
             <ul className="space-y-2">
               <Bullet>
-                The JobsWorldwide name, logo, domain, brand identity, and original website design are the
-                intellectual property of JobsWorldwide and may not be used without express written permission.
+                The Online Jobs name, logo, domain, brand identity, and original website design are the
+                intellectual property of Online Jobs and may not be used without express written permission.
               </Bullet>
               <Bullet>
                 Job listings, descriptions, and associated content remain the intellectual property of
@@ -194,7 +194,7 @@ export default function Terms() {
               </Bullet>
               <Bullet>
                 Original editorial content on our Site (such as the About page, help articles, and
-                category descriptions) is owned by JobsWorldwide and may not be reproduced without permission.
+                category descriptions) is owned by Online Jobs and may not be reproduced without permission.
               </Bullet>
             </ul>
             <p>
@@ -205,7 +205,7 @@ export default function Terms() {
 
           <Section number="7" title="User-Submitted Content (Job Postings)">
             <p>
-              Employers and recruiters may contact us to submit job listings for publication on JobsWorldwide.
+              Employers and recruiters may contact us to submit job listings for publication on Online Jobs.
               By submitting a job listing, you represent and warrant that:
             </p>
             <ul className="space-y-2">
@@ -228,7 +228,7 @@ export default function Terms() {
 
           <Section number="8" title="Advertising">
             <p>
-              JobsWorldwide displays third-party advertisements through Google AdSense and may feature
+              Online Jobs displays third-party advertisements through Google AdSense and may feature
               sponsored job listings from time to time.
             </p>
             <ul className="space-y-2">
@@ -264,7 +264,7 @@ export default function Terms() {
 
           <Section number="10" title="Limitation of Liability">
             <p>
-              To the fullest extent permitted by applicable law, JobsWorldwide and its operators, directors,
+              To the fullest extent permitted by applicable law, Online Jobs and its operators, directors,
               employees, and agents shall not be liable for any:
             </p>
             <ul className="space-y-2">
@@ -283,7 +283,7 @@ export default function Terms() {
 
           <Section number="11" title="Indemnification">
             <p>
-              You agree to indemnify, defend, and hold harmless JobsWorldwide and its operators, employees,
+              You agree to indemnify, defend, and hold harmless Online Jobs and its operators, employees,
               and agents from and against any claims, liabilities, damages, losses, costs, and expenses
               (including reasonable legal fees) arising from or relating to:
             </p>
@@ -357,7 +357,7 @@ export default function Terms() {
           <Section number="17" title="Entire Agreement">
             <p>
               These Terms and Conditions, together with our Privacy Policy, constitute the entire agreement
-              between you and JobsWorldwide with respect to your use of the Site and supersede all prior
+              between you and Online Jobs with respect to your use of the Site and supersede all prior
               agreements, representations, and understandings.
             </p>
           </Section>
@@ -368,11 +368,11 @@ export default function Terms() {
               please contact us:
             </p>
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 mt-2">
-              <p className="font-semibold text-gray-900 mb-1">JobsWorldwide</p>
+              <p className="font-semibold text-gray-900 mb-1">Online Jobs</p>
               <p className="text-sm text-gray-500 mb-3">Global job aggregation platform</p>
-              <a href="mailto:hello@jobsworldwide.online"
+              <a href="mailto:hello@onlinejobs.christech.co.ke"
                 className="text-blue-600 hover:underline font-medium text-base">
-                hello@jobsworldwide.online
+                hello@onlinejobs.christech.co.ke
               </a>
               <p className="text-sm text-gray-400 mt-2">We aim to respond to all enquiries within 2–3 business days.</p>
             </div>
