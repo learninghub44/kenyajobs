@@ -1,4 +1,5 @@
-// utils/api.js — All API calls for KenyaJobs.co.ke
+// utils/api.js — Public API client for Online Jobs
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "https://onlinejobs.christech.co.ke").replace(/\/$/, "");
 // Routes through internal Next.js API routes to avoid CORS and hide keys
 
 // ─────────────────────────────────────────
@@ -23,7 +24,7 @@ export async function fetchRemoteJobs(category = "") {
 // ─────────────────────────────────────────
 export async function fetchEntryLevelJobs(page = 1) {
   try {
-    const res = await fetch(`/api/entry-level-jobs?page=${page}`);
+    const res = await fetch(`${API_BASE}/api/entry-level-jobs?page=${page}`);
     if (!res.ok) throw new Error("JSearch entry level fetch failed");
     return await res.json();
   } catch (error) {
@@ -37,7 +38,7 @@ export async function fetchEntryLevelJobs(page = 1) {
 // ─────────────────────────────────────────
 export async function fetchGraduateJobs(page = 1) {
   try {
-    const res = await fetch(`/api/graduate-jobs?page=${page}`);
+    const res = await fetch(`${API_BASE}/api/graduate-jobs?page=${page}`);
     if (!res.ok) throw new Error("JSearch graduate fetch failed");
     return await res.json();
   } catch (error) {
@@ -51,7 +52,7 @@ export async function fetchGraduateJobs(page = 1) {
 // ─────────────────────────────────────────
 export async function fetchWFHJobs(page = 1) {
   try {
-    const res = await fetch(`/api/wfh-jobs?page=${page}`);
+    const res = await fetch(`${API_BASE}/api/wfh-jobs?page=${page}`);
     if (!res.ok) throw new Error("Adzuna fetch failed");
     return await res.json();
   } catch (error) {
@@ -65,7 +66,7 @@ export async function fetchWFHJobs(page = 1) {
 // ─────────────────────────────────────────
 export async function searchJobs(query) {
   try {
-    const res = await fetch(`/api/search-jobs?query=${encodeURIComponent(query)}`);
+    const res = await fetch(`${API_BASE}/api/search-jobs?query=${encodeURIComponent(query)}`);
     if (!res.ok) throw new Error("Search fetch failed");
     return await res.json();
   } catch (error) {
