@@ -64,7 +64,7 @@ export default function JobTrends() {
   return (
     <>
       <Head>
-        <title>Job Trends & Market Insights 2025 | JobsWorldwide</title>
+        <title>Job Trends & Market Insights 2025 | Online Jobs</title>
         <meta name="description" content="Explore the latest job market trends worldwide — trending roles, top hiring sectors, salary insights, and what employers are looking for in 2025." />
       </Head>
 
