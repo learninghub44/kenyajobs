@@ -329,8 +329,8 @@ select:focus-visible {
 .apply-panel { padding:22px; }
 .apply-kicker { margin:0 0 6px; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#7b828e; }
 .apply-panel h2 { font-size:16px; line-height:1.35; margin:0 0 18px; color:#171a21; }
-.apply-button { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:46px; padding:11px 14px; background:#171a21; color:#fff !important; border-radius:7px; font-size:13px; font-weight:700; }
-.apply-button:hover { background:#2c313a; }
+.apply-button { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:46px; padding:11px 14px; background:var(--primary) !important; color:#fff !important; border-radius:7px; font-size:13px; font-weight:700; border:0; }
+.apply-button:hover { background:var(--primary-hover) !important; color:#fff !important; }
 .share-button { width:100%; margin-top:9px; min-height:42px; border:1px solid #dfe3e8; background:#fff; color:#4c5561; border-radius:7px; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:7px; cursor:pointer; }
 .summary-panel { padding:22px; }
 .summary-panel h2 { margin:0 0 16px; font-size:15px; }
@@ -356,7 +356,7 @@ select:focus-visible {
 .job-not-found-image { width:100%; height:auto; border-radius:10px; border:1px solid #e1e4e8; margin-bottom:22px; }
 .job-not-found h1 { margin:0 0 8px; font-size:24px; }
 .job-not-found p { color:#68707d; margin:0 auto 20px; max-width:480px; }
-.button-primary { display:inline-flex; padding:11px 16px; background:#171a21; color:#fff !important; border-radius:7px; font-size:13px; font-weight:700; }
+.button-primary { display:inline-flex; align-items:center; justify-content:center; padding:11px 16px; background:var(--primary) !important; color:#fff !important; border:0; border-radius:7px; font-size:13px; font-weight:700; }
 @media (max-width: 800px) {
   .job-detail-layout { grid-template-columns:1fr; }
   .job-detail-sidebar { position:static; order:-1; }
@@ -400,3 +400,14 @@ select:focus-visible {
 .apply-button:hover, .button-primary:hover { background:#24543E; }
 .job-section-heading > span { background:#2F6B4F; }
 .job-tags span { background:#F4F6F1; border-color:#DDE3DC; color:#536057; }
+
+
+/* Button consistency — prevent legacy black button styles from overriding the brand system. */
+button.bg-text-primary,
+a.bg-text-primary,
+button.bg-black,
+a.bg-black { background:var(--primary) !important; color:#fff !important; }
+button.bg-text-primary:hover,
+a.bg-text-primary:hover,
+button.bg-black:hover,
+a.bg-black:hover { background:var(--primary-hover) !important; color:#fff !important; }
