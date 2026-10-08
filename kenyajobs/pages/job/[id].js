@@ -123,7 +123,7 @@ function cleanSectionText(value) {
   if (!value) return "";
   let text = Array.isArray(value) ? value.filter(Boolean).map(String).join("\n") : String(value);
   return text
-    .replace(/<br\\s*\\/?>(?=\\S)/gi, "\n")
+    .replace(/<br\s*\\/?>(?=\\S)/gi, "\n")
     .replace(/<\\/(p|div|li|h2|h3|h4)>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/gi, " ")
@@ -131,7 +131,7 @@ function cleanSectionText(value) {
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'")
     .replace(/[ \\t]+/g, " ")
-    .replace(/\\n[ \\t]+/g, "\n")
+    .replace(/\n[ \\t]+/g, "\n")
     .trim();
 }
 
@@ -139,15 +139,15 @@ function splitSectionItems(value) {
   const text = cleanSectionText(value);
   if (!text) return [];
   return text
-    .split(/(?:\\n+|\\s*[•●▪◦]\\s*|\\s*(?:^|\\n)\\s*[-–—]\\s+|\\s*;\\s+)/)
-    .map(item => item.replace(/^[-–—•●▪◦]+\\s*/, "").trim())
+    .split(/(?:\n+|\s*[•●▪◦]\s*|\s*(?:^|\n)\s*[-–—]\s+|\s*;\s+)/)
+    .map(item => item.replace(/^[-–—•●▪◦]+\s*/, "").trim())
     .filter(item => item.length > 1);
 }
 
 function classifyDescription(rawDescription) {
   const raw = cleanSectionText(rawDescription);
-  const lines = raw.split(/\\n+/).map(s => s.trim()).filter(Boolean);
-  const headingPattern = /^(about(?: the)? role|job description|description|role overview|overview|responsibilities|key responsibilities|duties|what you.?ll do|requirements|qualifications|job requirements|what we.?re looking for|skills|skills required|experience|education|benefits|perks|what we offer|we offer)\\s*:?\\s*$/i;
+  const lines = raw.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  const headingPattern = /^(about(?: the)? role|job description|description|role overview|overview|responsibilities|key responsibilities|duties|what you.?ll do|requirements|qualifications|job requirements|what we.?re looking for|skills|skills required|experience|education|benefits|perks|what we offer|we offer)\s*:?\s*$/i;
   const buckets = {
     "Job description": [],
     "Responsibilities": [],
@@ -366,7 +366,7 @@ export default function JobDetail() {
 
   const safeDescription = typeof window !== "undefined"
     ? DOMPurify.sanitize(description, { ALLOWED_TAGS: ["p","br","ul","ol","li","strong","em","b","i","h2","h3","h4","a"], ALLOWED_ATTR: ["href","target","rel"] })
-    : String(description).replace(/<script[\\s\\S]*?<\/script>/gi, "");
+    : String(description).replace(/<script[\s\\S]*?<\/script>/gi, "");
 
   const copyLink = async () => {
     try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch {}
@@ -410,7 +410,7 @@ export default function JobDetail() {
                 <div className="job-detail-title-wrap">
                   <div className="job-eyebrow">{source}</div>
                   <h1>{title}</h1>
-                  <Link href={`/company/${company.toLowerCase().replace(/[^a-z0-9\\s-]/g, "").trim().replace(/\\s+/g, "-")}?name=${encodeURIComponent(company)}`} className="job-company-link">
+                  <Link href={`/company/${company.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-")}?name=${encodeURIComponent(company)}`} className="job-company-link">
                     <Building2 size={15} /> {company}
                   </Link>
                   <div className="job-meta-line">
