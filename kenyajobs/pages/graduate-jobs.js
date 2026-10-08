@@ -57,7 +57,7 @@ export default function GraduateJobs() {
   return (
     <>
       <Head>
-        <title>Fresh Graduate Jobs - Trainee Programs | JobsWorldwide</title>
+        <title>Fresh Graduate Jobs - Trainee Programs | Online Jobs</title>
         <meta name="description" content="Find graduate trainee jobs and internships worldwide. Start your career today." />
       </Head>
 
