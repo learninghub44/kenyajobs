@@ -30,8 +30,8 @@ export default function PrivacyPolicy() {
   return (
     <>
       <Head>
-        <title>Privacy Policy | JobsWorldwide</title>
-        <meta name="description" content="Privacy Policy for JobsWorldwide — how we collect, use and protect your information." />
+        <title>Privacy Policy | Online Jobs</title>
+        <meta name="description" content="Privacy Policy for Online Jobs — how we collect, use and protect your information." />
       </Head>
 
       {/* Page header */}
@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-10 text-gray-700 leading-relaxed">
           <p className="font-semibold text-gray-900 mb-2">Our commitment to your privacy</p>
           <p className="text-sm">
-            JobsWorldwide operates at <strong>jobsworldwide.online</strong>. We believe privacy is a fundamental right.
+            Online Jobs operates at <strong>onlinejobs.christech.co.ke</strong>. We believe privacy is a fundamental right.
             This policy explains clearly and honestly what information we collect, why we collect it, how we use it,
             and what rights you have. We will never sell your personal data.
           </p>
@@ -59,21 +59,21 @@ export default function PrivacyPolicy() {
 
           <Section number="1" title="Who We Are">
             <p>
-              JobsWorldwide is a global job aggregation platform that collects and displays job listings from
+              Online Jobs is a global job aggregation platform that collects and displays job listings from
               established third-party job boards and employer websites. We are not an employer, recruiter, or
               staffing agency. Our platform is a discovery and aggregation service only.
             </p>
             <p>
               For questions about this policy, contact us at:{" "}
-              <a href="mailto:hello@jobsworldwide.online" className="text-blue-600 hover:underline font-medium">
-                hello@jobsworldwide.online
+              <a href="mailto:hello@onlinejobs.christech.co.ke" className="text-blue-600 hover:underline font-medium">
+                hello@onlinejobs.christech.co.ke
               </a>
             </p>
           </Section>
 
           <Section number="2" title="What Information We Collect">
             <p>
-              JobsWorldwide does not require you to create an account, register, or provide any personal information
+              Online Jobs does not require you to create an account, register, or provide any personal information
               to browse and search for jobs. The following is a description of information that may be collected:
             </p>
 
@@ -116,7 +116,7 @@ export default function PrivacyPolicy() {
           <Section number="3" title="How We Use Your Information">
             <p>We use collected information for the following purposes only:</p>
             <ul className="space-y-2">
-              <Bullet>To operate, maintain, and improve the JobsWorldwide platform</Bullet>
+              <Bullet>To operate, maintain, and improve the Online Jobs platform</Bullet>
               <Bullet>To respond to your enquiries, messages, or job posting requests</Bullet>
               <Bullet>To understand which job categories and search terms are most popular</Bullet>
               <Bullet>To diagnose technical issues and monitor site performance</Bullet>
@@ -132,9 +132,9 @@ export default function PrivacyPolicy() {
 
           <Section number="4" title="Third-Party Job Listings & External Links">
             <p>
-              JobsWorldwide is a job aggregator. All job listings displayed on our site are sourced from
+              Online Jobs is a job aggregator. All job listings displayed on our site are sourced from
               third-party job boards, company websites, and RSS feeds. When you click <strong>"Apply Now"</strong>{" "}
-              or <strong>"View Job"</strong>, you leave JobsWorldwide and are directed to an external website.
+              or <strong>"View Job"</strong>, you leave Online Jobs and are directed to an external website.
             </p>
             <p>
               Once you leave our site, the privacy practices and terms of that external website apply.
@@ -259,8 +259,8 @@ export default function PrivacyPolicy() {
             </ul>
             <p>
               To exercise any of these rights, contact us at{" "}
-              <a href="mailto:hello@jobsworldwide.online" className="text-blue-600 hover:underline font-medium">
-                hello@jobsworldwide.online
+              <a href="mailto:hello@onlinejobs.christech.co.ke" className="text-blue-600 hover:underline font-medium">
+                hello@onlinejobs.christech.co.ke
               </a>. We will respond within 30 days. We may need to verify your identity before processing
               your request.
             </p>
@@ -268,7 +268,7 @@ export default function PrivacyPolicy() {
 
           <Section number="10" title="Children's Privacy">
             <p>
-              JobsWorldwide is intended for users who are 16 years of age or older. Our site is not
+              Online Jobs is intended for users who are 16 years of age or older. Our site is not
               directed at children under 16 and we do not knowingly collect personal information from
               children. If you believe a child has provided us with personal information, please contact
               us and we will delete it promptly.
@@ -292,7 +292,7 @@ export default function PrivacyPolicy() {
               periodically to stay informed about how we protect your information.
             </p>
             <p>
-              Continued use of JobsWorldwide after any changes to this policy constitutes your acceptance
+              Continued use of Online Jobs after any changes to this policy constitutes your acceptance
               of the updated policy.
             </p>
           </Section>
@@ -303,11 +303,11 @@ export default function PrivacyPolicy() {
               data practices, please contact us:
             </p>
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 mt-2">
-              <p className="font-semibold text-gray-900 mb-1">JobsWorldwide</p>
+              <p className="font-semibold text-gray-900 mb-1">Online Jobs</p>
               <p className="text-sm text-gray-500 mb-3">Global job aggregation platform</p>
-              <a href="mailto:hello@jobsworldwide.online"
+              <a href="mailto:hello@onlinejobs.christech.co.ke"
                 className="text-blue-600 hover:underline font-medium text-base">
-                hello@jobsworldwide.online
+                hello@onlinejobs.christech.co.ke
               </a>
               <p className="text-sm text-gray-400 mt-2">We aim to respond to all enquiries within 2–3 business days.</p>
             </div>
