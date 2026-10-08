@@ -2,6 +2,9 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Online Jobs
 
+**Official platform:** `https://onlinejobs.christech.co.ke`  
+**Public API:** `https://onlinejobs.christech.co.ke/api`
+
 A job board that aggregates listings live from ~15 free job APIs/RSS feeds (Remotive, Jobicy, Arbeitnow, ReliefWeb, BrighterMonday, MyJobMag, JSearch, Adzuna, and more) and merges them with manually-posted jobs and sponsored listings managed through `/admin`.
 
 ### Environment variables
