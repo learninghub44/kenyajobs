@@ -411,3 +411,21 @@ button.bg-text-primary:hover,
 a.bg-text-primary:hover,
 button.bg-black:hover,
 a.bg-black:hover { background:var(--primary-hover) !important; color:#fff !important; }
+
+
+/* Explicit button text rendering: keep labels visible above utility/legacy rules. */
+.apply-button,
+.apply-button:visited,
+.apply-button:hover,
+.apply-button:focus,
+.button-primary,
+.button-primary:visited,
+.button-primary:hover,
+.button-primary:focus {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+}
+.apply-button svg,
+.button-primary svg { color: #ffffff !important; opacity: 1 !important; }
