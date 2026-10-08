@@ -17,11 +17,11 @@ export default async function handler(req, res) {
     const completion = await client.chat.completions.create({
       model: "llama-3.1-8b-instant",
       messages: [
-        { role: "system", content: "Translate this job listing into natural professional English. Preserve HTML structure, company names, people names, locations, URLs, currencies, numbers and job-specific terms. Do not add information. Return ONLY JSON with keys title and description." },
+        { role: "system", content: "Act as a professional job-board translator. Translate the entire job listing into clear, natural professional English. If the source is already English, return it unchanged. Preserve HTML structure, headings, lists, company names, people names, locations, URLs, currencies, numbers, dates and job-specific terms exactly. Do not summarize, omit, invent, or add information. Do not translate proper names. Return ONLY valid JSON with exactly two keys: title and description." },
         { role: "user", content: JSON.stringify({ language: language || "unknown", title: clean(title, 500), description: clean(description) }) }
       ],
       temperature: 0.1,
-      max_tokens: 3000,
+      max_tokens: 6000,
       response_format: { type: "json_object" }
     });
     const data = JSON.parse(completion.choices[0]?.message?.content || "{}");
