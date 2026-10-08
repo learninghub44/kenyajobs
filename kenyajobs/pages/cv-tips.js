@@ -60,7 +60,7 @@ export default function CVTips() {
   return (
     <>
       <Head>
-        <title>CV Tips & Career Resources for Kenyan Job Seekers | JobsWorldwide</title>
+        <title>CV Tips & Career Resources for Kenyan Job Seekers | Online Jobs</title>
         <meta name="description" content="Free CV tips, cover letter advice, and interview guidance tailored for Kenyan and African job seekers." />
       </Head>
 
