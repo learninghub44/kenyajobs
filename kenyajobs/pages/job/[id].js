@@ -119,27 +119,59 @@ function timeAgo(dateStr) {
   return `Posted ${d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`;
 }
 
-function cleanSectionText(value) {
-  if (!value) return "";
-  let text = Array.isArray(value) ? value.filter(Boolean).map(String).join("\n") : String(value);
-  return text
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/(p|div|li|h2|h3|h4)>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
+function decodeEntities(value) {
+  return String(value || "")
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
     .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">");
+}
+
+function cleanSectionText(value) {
+  if (!value) return "";
+  let text = Array.isArray(value) ? value.filter(Boolean).map(String).join("\n") : String(value);
+
+  text = text
+    .replace(/<br\s*\/?>(?!\n)/gi, "\n")
+    .replace(/<\/(p|div|li|h1|h2|h3|h4|h5)>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/__([^_]+?)__/g, "$1");
+
+  text = decodeEntities(text)
     .replace(/[ \t]+/g, " ")
     .replace(/\n[ \t]+/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
+
+  const headingMarkers = [
+    "Position Summary...",
+    "What you'll do...",
+    "What you’ll do...",
+    "Minimum Qualifications...",
+    "Preferred Qualifications...",
+    "Primary Location...",
+    "Benefits",
+    "Benefits include",
+    "At Sam's Club, we offer competitive pay"
+  ];
+
+  for (const marker of headingMarkers) {
+    const escaped = marker.replace(/[.*+?^()|[\]\\]/g, "\\$&");
+    text = text.replace(new RegExp("\\s*" + escaped + "\\s*", "gi"), "\n" + marker + "\n");
+  }
+
+  return text.replace(/\n{3,}/g, "\n\n").trim();
 }
 
 function splitSectionItems(value) {
   const text = cleanSectionText(value);
   if (!text) return [];
+
   return text
-    .split(/(?:\n+|\s*[•●▪◦]\s*|\s*(?:^|\n)\s*[-–—]\s+|\s*;\s+)/)
+    .split(/\n+|\s*[•●▪◦]\s*|\s*;\s+/)
     .map(item => item.replace(/^[-–—•●▪◦]+\s*/, "").trim())
     .filter(item => item.length > 1);
 }
@@ -147,34 +179,42 @@ function splitSectionItems(value) {
 function classifyDescription(rawDescription) {
   const raw = cleanSectionText(rawDescription);
   const lines = raw.split(/\n+/).map(s => s.trim()).filter(Boolean);
-  const headingPattern = /^(about(?: the)? role|job description|description|role overview|overview|responsibilities|key responsibilities|duties|what you.?ll do|requirements|qualifications|job requirements|what we.?re looking for|skills|skills required|experience|education|benefits|perks|what we offer|we offer)\s*:?\s*$/i;
+
+  const headingPattern = /^(about(?: the)? role|job description|description|position summary|role overview|overview|responsibilities|key responsibilities|duties|what you.?ll do|minimum qualifications|preferred qualifications|requirements|qualifications|job requirements|what we.?re looking for|skills|skills required|experience|education|benefits|benefits include|perks|what we offer|we offer|primary location)\s*:?\s*\.*$/i;
   const buckets = {
     "Job description": [],
     "Responsibilities": [],
     "Requirements": [],
-    "Benefits": []
+    "Benefits": [],
+    "Location": []
   };
+
   let current = "Job description";
 
   for (const line of lines) {
     const heading = line.match(headingPattern);
+
     if (heading) {
       const key = heading[1].toLowerCase();
-      current = /responsib|duties|you.?ll do/.test(key)
-        ? "Responsibilities"
-        : /require|qualif|skill|experience|education|looking for/.test(key)
-          ? "Requirements"
-          : /benefit|perk|offer/.test(key)
-            ? "Benefits"
-            : "Job description";
+
+      if (/responsib|duties|you.?ll do/.test(key)) current = "Responsibilities";
+      else if (/minimum qualifications|preferred qualifications|require|qualif|skill|experience|education|looking for/.test(key)) current = "Requirements";
+      else if (/benefit|perk|offer/.test(key)) current = "Benefits";
+      else if (/primary location/.test(key)) current = "Location";
+      else current = "Job description";
+
       continue;
     }
-    buckets[current].push(line);
+
+    if (current === "Location") buckets.Location.push(line);
+    else buckets[current].push(line);
   }
 
-  return Object.fromEntries(Object.entries(buckets)
-    .map(([title, items]) => [title, items.join("\n").trim()])
-    .filter(([, content]) => content));
+  return Object.fromEntries(
+    Object.entries(buckets)
+      .map(([title, items]) => [title, items.join("\n").trim()])
+      .filter(([, content]) => content)
+  );
 }
 
 function buildJobSections(job, description) {
@@ -191,25 +231,16 @@ function buildJobSections(job, description) {
   }
 
   const sections = [];
+
   for (const title of ["Job description", "Responsibilities", "Requirements", "Benefits"]) {
     const content = classified[title];
     if (!content) continue;
+
     const items = splitSectionItems(content);
     sections.push({
       title,
       items: items.length > 1 ? items : [content]
     });
-  }
-
-  // Do not invent benefits or requirements. If the source does not provide them,
-  // show a clear source-status message rather than misleading applicants.
-  for (const title of ["Responsibilities", "Requirements", "Benefits"]) {
-    if (!sections.some(section => section.title === title)) {
-      sections.push({
-        title,
-        items: [`${title} were not provided in the original listing.`]
-      });
-    }
   }
 
   return sections;
@@ -220,7 +251,8 @@ function SectionContent({ items }) {
     <div className="job-prose">
       {items.map((item, i) => {
         const text = String(item).trim();
-        const isNotice = /were not provided in the original listing\\.$/i.test(text);
+        const isNotice = /were not provided in the original listing\.$/i.test(text);
+
         return (
           <p key={i} className={isNotice ? "job-section-notice" : undefined}>
             {!isNotice && items.length > 1 ? <span className="job-bullet" aria-hidden="true">•</span> : null}
