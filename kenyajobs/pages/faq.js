@@ -8,7 +8,7 @@ const FAQS = [
     category: "For Job Seekers",
     questions: [
       {
-        q: "Is JobsWorldwide free to use?",
+        q: "Is Online Jobs free to use?",
         a: "Yes — completely free. You can browse, search, filter, and apply to any job on the platform without creating an account or paying anything. We will never charge job seekers.",
       },
       {
@@ -33,7 +33,7 @@ const FAQS = [
       },
       {
         q: "I found a suspicious or fake job listing. What should I do?",
-        a: "Do not apply and do not send any money. Legitimate employers will never ask you to pay to apply for a job. Please report it to us at hello@jobsworldwide.online and we will remove it and investigate the source.",
+        a: "Do not apply and do not send any money. Legitimate employers will never ask you to pay to apply for a job. Please report it to us at support@christech.co.ke and we will remove it and investigate the source.",
       },
     ],
   },
@@ -41,8 +41,8 @@ const FAQS = [
     category: "For Employers",
     questions: [
       {
-        q: "How do I post a job on JobsWorldwide?",
-        a: "Email us at hello@jobsworldwide.online with your job details, or fill in the enquiry form on our Advertise page. We'll have your listing live within 24 hours. Pricing starts at KES 3,500 per listing.",
+        q: "How do I post a job on Online Jobs?",
+        a: "Email us at support@christech.co.ke with your job details, or fill in the enquiry form on our Advertise page. We'll have your listing live within 24 hours. Pricing starts at KES 3,500 per listing.",
       },
       {
         q: "How long does a listing stay live?",
@@ -67,10 +67,10 @@ const FAQS = [
       },
       {
         q: "The site is slow or a page isn't loading. What should I do?",
-        a: "Try refreshing the page. If the issue persists, it may be a temporary API timeout from one of our upstream sources. Most issues resolve within a few minutes. Contact us at hello@jobsworldwide.online if the problem continues.",
+        a: "Try refreshing the page. If the issue persists, it may be a temporary API timeout from one of our upstream sources. Most issues resolve within a few minutes. Contact us at support@christech.co.ke if the problem continues.",
       },
       {
-        q: "Does JobsWorldwide work on mobile?",
+        q: "Does Online Jobs work on mobile?",
         a: "Yes — the site is fully responsive and designed to work on all screen sizes including phones and tablets. You can browse and apply from any device.",
       },
     ],
@@ -102,8 +102,8 @@ export default function FAQ() {
   return (
     <>
       <Head>
-        <title>Help & FAQs | JobsWorldwide</title>
-        <meta name="description" content="Answers to common questions about JobsWorldwide — for job seekers and employers." />
+        <title>Help & FAQs | Online Jobs</title>
+        <meta name="description" content="Answers to common questions about Online Jobs — for job seekers and employers." />
       </Head>
 
       {/* Header */}
@@ -112,7 +112,7 @@ export default function FAQ() {
           <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">Help Centre</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Frequently Asked Questions</h1>
           <p className="text-base text-gray-500 max-w-xl">
-            Everything you need to know about using JobsWorldwide — for job seekers and employers.
+            Everything you need to know about using Online Jobs — for job seekers and employers.
           </p>
         </div>
       </div>
