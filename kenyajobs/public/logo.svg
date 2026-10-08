@@ -1,6 +1,6 @@
 <svg width="680" height="240" viewBox="0 0 680 240" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>JobsWorldwide</title>
-  <desc>JobsWorldwide logo — globe icon with location pin and bold wordmark</desc>
+  <title>Online Jobs</title>
+  <desc>Online Jobs logo — globe icon with location pin and bold wordmark</desc>
 
   <defs>
     <clipPath id="gc">
@@ -43,13 +43,13 @@
   <!-- Divider -->
   <rect x="216" y="116" width="332" height="2" fill="#e2e8f0" rx="1"/>
 
-  <!-- "Worldwide" wordmark -->
+  <!-- "Online Jobs" wordmark -->
   <text x="219" y="156"
     font-family="'DM Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif"
-    font-size="36" font-weight="500" fill="#f2a93c" letter-spacing="5">Worldwide</text>
+    font-size="36" font-weight="500" fill="#f2a93c" letter-spacing="5">Online Jobs</text>
 
   <!-- Tagline -->
   <text x="220" y="188"
     font-family="'DM Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif"
-    font-size="13" font-weight="400" fill="#8b94a0" letter-spacing="2.5">Africa · Remote · Worldwide</text>
+    font-size="13" font-weight="400" fill="#8b94a0" letter-spacing="2.5">Africa · Remote · Online Jobs</text>
 </svg>
