@@ -96,7 +96,7 @@ export default function Navbar() {
               Login
             </Link>
             <a
-              href="mailto:hello@onlinejobs.christech.co.ke?subject=Post a Job"
+              href="mailto:support@christech.co.ke?subject=Post a Job"
               className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2"
             >
               <Briefcase size={16} />
@@ -153,7 +153,7 @@ export default function Navbar() {
               Login
             </Link>
             <a
-              href="mailto:hello@onlinejobs.christech.co.ke?subject=Post a Job"
+              href="mailto:support@christech.co.ke?subject=Post a Job"
               className="flex items-center justify-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-3 rounded-lg"
             >
               <Briefcase size={16} />
