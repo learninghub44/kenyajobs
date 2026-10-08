@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import JobCard from "@/components/JobCard";
@@ -82,8 +81,6 @@ const CAT_CARDS = [
     href: "/remote-jobs",
     icon: Wifi,
     accent: "#3B82F6",
-    photo: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=600&q=80&auto=format&fit=crop",
-    alt: "Person working on laptop remotely",
   },
   {
     title: "Entry Level",
@@ -91,8 +88,6 @@ const CAT_CARDS = [
     href: "/entry-level",
     icon: Rocket,
     accent: "#10B981",
-    photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=80&auto=format&fit=crop",
-    alt: "Young professional at work",
   },
   {
     title: "Graduate Jobs",
@@ -100,8 +95,6 @@ const CAT_CARDS = [
     href: "/graduate-jobs",
     icon: GraduationCap,
     accent: "#8B5CF6",
-    photo: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80&auto=format&fit=crop",
-    alt: "University graduation",
   },
   {
     title: "Work From Home",
@@ -109,8 +102,6 @@ const CAT_CARDS = [
     href: "/work-from-home",
     icon: HomeIcon,
     accent: "#F59E0B",
-    photo: "https://images.unsplash.com/photo-1585421514738-01798e348b17?w=600&q=80&auto=format&fit=crop",
-    alt: "Home office setup",
   },
 ];
 
@@ -329,14 +320,8 @@ export default function Home() {
 
       {/* ── HIRING BANNER ─────────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 mt-8">
-        <div className="relative rounded-xl overflow-hidden border border-border bg-navy min-h-[140px] flex items-center">
-          <Image
-            src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1400&q=80&auto=format&fit=crop"
-            alt="Team collaboration"
-            fill className="object-cover opacity-20"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/90 to-transparent" />
-          <div className="relative px-8 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 w-full">
+        <div className="rounded-xl overflow-hidden border border-border bg-navy min-h-[140px] flex items-center">
+          <div className="px-8 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 w-full">
             <div>
               <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-1">Hiring?</p>
               <h2 className="text-xl font-bold text-white mb-1">Post a job — reach thousands of active candidates</h2>
@@ -458,14 +443,9 @@ export default function Home() {
             {CAT_CARDS.map(({ title, desc, href, icon: Icon, accent, photo, alt }) => (
               <Link key={href} href={href}
                 className="group bg-surface border border-border hover:border-primary/30 rounded-xl overflow-hidden hover:shadow-md transition-all duration-200 flex flex-col">
-                <div className="relative h-40 w-full overflow-hidden">
-                  <Image
-                    src={photo} alt={alt} fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-3 left-4 w-10 h-10 rounded-lg flex items-center justify-center bg-white/95 shadow-sm">
-                    <Icon size={18} style={{ color: accent }} />
+                <div className="h-24 w-full bg-surface-muted border-b border-border flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-lg bg-white border border-border flex items-center justify-center">
+                    <Icon size={20} style={{ color: accent }} />
                   </div>
                 </div>
                 <div className="p-5 flex-1 flex flex-col">
