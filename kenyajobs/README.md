@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
-## JobsWorldwide
+## Online Jobs
 
 A job board that aggregates listings live from ~15 free job APIs/RSS feeds (Remotive, Jobicy, Arbeitnow, ReliefWeb, BrighterMonday, MyJobMag, JSearch, Adzuna, and more) and merges them with manually-posted jobs and sponsored listings managed through `/admin`.
 
@@ -27,7 +27,7 @@ To keep listings updating on a real clock regardless of traffic, this repo inclu
 
 1. Set `CRON_SECRET` to any random string in your hosting provider's environment variables (Cloudflare Pages / Vercel / Render settings).
 2. In the GitHub repo, go to **Settings → Secrets and variables → Actions** and add two repository secrets:
-   - `SITE_URL` — your live site URL, e.g. `https://jobsworldwide.online` (no trailing slash)
+   - `SITE_URL` — your live site URL, e.g. `https://onlinejobs.christech.co.ke` (no trailing slash)
    - `CRON_SECRET` — the same value you set in step 1
 3. That's it — the workflow runs automatically every 30 minutes. You can also trigger it manually from the **Actions** tab → "Refresh job listings" → "Run workflow".
 
