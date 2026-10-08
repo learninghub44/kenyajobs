@@ -64,10 +64,10 @@ export default function About() {
   return (
     <>
       <Head>
-        <title>About JobsWorldwide — Free Job Aggregator for Kenya & Africa</title>
+        <title>About Online Jobs — Free Job Aggregator for Kenya & Africa</title>
         <meta
           name="description"
-          content="JobsWorldwide aggregates live job listings from 15+ trusted sources across Kenya, East Africa, and global remote boards — free, no sign-up needed."
+          content="Online Jobs aggregates live job listings from 15+ trusted sources across Kenya, East Africa, and global remote boards — free, no sign-up needed."
         />
       </Head>
 
@@ -88,7 +88,7 @@ export default function About() {
             <span className="text-amber-400">job in Africa & beyond.</span>
           </h1>
           <p className="text-slate-300 text-lg max-w-xl leading-relaxed">
-            JobsWorldwide is a free job aggregator built to save you hours of searching. We pull live listings from 15+ trusted boards across Kenya, East Africa, and global remote platforms — and surface them in one clean feed.
+            Online Jobs is a free job aggregator built to save you hours of searching. We pull live listings from 15+ trusted boards across Kenya, East Africa, and global remote platforms — and surface them in one clean feed.
           </p>
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function About() {
                   Finding a job in Kenya means visiting BrighterMonday, then MyJobMag, then LinkedIn, then checking various government portals, NGO boards, and company websites — only to find the same listings recycled across all of them, mixed in with outdated postings from months ago.
                 </p>
                 <p>
-                  JobsWorldwide cuts through that. We aggregate directly from the source — pulling from 15+ job boards and RSS feeds multiple times a day — and present them in a single, searchable feed. No registration. No CV uploads. No paywalls. Just jobs.
+                  Online Jobs cuts through that. We aggregate directly from the source — pulling from 15+ job boards and RSS feeds multiple times a day — and present them in a single, searchable feed. No registration. No CV uploads. No paywalls. Just jobs.
                 </p>
                 <p>
                   When you click Apply on any listing, you go directly to the original employer's application page. We are a discovery tool, not a gatekeeper.
@@ -280,9 +280,9 @@ export default function About() {
               </div>
             ))}
           </div>
-          <a href="mailto:hello@jobsworldwide.online"
+          <a href="mailto:hello@onlinejobs.christech.co.ke"
             className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
-            <Mail size={14} /> Get in touch — hello@jobsworldwide.online
+            <Mail size={14} /> Get in touch — hello@onlinejobs.christech.co.ke
           </a>
         </section>
 
@@ -298,15 +298,15 @@ export default function About() {
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
               <Mail size={14} /> Contact Us
             </Link>
-            <a href="mailto:hello@jobsworldwide.online"
+            <a href="mailto:hello@onlinejobs.christech.co.ke"
               className="inline-flex items-center gap-2 border border-gray-200 hover:border-gray-300 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
-              hello@jobsworldwide.online
+              hello@onlinejobs.christech.co.ke
             </a>
           </div>
           <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-400">
             <Link href="/privacy-policy" className="hover:text-gray-700 transition-colors">Privacy Policy</Link>
             <Link href="/terms-and-conditions" className="hover:text-gray-700 transition-colors">Terms & Conditions</Link>
-            <span>© {new Date().getFullYear()} JobsWorldwide</span>
+            <span>© {new Date().getFullYear()} Online Jobs</span>
           </div>
         </section>
 
