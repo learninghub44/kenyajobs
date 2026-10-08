@@ -264,115 +264,25 @@ export default function Home() {
         <meta name="description" content="Find your dream job worldwide. Thousands of opportunities across Africa, Europe, Asia and beyond — remote, entry level, graduate and work from home." />
       </Head>
 
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-white border-b border-border">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{backgroundImage:"linear-gradient(#1A1A2E 1px,transparent 1px),linear-gradient(90deg,#1A1A2E 1px,transparent 1px)",backgroundSize:"40px 40px"}} />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-text-secondary mb-6">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <ChevronRight size={14} className="text-text-tertiary" />
-            <span className="text-text-primary font-medium">Find a Job</span>
+      {/* ── JOB SEARCH ─────────────────────────────────────────────────────── */}
+      <section className="relative bg-white border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-14">
+          <div className="max-w-3xl">
+            <p className="kicker mb-3">Online Jobs · Kenya & beyond</p>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-text-primary mb-4 leading-tight">Find work that moves your career forward.</h1>
+            <p className="text-text-secondary text-lg leading-relaxed max-w-2xl">Search current opportunities from employers and trusted job sources in Kenya, Africa and remote markets.</p>
           </div>
-
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            {/* Left content */}
-            <div className="flex-1">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-text-primary mb-4 leading-[1.1]">
-                Find Your Next<br />
-                <span className="text-primary">Dream Job</span>
-              </h1>
-              <p className="text-text-secondary text-lg mb-8 max-w-xl leading-relaxed">
-                Search through thousands of live job listings from top employers across Africa and worldwide.
-              </p>
-
-              {/* Search filters row */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                {/* Job Function dropdown */}
-                <div className="relative flex-1">
-                  <select
-                    value={selectedFunction}
-                    onChange={e => setSelectedFunction(e.target.value)}
-                    className="w-full appearance-none bg-surface-muted border border-border rounded-lg px-4 py-3 pr-10 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer"
-                  >
-                    {JOB_FUNCTIONS.map(f => (
-                      <option key={f} value={f}>{f}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none" />
-                </div>
-
-                {/* Location dropdown */}
-                <div className="relative flex-1">
-                  <select
-                    value={selectedLocation}
-                    onChange={e => setSelectedLocation(e.target.value)}
-                    className="w-full appearance-none bg-surface-muted border border-border rounded-lg px-4 py-3 pr-10 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer"
-                  >
-                    {LOCATIONS.map(l => (
-                      <option key={l} value={l}>{l}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none" />
-                </div>
-
-                {/* Experience dropdown */}
-                <div className="relative flex-1">
-                  <select
-                    value={selectedExperience}
-                    onChange={e => setSelectedExperience(e.target.value)}
-                    className="w-full appearance-none bg-surface-muted border border-border rounded-lg px-4 py-3 pr-10 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer"
-                  >
-                    {EXPERIENCE_LEVELS.map(e => (
-                      <option key={e} value={e}>{e}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none" />
-                </div>
-
-                {/* Search button */}
-                <button
-                  onClick={handleSearch}
-                  className="bg-primary hover:bg-primary-hover text-white font-semibold px-8 py-3 rounded-lg transition-colors whitespace-nowrap flex items-center justify-center gap-2"
-                >
-                  <Search size={18} />
-                  Search
-                </button>
-              </div>
-
-              {/* Trending searches */}
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-text-tertiary text-sm font-medium">Trending:</span>
-                {POPULAR_SEARCHES.map(s => (
-                  <button key={s} onClick={() => setSearch(s)}
-                    className="text-sm text-text-secondary hover:text-primary bg-surface hover:bg-primary-light border border-border px-3 py-1.5 rounded-full transition-colors">
-                    {s}
-                  </button>
-                ))}
-              </div>
+          <div className="mt-8 max-w-5xl border border-border bg-white p-2 rounded-lg shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_auto] gap-2">
+              <select value={selectedFunction} onChange={e=>setSelectedFunction(e.target.value)} className="job-search-input">{JOB_FUNCTIONS.map(f=><option key={f} value={f}>{f}</option>)}</select>
+              <select value={selectedLocation} onChange={e=>setSelectedLocation(e.target.value)} className="job-search-input">{LOCATIONS.map(l=><option key={l} value={l}>{l}</option>)}</select>
+              <select value={selectedExperience} onChange={e=>setSelectedExperience(e.target.value)} className="job-search-input">{EXPERIENCE_LEVELS.map(e=><option key={e} value={e}>{e}</option>)}</select>
+              <button onClick={handleSearch} className="bg-primary hover:bg-primary-hover text-white font-semibold px-7 py-3 rounded-md text-sm">Search jobs</button>
             </div>
-
-            {/* Right stats */}
-            <div className="hidden xl:block w-72">
-              <div className="bg-surface-muted rounded-xl p-5 border border-border">
-                <h3 className="font-semibold text-text-primary mb-4">Platform Statistics</h3>
-                <div className="space-y-3">
-                  {STATS.map(({ value, label, icon: Icon }) => (
-                    <div key={label} className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-primary-light flex items-center justify-center flex-shrink-0">
-                        <Icon size={16} className="text-primary" />
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-text-primary tabular">{value}</div>
-                        <div className="text-xs text-text-tertiary">{label}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 mt-4 text-sm">
+            <span className="text-text-tertiary font-medium mr-1">Popular</span>
+            {POPULAR_SEARCHES.slice(0,6).map(s=><button key={s} onClick={()=>setSearch(s)} className="border border-border bg-white hover:bg-surface-muted px-3 py-1.5 rounded-md text-text-secondary">{s}</button>)}
           </div>
         </div>
       </section>
@@ -492,17 +402,17 @@ export default function Home() {
         )}
 
         {loading && baseJobs.length === 0 && !search.trim() && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="space-y-3 max-w-5xl">
             {Array.from({ length: 9 }).map((_, i) => <JobSkeleton key={i} />)}
           </div>
         )}
         {searching && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="space-y-3 max-w-5xl">
             {Array.from({ length: 6 }).map((_, i) => <JobSkeleton key={i} />)}
           </div>
         )}
         {!searching && filtered.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="space-y-3 max-w-5xl">
             {filtered.map((job, index) => (
               <div key={job.id || index}>
                 <JobCard job={job} />
