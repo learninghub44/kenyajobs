@@ -54,7 +54,7 @@ export default function AfricaJobs() {
   return (
     <>
       <Head>
-        <title>Africa Jobs — Kenya, Nigeria, South Africa & More | JobsWorldwide</title>
+        <title>Africa Jobs — Kenya, Nigeria, South Africa & More | Online Jobs</title>
         <meta name="description" content="Browse live job listings from across Africa — Kenya, Nigeria, South Africa, Ghana, Uganda, Tanzania and more. Aggregated from trusted African job boards." />
       </Head>
 
