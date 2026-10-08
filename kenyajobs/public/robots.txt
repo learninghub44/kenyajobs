@@ -4,6 +4,6 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/admin/
 
-Sitemap: https://kenyajobs.vercel.app/sitemap.xml
+Sitemap: https://onlinejobs.christech.co.ke/sitemap.xml
 Disallow: /admin
 Disallow: /admin/
