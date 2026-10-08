@@ -5,22 +5,19 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
-import AdSlot from "@/components/AdSlot";
-import ShareBar from "@/components/ShareBar";
-import { MapPin, Briefcase, ArrowUpRight, Building2, Clock, Share2, ChevronRight, Banknote, Link as LinkIcon, Tag, ListChecks, CheckCircle2, Gift, Search } from "lucide-react";
+import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2 } from "lucide-react";
 
 function timeAgo(dateStr) {
   if (!dateStr) return "Recently posted";
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const days = Math.floor(diff / 86400000);
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "Recently posted";
+  const days = Math.max(0, Math.floor((Date.now() - d.getTime()) / 86400000));
   if (days === 0) return "Posted today";
   if (days === 1) return "Posted yesterday";
   if (days < 7) return `Posted ${days} days ago`;
-  return `Posted on ${new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`;
+  return `Posted ${d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`;
 }
 
-// Different sources expose salary differently — a plain string (manual jobs,
-// Remotive), a min/max range (Jobicy, JSearch, Adzuna), or nothing at all.
 function formatSalary(job) {
   if (job.salary && typeof job.salary === "string") return job.salary;
   const min = job.annualSalaryMin ?? job.job_min_salary ?? job.salary_min;
@@ -31,30 +28,17 @@ function formatSalary(job) {
   return null;
 }
 
-function companyColor(name = "") {
-  const colors = [
-    ["#1d4ed8", "#dbeafe"],
-    ["#047857", "#d1fae5"],
-    ["#7c3aed", "#ede9fe"],
-    ["#dc2626", "#fee2e2"],
-    ["#d97706", "#fef3c7"],
-    ["#0891b2", "#cffafe"],
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  return colors[Math.abs(hash) % colors.length];
+function initials(name) {
+  return String(name || "Company").split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join("").toUpperCase() || "CO";
 }
 
-async function fetchAllSources() {
-  const results = await Promise.allSettled([
-    fetch("/api/africa-jobs").then(r => r.json()).catch(() => []),
-    fetch("/api/remote-jobs").then(r => r.json()).catch(() => []),
-    fetch("/api/entry-level-jobs").then(r => r.json()).catch(() => []),
-    fetch("/api/graduate-jobs").then(r => r.json()).catch(() => []),
-    fetch("/api/wfh-jobs").then(r => r.json()).catch(() => []),
-    fetch("/api/manual-jobs").then(r => r.json()).catch(() => []),
-  ]);
-  return results.filter(r => r.status === "fulfilled" && Array.isArray(r.value)).flatMap(r => r.value);
+async function findRelated(found) {
+  const endpoints = ["/api/africa-jobs", "/api/remote-jobs", "/api/entry-level-jobs", "/api/graduate-jobs", "/api/wfh-jobs"];
+  const results = await Promise.allSettled(endpoints.map(u => fetch(u).then(r => r.json()).catch(() => [])));
+  return results.flatMap(r => r.status === "fulfilled" && Array.isArray(r.value) ? r.value : [])
+    .filter(j => String(j.id || j.job_id) !== String(found.id || found.job_id))
+    .filter(j => j.source === found.source || String(j.location || "").toLowerCase() === String(found.location || "").toLowerCase())
+    .slice(0, 3);
 }
 
 export default function JobDetail() {
@@ -64,446 +48,215 @@ export default function JobDetail() {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [translatedJob, setTranslatedJob] = useState(null);
+  const [translationLoading, setTranslationLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!id) return;
-
-    // Prefer the exact job data the user just saw on the listing page — avoids depending on
-    // slow/rate-limited live sources returning the identical job again on a fresh request.
-    const cached = loadJob(id);
-    if (cached) {
-      async function applyCachedJob() {
-        setJob(cached);
-        setNotFound(false);
-        setLoading(false);
-        // Still fetch in the background, just to populate "Similar Jobs" — never blocks the
-        // main content and never flips this job to "not found" if a source is slow/unavailable.
-        try {
-          const allJobs = await fetchAllSources();
-          setRelated(allJobs.filter(j =>
-            (j.id || j.job_id) !== id && (j.source === cached.source || j.location === cached.location)
-          ).slice(0, 3));
-        } catch {
-          // Related jobs are a nice-to-have; ignore failures.
-        }
-      }
-      applyCachedJob();
-      return;
-    }
-
-    // No cached data (direct link, shared URL, new tab, or cleared session storage).
     let cancelled = false;
-    async function findJob() {
-      setLoading(true);
-      setNotFound(false);
+
+    async function load() {
+      const cached = loadJob(id);
+      if (cached) {
+        setJob(cached);
+        setLoading(false);
+        findRelated(cached).then(x => !cancelled && setRelated(x)).catch(() => {});
+        return;
+      }
+
       try {
-        // Fast, reliable path: a single DB lookup. Covers manually-posted jobs and any
-        // live-pulled job that's been seen by any *-jobs API route recently — which is
-        // almost always true, since every listing page writes through to this cache.
-        // This is what makes opening a job in a new tab / sharing a link / refreshing the
-        // page actually work, instead of depending on every one of ~15 live sources
-        // responding identically (and within their timeout) a second time.
-        const lookupRes = await fetch(`/api/job-lookup/${id}`);
-        if (lookupRes.ok) {
-          const found = await lookupRes.json();
+        const response = await fetch(`/api/job-lookup/${encodeURIComponent(id)}`);
+        if (response.ok) {
+          const found = await response.json();
           if (cancelled) return;
           setJob(found);
           saveJob(id, found);
           setLoading(false);
-          fetchAllSources()
-            .then(allJobs => { if (!cancelled) setRelated(allJobs.filter(j => (j.id || j.job_id) !== id && (j.source === found.source || j.location === found.location)).slice(0, 3)); })
-            .catch(() => {});
+          findRelated(found).then(x => !cancelled && setRelated(x)).catch(() => {});
           return;
         }
+      } catch {}
 
-        // Last resort: the job hasn't been cached yet (e.g. opened within seconds of a
-        // cold start) — scan every live source fresh.
-        const allJobs = await fetchAllSources();
-        if (cancelled) return;
-        const found = allJobs.find(j =>
-          String(j.id) === String(id) ||
-          String(j.job_id) === String(id) ||
-          String(j.title || j.job_title || "") === String(id)
-        );
-        if (found) {
-          setJob(found);
-          saveJob(id, found);
-          setRelated(allJobs.filter(j => j !== found && (j.source === found.source || j.location === found.location)).slice(0, 3));
-        } else {
-          setNotFound(true);
-        }
-      } catch {
-        if (!cancelled) setNotFound(true);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+      setNotFound(true);
+      setLoading(false);
     }
-    findJob();
+
+    load();
     return () => { cancelled = true; };
   }, [id]);
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  useEffect(() => {
+    if (!job) return;
+    const title = job.title || job.job_title || "";
+    const description = job.description || job.job_description || "";
+    const sourceLanguage = job.language || job.lang || job.originalLanguage;
+    if (!sourceLanguage || String(sourceLanguage).toLowerCase().startsWith("en")) return;
+    let cancelled = false;
+    setTranslationLoading(true);
+    fetch("/api/translate-job", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description, language: sourceLanguage })
+    }).then(r => r.ok ? r.json() : null)
+      .then(data => { if (!cancelled && data?.title) setTranslatedJob(data); })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setTranslationLoading(false); });
+    return () => { cancelled = true; };
+  }, [job]);
 
   if (loading) return (
-    <div className="max-w-5xl mx-auto px-4 py-10 animate-pulse">
-      <div className="h-4 bg-gray-200 rounded w-48 mb-8" />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-2xl border p-8 space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-2/3" />
-            <div className="h-5 bg-gray-100 rounded w-1/3" />
-            <div className="flex gap-2">
-              <div className="h-8 bg-gray-100 rounded-full w-24" />
-              <div className="h-8 bg-gray-100 rounded-full w-20" />
-            </div>
-            <div className="h-12 bg-gray-200 rounded-xl w-40" />
-          </div>
-          <div className="bg-white rounded-2xl border p-8 space-y-3">
-            {[...Array(6)].map((_, i) => <div key={i} className="h-4 bg-gray-100 rounded" style={{ width: `${90 - i * 8}%` }} />)}
-          </div>
+    <main className="job-detail-page">
+      <div className="job-detail-shell">
+        <div className="job-skeleton-head" />
+        <div className="job-detail-layout">
+          <div><div className="job-skeleton-card" /><div className="job-skeleton-card tall" /></div>
+          <div className="job-skeleton-card side" />
         </div>
-        <div className="bg-white rounded-2xl border p-6 h-64" />
       </div>
-    </div>
+    </main>
   );
 
   if (notFound || !job) return (
-    <>
-      <Head>
-        <title>Job Not Found | Online Jobs</title>
-      </Head>
-      <div className="max-w-lg mx-auto px-4 py-20 text-center">
-        <div className="relative w-full max-w-sm mx-auto mb-8 rounded-2xl overflow-hidden">
-          <Image
-            src="/dream-job-signpost.jpg"
-            alt="Signpost pointing the way to your dream job"
-            width={1280}
-            height={854}
-            className="w-full h-auto"
-            priority
-          />
-        </div>
-        <h1 className="text-xl font-bold text-gray-900 mb-2">This job has wandered off</h1>
-        <p className="text-gray-500 mb-8">
-          It may have expired, been filled, or the link is out of date. Your dream job is still out there though — let&apos;s keep looking.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link href="/" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
-            ← Back to Jobs
-          </Link>
-          <Link href="/search" className="inline-flex items-center gap-2 bg-white border border-gray-200 hover:border-blue-300 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
-            <Search size={15} /> Search Jobs
-          </Link>
-        </div>
+    <main className="job-detail-page">
+      <div className="job-not-found">
+        <Image src="/dream-job-signpost.jpg" alt="" width={640} height={426} className="job-not-found-image" />
+        <h1>Job no longer available</h1>
+        <p>This listing may have expired, been filled, or been removed from its original source.</p>
+        <Link href="/" className="button-primary">Browse current jobs</Link>
       </div>
-    </>
+    </main>
   );
 
-  const title = job.title || job.job_title || "Job Title";
+  const rawTitle = job.title || job.job_title || "Job opportunity";
+  const rawDescription = job.description || job.job_description || "No description is available for this listing.";
+  const title = translatedJob?.title || rawTitle;
+  const description = translatedJob?.description || rawDescription;
   const company = job.company || job.company_name || job.employer_name || "Company";
   const location = String(job.location || job.candidate_required_location || job.job_city || "Worldwide");
-  const jobType = String(job.type || job.job_type || job.employment_type || "Full-time");
-  const isRemote = location.toLowerCase().includes("remote") || jobType.toLowerCase().includes("remote");
-  const description = job.description || job.job_description || "No description available.";
-  const sanitizedDescription = typeof window !== "undefined"
-    ? DOMPurify.sanitize(description, { ALLOWED_TAGS: ["p", "br", "ul", "ol", "li", "strong", "em", "b", "i", "h3", "h4", "a"], ALLOWED_ATTR: ["href", "target", "rel"] })
-    : "";
+  const type = String(job.type || job.job_type || job.employment_type || "Full-time");
+  const source = String(job.source || "Original source");
   const applyUrl = job.url || job.job_apply_link || job.redirect_url || "#";
-  const source = job.source || "Source";
-  const posted = timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc);
-  const [fg, bg] = companyColor(company);
-  const logoUrl = job.companyLogo || job.company_logo || job.employer_logo;
-  const companyWebsite = job.companyWebsite || job.employer_website;
   const salary = formatSalary(job);
-  const category = job.category;
-  const tags = Array.isArray(job.tags) ? job.tags.slice(0, 8) : [];
-  const highlights = job.highlights && typeof job.highlights === "object" ? job.highlights : null;
+  const remote = location.toLowerCase().includes("remote") || type.toLowerCase().includes("remote");
+  const logo = job.companyLogo || job.company_logo || job.employer_logo;
+  const safeDescription = typeof window !== "undefined"
+    ? DOMPurify.sanitize(description, { ALLOWED_TAGS: ["p","br","ul","ol","li","strong","em","b","i","h2","h3","h4","a"], ALLOWED_ATTR: ["href","target","rel"] })
+    : String(description).replace(/<script[\\s\\S]*?<\\/script>/gi, "");
 
-  const jsonLd = {
-    "@context": "https://schema.org/",
-    "@type": "JobPosting",
-    "title": title,
-    "description": String(job.description || job.job_description || "").replace(/<[^>]*>/g, " ").slice(0, 500),
-    "datePosted": job.date || job.publication_date || job.job_posted_at_datetime_utc || new Date().toISOString(),
-    "hiringOrganization": {
-      "@type": "Organization",
-      "name": company,
-      "logo": job.companyLogo || job.company_logo || job.employer_logo || "",
-    },
-    "jobLocation": {
-      "@type": "Place",
-      "address": { "@type": "PostalAddress", "addressLocality": location },
-    },
-    "employmentType": jobType?.toUpperCase().replace("-", "_") || "FULL_TIME",
-    "jobLocationType": isRemote ? "TELECOMMUTE" : undefined,
-    "url": `https://onlinejobs.christech.co.ke/job/${id}`,
-    "directApply": Boolean(applyUrl),
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch {}
   };
+
+  const meta = [
+    [MapPin, "Location", location],
+    [BriefcaseBusiness, "Job type", type],
+    [Clock3, "Posted", timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc)],
+    ...(salary ? [[Banknote, "Salary", salary]] : []),
+  ];
 
   return (
     <>
       <Head>
         <title>{title} at {company} | Online Jobs</title>
         <meta name="description" content={`Apply for ${title} at ${company}. ${location}.`} />
-        <meta property="og:title"       content={`${title} at ${company}`} />
-        <meta property="og:description" content={`${jobType} · ${location} — Apply now on Online Jobs`} />
-        <meta property="og:type"        content="website" />
-        <meta property="og:url"         content={`https://onlinejobs.christech.co.ke/job/${id}`} />
-        <meta property="og:image"       content="https://onlinejobs.christech.co.ke/og-image.jpg" />
-        <meta name="twitter:card"       content="summary_large_image" />
-        <meta name="twitter:title"      content={`${title} at ${company}`} />
-        <meta name="twitter:description" content={`${jobType} · ${location} — Apply now on Online Jobs`} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <meta property="og:title" content={`${title} at ${company}`} />
+        <meta property="og:description" content={`${type} · ${location} — Online Jobs`} />
+        <meta property="og:url" content={`https://onlinejobs.christech.co.ke/job/${id}`} />
       </Head>
 
-      <div className="min-h-screen bg-[#F7F8FA] text-slate-900">
-        {/* Breadcrumb */}
-        <div className="bg-white border-b border-slate-200">
-          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
-            <ChevronRight size={14} />
-            <span className="text-gray-800 font-medium truncate">{title}</span>
-          </div>
-        </div>
+      <main className="job-detail-page">
+        <div className="job-detail-shell">
+          <Link href="/" className="job-back"><ArrowLeft size={15} /> Back to jobs</Link>
 
-        <div className="max-w-5xl mx-auto px-4 py-6 sm:py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            {/* Main content */}
-            <div className="lg:col-span-2 space-y-5">
-
-              {/* Job header card */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_8px_30px_rgba(15,23,42,0.05)] overflow-hidden">
-                <div className="h-2 bg-[#E63946]" />
-                <div className="px-4 sm:px-7 pb-6 sm:pb-7 -mt-10">
-                  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5 mb-6">
-                    {/* Company logo */}
-                    {logoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={logoUrl}
-                        alt={company}
-                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover flex-shrink-0 border-4 border-white shadow-md bg-white"
-                        onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
-                      />
-                    ) : null}
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center font-bold text-2xl flex-shrink-0 border-4 border-white shadow-md"
-                      style={{ backgroundColor: bg, color: fg, display: logoUrl ? "none" : "flex" }}>
-                      {company.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0 pt-1">
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 min-w-0">
-                        <div className="min-w-0 w-full">
-                          <p className="font-semibold text-sm mb-0.5 break-words" style={{ color: fg }}>{company}</p>
-                          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight break-words [overflow-wrap:anywhere]">{title}</h1>
-                          {source && <p className="text-xs text-gray-400 mt-1">via {source}</p>}
-                        </div>
-                        <ShareBar
-                          url={typeof window !== "undefined" ? window.location.href : ""}
-                          text={`${title} at ${company} — apply now!`}
-                          variant="dropdown"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Meta chips */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                      <MapPin size={13} className="text-blue-500" /> {location}
-                    </span>
-                    <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                      <Briefcase size={13} className="text-green-500" /> {jobType}
-                    </span>
-                    <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                      <Clock size={13} className="text-orange-500" /> {posted}
-                    </span>
-                    {salary && (
-                      <span className="flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                        <Banknote size={13} className="text-green-600" /> {salary}
-                      </span>
-                    )}
-                    {category && (
-                      <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                        <Tag size={13} className="text-indigo-500" /> {category}
-                      </span>
-                    )}
-                  </div>
-
-                  {tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-6">
-                      {tags.map((t) => (
-                        <span key={t} className="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">{t}</span>
-                      ))}
-                    </div>
-                  )}
-                  {tags.length === 0 && <div className="mb-6" />}
-
-                  {/* Apply button */}
-                  <a href={applyUrl} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-sm text-base">
-                    Apply on {source} <ArrowUpRight size={17} />
-                  </a>
-
-                  {/* Share bar */}
-                  <div className="mt-5 pt-5 border-t border-gray-100">
-                    <ShareBar
-                      url={typeof window !== "undefined" ? window.location.href : ""}
-                      text={`${title} at ${company} — apply now!`}
-                      variant="bar"
-                      label="Share this job"
-                    />
+          <div className="job-detail-layout">
+            <div className="job-detail-main">
+              <header className="job-detail-header">
+                <div className="job-company-mark">
+                  {logo ? <img src={logo} alt="" onError={(e) => { e.currentTarget.style.display = "none"; }} /> : <span>{initials(company)}</span>}
+                </div>
+                <div className="job-detail-title-wrap">
+                  <div className="job-eyebrow">{source}</div>
+                  <h1>{title}</h1>
+                  <Link href={`/company/${company.toLowerCase().replace(/[^a-z0-9\\s-]/g, "").trim().replace(/\\s+/g, "-")}?name=${encodeURIComponent(company)}`} className="job-company-link">
+                    <Building2 size={15} /> {company}
+                  </Link>
+                  <div className="job-meta-line">
+                    <span><MapPin size={15} />{location}</span>
+                    <span><BriefcaseBusiness size={15} />{type}</span>
+                    {remote && <span><Globe2 size={15} />Remote</span>}
                   </div>
                 </div>
-              </div>
+              </header>
 
-              {/* Description */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-7 shadow-sm">
-                <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
-                  <span className="w-1 h-5 bg-blue-600 rounded-full inline-block" />
-                  Job Description
-                </h2>
-                <div className="text-gray-600 leading-relaxed prose prose-sm max-w-none prose-headings:text-gray-800 prose-a:text-blue-600"
-                  dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
-              </div>
-
-              {/* Highlights: Qualifications / Responsibilities / Benefits (JSearch sources) */}
-              {highlights && (highlights.Qualifications || highlights.Responsibilities || highlights.Benefits) && (
-                <div className="grid sm:grid-cols-2 gap-5">
-                  {highlights.Responsibilities?.length > 0 && (
-                    <HighlightCard icon={ListChecks} color="#2563eb" bg="#eff6ff" title="Responsibilities" items={highlights.Responsibilities} />
-                  )}
-                  {highlights.Qualifications?.length > 0 && (
-                    <HighlightCard icon={CheckCircle2} color="#059669" bg="#ecfdf5" title="Qualifications" items={highlights.Qualifications} />
-                  )}
-                  {highlights.Benefits?.length > 0 && (
-                    <HighlightCard icon={Gift} color="#d97706" bg="#fffbeb" title="Benefits" items={highlights.Benefits} />
-                  )}
+              {translatedJob && (
+                <div className="translation-note">
+                  <CheckCircle2 size={16} />
+                  <span>Translated to English from {job.language || job.lang || "the original language"}.</span>
                 </div>
               )}
+              {translationLoading && !translatedJob && (
+                <div className="translation-note muted">Preparing the English version of this listing…</div>
+              )}
 
-              {/* Bottom apply */}
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+              <article className="job-description-panel">
+                <div className="job-section-heading"><span /> <h2>Job description</h2></div>
+                <div className="job-prose" dangerouslySetInnerHTML={{ __html: safeDescription }} />
+              </article>
+
+              {Array.isArray(job.tags) && job.tags.length > 0 && (
+                <section className="job-description-panel">
+                  <div className="job-section-heading"><span /><h2>Skills & tags</h2></div>
+                  <div className="job-tags">{job.tags.slice(0, 12).map((tag, i) => <span key={i}>{tag}</span>)}</div>
+                </section>
+              )}
+
+              <div className="job-source-note">
+                <Globe2 size={16} />
+                <div><strong>Application source</strong><p>This listing is provided by {source}. You will complete your application on the original source.</p></div>
+              </div>
+            </div>
+
+            <aside className="job-detail-sidebar">
+              <div className="apply-panel">
                 <div>
-                  <p className="font-bold text-lg">Ready to apply?</p>
-                  <p className="text-blue-100 text-sm">You&apos;ll be directed to {source} to complete your application.</p>
+                  <p className="apply-kicker">Ready to apply?</p>
+                  <h2>{title}</h2>
                 </div>
-                <a href={applyUrl} target="_blank" rel="noopener noreferrer"
-                  className="flex-shrink-0 bg-white text-blue-700 font-bold px-7 py-3 rounded-xl hover:bg-blue-50 transition-colors text-sm whitespace-nowrap">
-                  Apply Now <ArrowUpRight size={14} className="inline ml-1" />
+                <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="apply-button">
+                  Apply on {source} <ExternalLink size={16} />
                 </a>
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-5">
-              {/* Job overview */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                <h3 className="font-bold text-gray-900 mb-4">Job Overview</h3>
-                <ul className="space-y-4">
-                  {[
-                    { icon: Building2, label: "Company", value: company, color: "text-blue-500" },
-                    { icon: MapPin, label: "Location", value: location, color: "text-red-500" },
-                    { icon: Briefcase, label: "Job Type", value: jobType, color: "text-green-500" },
-                    { icon: Globe2, label: "Source", value: source, color: "text-purple-500" },
-                  ].map(({ icon: Icon, label, value, color }) => (
-                    <li key={label} className="flex items-start gap-3">
-                      <div className={`mt-0.5 ${color}`}><Icon size={16} /></div>
-                      <div>
-                        <p className="text-xs text-gray-400 font-medium">{label}</p>
-                        <p className="text-sm font-semibold text-gray-800">{value}</p>
-                      </div>
-                    </li>
-                  ))}
-                  {companyWebsite && (
-                    <li className="flex items-start gap-3">
-                      <div className="mt-0.5 text-indigo-500"><LinkIcon size={16} /></div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-gray-400 font-medium">Company Website</p>
-                        <a href={companyWebsite} target="_blank" rel="noopener noreferrer"
-                          className="text-sm font-semibold text-blue-600 hover:underline truncate block">
-                          {companyWebsite.replace(/^https?:\/\//, "")}
-                        </a>
-                      </div>
-                    </li>
-                  )}
-                </ul>
+                <button onClick={copyLink} className="share-button"><Share2 size={15} />{copied ? "Link copied" : "Share job"}</button>
               </div>
 
-              {/* Ad slot */}
-              <AdSlot placement="sidebar" adSlot="0000000000" />
-
-              {/* Related jobs */}
-              {related.length > 0 && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                  <h3 className="font-bold text-gray-900 mb-4">Similar Jobs</h3>
-                  <div className="space-y-3">
-                    {related.map((j, i) => {
-                      const relTitle = j.title || j.job_title || "Job";
-                      const relCompany = j.company || j.company_name || "Company";
-                      const relId = j.id || j.job_id || encodeURIComponent(relTitle);
-                      const [rfg, rbg] = companyColor(relCompany);
-                      return (
-                        <Link key={i} href={`/job/${relId}`} onClick={() => saveJob(relId, j)}
-                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group border border-transparent hover:border-gray-200">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0"
-                            style={{ backgroundColor: rbg, color: rfg }}>
-                            {relCompany.charAt(0)}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 truncate transition-colors">{relTitle}</p>
-                            <p className="text-xs text-gray-400 truncate">{relCompany}</p>
-                          </div>
-                        </Link>
-                      );
-                    })}
+              <div className="summary-panel">
+                <h2>Job summary</h2>
+                {meta.map(([Icon, label, value]) => (
+                  <div className="summary-row" key={label}>
+                    <Icon size={17} />
+                    <div><span>{label}</span><strong>{value}</strong></div>
                   </div>
-                </div>
-              )}
-            </div>
+                ))}
+                <div className="summary-row"><Globe2 size={17} /><div><span>Source</span><strong>{source}</strong></div></div>
+              </div>
+            </aside>
           </div>
+
+          {related.length > 0 && (
+            <section className="related-jobs">
+              <div className="related-heading"><div><p className="job-eyebrow">Keep looking</p><h2>More opportunities</h2></div><Link href="/">View all jobs</Link></div>
+              <div className="related-list">
+                {related.map((item, index) => (
+                  <Link key={item.id || index} href={`/job/${item.id || item.job_id}`} onClick={() => saveJob(item.id || item.job_id, item)} className="related-job">
+                    <div><strong>{item.title || item.job_title}</strong><span>{item.company || item.company_name || "Company"} · {item.location || "Worldwide"}</span></div>
+                    <ExternalLink size={16} />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
-      </div>
+      </main>
     </>
-  );
-}
-
-// Need to import Globe2 separately
-function Globe2({ size }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="2" y1="12" x2="22" y2="12"/>
-      <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
-    </svg>
-  );
-}
-
-function HighlightCard({ icon: Icon, color, bg, title, items }) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: bg, color }}>
-          <Icon size={14} />
-        </span>
-        {title}
-      </h3>
-      <ul className="space-y-2.5">
-        {items.slice(0, 8).map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-gray-600 leading-snug">
-            <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-            {item}
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
