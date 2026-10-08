@@ -121,31 +121,23 @@ export default function JobDetail() {
     const title = job.title || job.job_title || "";
     const description = job.description || job.job_description || "";
     const sourceLanguage = job.language || job.lang || job.originalLanguage || "";
-    const sample = (title + " " + description).toLowerCase();
-    const foreignMarkers = [
-      " français ", " français", " espagnol ", " español ", " deutsch ", " deutsche ", " português ", " portugues ",
-      " italiano ", " nederlands ", " svenska ", " norsk ", " dansk ", " suomi ", " polski ", " čeština ",
-      " română ", " magyar ", " ελληνικά ", " русский ", " українська ", " العربية ", " 中文 ", " 日本語 ",
-      " travailler ", " arbeiten ", " deutschland ", " experiencia ", " requisitos ", " responsabilidades ",
-      " candidatura ", " candidature ", " veuillez ", " poste ", " entreprise ", " emploi ", " compétences ",
-      " trabajo ", " salario ", " beneficios ", " candidato ", " habilidades ", " requisitos ", " ofertas ",
-      " oferta ", " empleo ", " gesucht ", " bewerbung ", " aufgaben ", " anforderungen ", " qualifikationen ",
-      " vacante ", " rémunération ", " salaire ", " avantages ", " compétences ", " expérience ", " formation ",
-      " contrat ", " mission ", " recrutement ", " sociedad ", " empresa ", " puesto "
-    ];
-    const looksForeign = foreignMarkers.some(marker => sample.includes(marker)) ||
-      (sourceLanguage && !String(sourceLanguage).toLowerCase().startsWith("en"));
-    if (!looksForeign) return;
+    const detectedLanguage = detectForeignLanguage(title, description, sourceLanguage);
+    if (!detectedLanguage) return;
+
     let cancelled = false;
     setTranslationLoading(true);
     fetch("/api/translate-job", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, language: sourceLanguage })
-    }).then(r => r.ok ? r.json() : null)
-      .then(data => { if (!cancelled && data?.title) setTranslatedJob(data); })
+      body: JSON.stringify({ title, description, language: detectedLanguage })
+    })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        if (!cancelled && data?.title && data?.description) setTranslatedJob(data);
+      })
       .catch(() => {})
       .finally(() => { if (!cancelled) setTranslationLoading(false); });
+
     return () => { cancelled = true; };
   }, [job]);
 
