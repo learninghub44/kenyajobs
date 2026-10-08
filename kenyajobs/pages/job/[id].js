@@ -119,6 +119,62 @@ function timeAgo(dateStr) {
   return `Posted ${d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`;
 }
 
+function normalizeJobSection(value) {
+  if (!value) return "";
+  if (Array.isArray(value)) return value.filter(Boolean).map(String).join("\n");
+  return String(value).trim();
+}
+
+function buildJobSections(job, description) {
+  const sections = [
+    ["Responsibilities", job.responsibilities || job.responsibility || job.duties || job.job_responsibilities],
+    ["Requirements", job.requirements || job.qualifications || job.job_requirements || job.skills_required],
+    ["Benefits", job.benefits || job.job_benefits || job.perks],
+  ].map(([title, value]) => ({ title, content: normalizeJobSection(value) })).filter(x => x.content);
+
+  const raw = String(description || "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h2|h3|h4)>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&");
+
+  const blocks = raw.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  const headingPattern = /^(about (the )?role|job description|description|responsibilities|key responsibilities|duties|requirements|qualifications|what you.?ll do|what we.?re looking for|benefits|perks|what we offer)\s*:?[\s-]*$/i;
+  let current = { title: "Job description", content: [] };
+
+  for (const block of blocks) {
+    const match = block.match(headingPattern);
+    if (match) {
+      if (current.content.length) sections.push({ title: current.title, content: current.content.join("\n") });
+      const key = match[1].toLowerCase();
+      current = {
+        title: /responsib|duties|you.?ll do/.test(key) ? "Responsibilities"
+          : /require|qualif|looking for/.test(key) ? "Requirements"
+          : /benefit|perk|offer/.test(key) ? "Benefits"
+          : "Job description",
+        content: []
+      };
+    } else {
+      current.content.push(block);
+    }
+  }
+  if (current.content.length) sections.push({ title: current.title, content: current.content.join("\n") });
+
+  const unique = [];
+  for (const section of sections) {
+    const content = String(section.content || "").trim();
+    if (content && !unique.some(x => x.title === section.title && x.content === content)) {
+      unique.push({ title: section.title, content });
+    }
+  }
+  return unique;
+}
+
+function SectionContent({ content }) {
+  return <div className="job-prose">{String(content).split(/\n+/).map((line, i) => <p key={i}>{line}</p>)}</div>;
+}
+
 function formatSalary(job) {
   if (job.salary && typeof job.salary === "string") return job.salary;
   const min = job.annualSalaryMin ?? job.job_min_salary ?? job.salary_min;
@@ -318,10 +374,14 @@ export default function JobDetail() {
                 <div className="translation-note muted">Preparing the English version of this listing…</div>
               )}
 
-              <article className="job-description-panel">
-                <div className="job-section-heading"><span /> <h2>Job description</h2></div>
-                <div className="job-prose" dangerouslySetInnerHTML={{ __html: safeDescription }} />
-              </article>
+              {buildJobSections(job, description).map((section, index) => (
+                <article className="job-description-panel" key={section.title + index}>
+                  <div className="job-section-heading"><span /> <h2>{section.title}</h2></div>
+                  {index === 0 && !job.responsibilities && !job.requirements && !job.benefits
+                    ? <div className="job-prose" dangerouslySetInnerHTML={{ __html: safeDescription }} />
+                    : <SectionContent content={section.content} />}
+                </article>
+              ))}
 
               {Array.isArray(job.tags) && job.tags.length > 0 && (
                 <section className="job-description-panel">
