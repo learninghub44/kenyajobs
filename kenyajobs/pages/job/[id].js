@@ -175,7 +175,7 @@ export default function JobDetail() {
   if (notFound || !job) return (
     <>
       <Head>
-        <title>Job Not Found | JobsWorldwide</title>
+        <title>Job Not Found | Online Jobs</title>
       </Head>
       <div className="max-w-lg mx-auto px-4 py-20 text-center">
         <div className="relative w-full max-w-sm mx-auto mb-8 rounded-2xl overflow-hidden">
@@ -248,16 +248,16 @@ export default function JobDetail() {
   return (
     <>
       <Head>
-        <title>{title} at {company} | JobsWorldwide</title>
+        <title>{title} at {company} | Online Jobs</title>
         <meta name="description" content={`Apply for ${title} at ${company}. ${location}.`} />
         <meta property="og:title"       content={`${title} at ${company}`} />
-        <meta property="og:description" content={`${jobType} · ${location} — Apply now on JobsWorldwide`} />
+        <meta property="og:description" content={`${jobType} · ${location} — Apply now on Online Jobs`} />
         <meta property="og:type"        content="website" />
         <meta property="og:url"         content={`https://onlinejobs.christech.co.ke/job/${id}`} />
         <meta property="og:image"       content="https://onlinejobs.christech.co.ke/og-image.jpg" />
         <meta name="twitter:card"       content="summary_large_image" />
         <meta name="twitter:title"      content={`${title} at ${company}`} />
-        <meta name="twitter:description" content={`${jobType} · ${location} — Apply now on JobsWorldwide`} />
+        <meta name="twitter:description" content={`${jobType} · ${location} — Apply now on Online Jobs`} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
