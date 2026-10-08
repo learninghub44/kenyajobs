@@ -53,7 +53,7 @@ export default function Internships() {
   return (
     <>
       <Head>
-        <title>Internships in Kenya & Africa | JobsWorldwide</title>
+        <title>Internships in Kenya & Africa | Online Jobs</title>
         <meta name="description" content="Browse internship opportunities across Kenya, East Africa and globally. Start building your career with hands-on experience." />
       </Head>
 
