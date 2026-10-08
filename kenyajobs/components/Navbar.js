@@ -24,28 +24,13 @@ export default function Navbar() {
 
   return (
     <header className="bg-white border-b border-border sticky top-0 z-50">
-      {/* Top bar */}
-      <div className="bg-navy text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-8 text-xs">
-          <p className="text-gray-300">The future of work gets decided by you. Tell us what matters to your career.</p>
-          <div className="hidden sm:flex items-center gap-4">
-            <a href="mailto:support@christech.co.ke" className="text-gray-300 hover:text-white transition-colors">support@christech.co.ke</a>
-            <span className="text-gray-500">|</span>
-            <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Main nav */}
       <nav className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
 
-          {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0">
             <Image src="/logo-nav.svg" alt="Online Jobs" width={200} height={32} className="h-8 w-auto" priority />
           </Link>
 
-          {/* Desktop nav links */}
           <div className="hidden lg:flex items-center gap-1">
             {NAV_LINKS.map((item) => (
               <div
@@ -79,7 +64,6 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
             <Link
               href="/search"
@@ -104,7 +88,6 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Mobile burger */}
           <button
             className="lg:hidden p-2 text-text-secondary rounded-lg hover:bg-surface-muted transition-colors"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -115,7 +98,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <div className="lg:hidden bg-white border-t border-border px-4 py-4">
           {NAV_LINKS.map((item) => (
