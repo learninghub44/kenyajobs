@@ -1,4 +1,4 @@
-const SITE_URL = "https://kenyajobs.vercel.app";
+const SITE_URL = "https://onlinejobs.christech.co.ke";
 
 const PAGES = [
   { path: "/",                                priority: "1.0", changefreq: "daily"   },
