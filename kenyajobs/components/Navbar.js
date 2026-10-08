@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { Search, Menu, X, ChevronDown, Briefcase, User } from "lucide-react";
+import { Search, Menu, X, ChevronDown, Briefcase } from "lucide-react";
 
 const NAV_LINKS = [
   { label: "Job seeker", href: "#", children: [
@@ -72,13 +72,6 @@ export default function Navbar() {
             >
               <Search size={18} />
             </Link>
-            <Link
-              href="/admin"
-              className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg hover:bg-surface-muted transition-colors"
-            >
-              <User size={16} />
-              Login
-            </Link>
             <a
               href="mailto:support@christech.co.ke?subject=Post a Job"
               className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2"
@@ -127,13 +120,6 @@ export default function Navbar() {
             </div>
           ))}
           <div className="mt-4 pt-4 border-t border-border flex flex-col gap-2">
-            <Link
-              href="/admin"
-              className="flex items-center justify-center gap-2 text-sm font-medium text-text-secondary px-4 py-3 rounded-lg border border-border hover:bg-surface-muted transition-colors"
-            >
-              <User size={16} />
-              Login
-            </Link>
             <a
               href="mailto:support@christech.co.ke?subject=Post a Job"
               className="flex items-center justify-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-3 rounded-lg"
