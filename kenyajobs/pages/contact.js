@@ -6,7 +6,7 @@ const SOCIALS = [
   {
     name: "Instagram",
     handle: "Follow us",
-    href: "https://instagram.com/jobsworldwideke",
+    href: "https://instagram.com/onlinejobske",
     color: "#E1306C",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
@@ -17,7 +17,7 @@ const SOCIALS = [
   {
     name: "Facebook",
     handle: "Follow us",
-    href: "https://facebook.com/jobsworldwideke",
+    href: "https://facebook.com/onlinejobske",
     color: "#1877F2",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
@@ -28,7 +28,7 @@ const SOCIALS = [
   {
     name: "Twitter / X",
     handle: "Follow us",
-    href: "https://twitter.com/jobsworldwideke",
+    href: "https://twitter.com/onlinejobske",
     color: "#000000",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
@@ -39,7 +39,7 @@ const SOCIALS = [
   {
     name: "TikTok",
     handle: "Follow us",
-    href: "https://tiktok.com/@jobsworldwideke",
+    href: "https://tiktok.com/@onlinejobskeke",
     color: "#010101",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
@@ -88,8 +88,8 @@ export default function Contact() {
   return (
     <>
       <Head>
-        <title>Contact Us | JobsWorldwide</title>
-        <meta name="description" content="Get in touch with the JobsWorldwide team." />
+        <title>Contact Us | Online Jobs</title>
+        <meta name="description" content="Get in touch with the Online Jobs team." />
       </Head>
 
       {/* Header */}
@@ -111,12 +111,12 @@ export default function Contact() {
           {/* Email */}
           <div>
             <h2 className="text-lg font-bold text-gray-800 mb-4">Contact Info</h2>
-            <a href="mailto:hello@jobsworldwide.online"
+            <a href="mailto:support@christech.co.ke"
               className="flex items-center gap-3 text-base text-gray-600 hover:text-blue-600 transition-colors">
               <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Mail size={16} className="text-blue-600" />
               </div>
-              hello@jobsworldwide.online
+              support@christech.co.ke
             </a>
           </div>
 
@@ -151,7 +151,7 @@ export default function Contact() {
           <div className="bg-blue-50 rounded-2xl p-5">
             <h3 className="text-base font-semibold text-gray-800 mb-1">Want to post a job?</h3>
             <p className="text-sm text-gray-500 mb-3">Reach thousands of active job seekers across Africa and globally.</p>
-            <a href="mailto:hello@jobsworldwide.online?subject=Post a Job"
+            <a href="mailto:support@christech.co.ke?subject=Post a Job"
               className="text-sm font-semibold text-blue-600 hover:underline">
               Email us to get started →
             </a>
