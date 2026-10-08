@@ -281,6 +281,8 @@ select:focus-visible {
 }
 
 
+.job-search-input { width:100%; min-height:46px; border:1px solid #e1e4e8; background:#fafbfc; color:#303640; padding:0 13px; border-radius:6px; font-size:13px; outline:none; }
+.job-search-input:focus { background:#fff; border-color:#9ca3af; box-shadow:0 0 0 2px rgba(23,26,33,.06); }
 /* ── Online Jobs: production job-board interface ───────────────────────── */
 .job-card {
   display: grid;
