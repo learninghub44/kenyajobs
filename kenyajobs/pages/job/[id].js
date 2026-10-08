@@ -294,27 +294,4 @@ export default function JobDetail() {
       </main>
     </>
   );
-}  useEffect(() => {
-    if (!job) return;
-    const title = job.title || job.job_title || "";
-    const description = job.description || job.job_description || "";
-    const sourceLanguage = job.language || job.lang || job.originalLanguage || "";
-    const detectedLanguage = detectForeignLanguage(title, description, sourceLanguage);
-    if (!detectedLanguage) return;
-
-    let cancelled = false;
-    setTranslationLoading(true);
-    fetch("/api/translate-job", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, language: detectedLanguage })
-    })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (!cancelled && data?.title && data?.description) setTranslatedJob(data);
-      })
-      .catch(() => {})
-      .finally(() => { if (!cancelled) setTranslationLoading(false); });
-
-    return () => { cancelled = true; };
-  }, [job]);
+}
