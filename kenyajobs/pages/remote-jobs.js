@@ -55,7 +55,7 @@ export default function RemoteJobs() {
   return (
     <>
       <Head>
-        <title>Remote Jobs Worldwide - Work From Anywhere | JobsWorldwide</title>
+        <title>Remote Jobs Worldwide - Work From Anywhere | Online Jobs</title>
         <meta name="description" content="Browse the latest remote jobs worldwide. Work from anywhere." />
       </Head>
 
