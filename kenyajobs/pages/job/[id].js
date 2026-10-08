@@ -241,7 +241,7 @@ export default function JobDetail() {
     },
     "employmentType": jobType?.toUpperCase().replace("-", "_") || "FULL_TIME",
     "jobLocationType": isRemote ? "TELECOMMUTE" : undefined,
-    "url": `https://kenyajobs.vercel.app/job/${id}`,
+    "url": `https://onlinejobs.christech.co.ke/job/${id}`,
     "directApply": Boolean(applyUrl),
   };
 
@@ -253,8 +253,8 @@ export default function JobDetail() {
         <meta property="og:title"       content={`${title} at ${company}`} />
         <meta property="og:description" content={`${jobType} · ${location} — Apply now on JobsWorldwide`} />
         <meta property="og:type"        content="website" />
-        <meta property="og:url"         content={`https://kenyajobs.vercel.app/job/${id}`} />
-        <meta property="og:image"       content="https://kenyajobs.vercel.app/og-image.jpg" />
+        <meta property="og:url"         content={`https://onlinejobs.christech.co.ke/job/${id}`} />
+        <meta property="og:image"       content="https://onlinejobs.christech.co.ke/og-image.jpg" />
         <meta name="twitter:card"       content="summary_large_image" />
         <meta name="twitter:title"      content={`${title} at ${company}`} />
         <meta name="twitter:description" content={`${jobType} · ${location} — Apply now on JobsWorldwide`} />
@@ -264,9 +264,9 @@ export default function JobDetail() {
         />
       </Head>
 
-      <div className="bg-gray-50 min-h-screen">
+      <div className="min-h-screen bg-[#F7F8FA] text-slate-900">
         {/* Breadcrumb */}
-        <div className="bg-white border-b border-gray-100">
+        <div className="bg-white border-b border-slate-200">
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-2 text-sm text-gray-500">
             <Link href="/" className="hover:text-blue-600 transition-colors">Home</Link>
             <ChevronRight size={14} />
@@ -274,15 +274,15 @@ export default function JobDetail() {
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="max-w-5xl mx-auto px-4 py-6 sm:py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             {/* Main content */}
             <div className="lg:col-span-2 space-y-5">
 
               {/* Job header card */}
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div className="h-20 sm:h-24" style={{ background: `linear-gradient(135deg, ${bg}, white)` }} />
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_8px_30px_rgba(15,23,42,0.05)] overflow-hidden">
+                <div className="h-2 bg-[#E63946]" />
                 <div className="px-4 sm:px-7 pb-6 sm:pb-7 -mt-10">
                   <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5 mb-6">
                     {/* Company logo */}
