@@ -90,8 +90,17 @@ export default function JobDetail() {
     if (!job) return;
     const title = job.title || job.job_title || "";
     const description = job.description || job.job_description || "";
-    const sourceLanguage = job.language || job.lang || job.originalLanguage;
-    if (!sourceLanguage || String(sourceLanguage).toLowerCase().startsWith("en")) return;
+    const sourceLanguage = job.language || job.lang || job.originalLanguage || "";
+    const sample = (title + " " + description).toLowerCase();
+    const foreignMarkers = [
+      " français ", " français", " español ", " español", " deutsch ", " português ", " italiano ",
+      " arbeiten ", " deutschland ", " experiencia ", " requisitos ", " responsabilidades ",
+      " candidature ", " veuillez ", " poste ", " entreprise ", " emploi ", " compétences ",
+      " trabajo ", " salario ", " beneficios ", " candidato ", " experiencia "
+    ];
+    const looksForeign = foreignMarkers.some(marker => sample.includes(marker)) ||
+      (sourceLanguage && !String(sourceLanguage).toLowerCase().startsWith("en"));
+    if (!looksForeign) return;
     let cancelled = false;
     setTranslationLoading(true);
     fetch("/api/translate-job", {
