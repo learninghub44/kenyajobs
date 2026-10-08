@@ -1,7 +1,7 @@
 {
-  "name": "JobsWorldwide",
-  "short_name": "JobsWorldwide",
-  "description": "Find jobs worldwide — remote, entry level, graduate and work from home.",
+  "name": "Online Jobs",
+  "short_name": "Online Jobs",
+  "description": "Find jobs in Kenya and remote opportunities — entry level, graduate, internship and work from home.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -22,7 +22,7 @@
     { "src": "/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
   ],
   "shortcuts": [
-    { "name": "Remote Jobs",    "url": "/remote-jobs",    "description": "Browse remote jobs worldwide"  },
+    { "name": "Remote Jobs",    "url": "/remote-jobs",    "description": "Browse remote jobs"  },
     { "name": "Entry Level",    "url": "/entry-level",    "description": "Entry level jobs for beginners" },
     { "name": "Graduate Jobs",  "url": "/graduate-jobs",  "description": "Graduate jobs and programmes"  },
     { "name": "Work From Home", "url": "/work-from-home", "description": "Work from home opportunities"  }
