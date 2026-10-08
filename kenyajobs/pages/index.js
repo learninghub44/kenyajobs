@@ -234,14 +234,50 @@ export default function Home() {
 
   const jobPool = search.trim() ? searchJobs : baseJobs;
   const filtered = jobPool.filter(j => {
-    const l   = String(j.location || "").toLowerCase();
-    const tp  = String(j.type || "").toLowerCase();
-    const src = String(j.source || "").toLowerCase();
-    return !activeTab ||
-      (activeTab === "remote" && (l.includes("remote") || tp.includes("remote"))) ||
-      (activeTab === "entry"  && src.includes("entry")) ||
-      (activeTab === "graduate" && src.includes("graduate")) ||
-      (activeTab === "wfh" && (l.includes("home") || tp.includes("home")));
+    const text = [
+      j.title, j.job_title, j.description, j.job_description, j.company,
+      j.company_name, j.category, j.job_function, j.industry, j.department,
+      j.experience, j.experience_level, j.seniority, j.type, j.job_type,
+      j.employment_type, j.location, j.candidate_required_location
+    ].filter(Boolean).join(" ").toLowerCase();
+    const l = String(j.location || j.candidate_required_location || "").toLowerCase();
+    const tp = String(j.type || j.job_type || j.employment_type || "").toLowerCase();
+
+    const categoryMatch =
+      !activeTab ||
+      (activeTab === "remote" && (l.includes("remote") || tp.includes("remote") || text.includes("work from home"))) ||
+      (activeTab === "entry" && /(entry.?level|junior|no experience|graduate trainee|trainee)/i.test(text)) ||
+      (activeTab === "graduate" && /(graduate|fresh graduate|recent graduate)/i.test(text)) ||
+      (activeTab === "wfh" && /(work from home|work-from-home|wfh|remote)/i.test(text));
+
+    const functionMatch =
+      selectedFunction === "Any Job Function" ||
+      text.includes(selectedFunction.toLowerCase()) ||
+      (selectedFunction === "Technology" && /(software|developer|it |information technology|data|cyber|technology)/i.test(text)) ||
+      (selectedFunction === "Finance" && /(finance|accountant|accounting|audit|banking|bookkeep)/i.test(text)) ||
+      (selectedFunction === "Healthcare" && /(health|nurse|clinical|medical|doctor|pharmacy)/i.test(text)) ||
+      (selectedFunction === "Education" && /(teacher|teaching|education|lecturer|tutor|school)/i.test(text)) ||
+      (selectedFunction === "Marketing" && /(marketing|seo|brand|digital marketing|communications)/i.test(text)) ||
+      (selectedFunction === "Sales" && /(sales|business development|account manager)/i.test(text)) ||
+      (selectedFunction === "Engineering" && /(engineer|engineering|civil|mechanical|electrical)/i.test(text)) ||
+      (selectedFunction === "Design" && /(designer|design|ux|ui|creative|graphic)/i.test(text)) ||
+      (selectedFunction === "Customer Service" && /(customer service|customer support|call centre|call center|support agent)/i.test(text));
+
+    const locationMatch =
+      selectedLocation === "Any Location" ||
+      (selectedLocation === "Remote" && (l.includes("remote") || tp.includes("remote") || text.includes("work from home"))) ||
+      (selectedLocation === "Worldwide" && /(worldwide|anywhere|global|world)/i.test(l)) ||
+      (selectedLocation === "Africa" && /(africa|kenya|uganda|tanzania|rwanda|ghana|nigeria|south africa|ethiopia)/i.test(l)) ||
+      l.includes(selectedLocation.toLowerCase());
+
+    const experienceMatch =
+      selectedExperience === "Any Experience Level" ||
+      (selectedExperience === "Entry Level" && /(entry.?level|junior|no experience|0.?2 years|graduate|trainee)/i.test(text)) ||
+      (selectedExperience === "Mid Level" && /(mid.?level|intermediate|2.?5 years|3.?5 years|professional)/i.test(text)) ||
+      (selectedExperience === "Senior Level" && /(senior|lead|principal|manager|director|head of|5\+ years|7\+ years)/i.test(text)) ||
+      (selectedExperience === "Internship" && /(internship|intern\b|attachment|industrial attachment)/i.test(text));
+
+    return categoryMatch && functionMatch && locationMatch && experienceMatch;
   });
 
   const handleSearch = () => {
