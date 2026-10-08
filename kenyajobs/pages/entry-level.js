@@ -58,7 +58,7 @@ export default function EntryLevel() {
   return (
     <>
       <Head>
-        <title>Entry Level Jobs - No Experience Required | JobsWorldwide</title>
+        <title>Entry Level Jobs - No Experience Required | Online Jobs</title>
         <meta name="description" content="Find entry level jobs worldwide. No experience required. Start your career today." />
       </Head>
 
