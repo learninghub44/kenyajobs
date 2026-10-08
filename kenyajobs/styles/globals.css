@@ -429,3 +429,25 @@ a.bg-black:hover { background:var(--primary-hover) !important; color:#fff !impor
 }
 .apply-button svg,
 .button-primary svg { color: #ffffff !important; opacity: 1 !important; }
+
+
+.job-prose p {
+  margin: 0 0 12px;
+  line-height: 1.72;
+}
+.job-prose p:last-child { margin-bottom: 0; }
+.job-prose .job-bullet {
+  display: inline-block;
+  margin-right: 9px;
+  font-weight: 700;
+  color: #2F6B4F;
+}
+.job-prose .job-section-notice {
+  color: #7A857D;
+  font-size: 13px;
+  font-style: italic;
+  padding: 10px 12px;
+  background: #F5F7F2;
+  border: 1px solid #EAEDE8;
+  border-radius: 6px;
+}
