@@ -58,8 +58,8 @@ export default function SitemapPage() {
   return (
     <>
       <Head>
-        <title>Sitemap | JobsWorldwide</title>
-        <meta name="description" content="Browse all pages on JobsWorldwide — job categories, career resources, employer tools, and company information." />
+        <title>Sitemap | Online Jobs</title>
+        <meta name="description" content="Browse all pages on Online Jobs — job categories, career resources, employer tools, and company information." />
         <link rel="canonical" href="https://kenyajobs.vercel.app/sitemap" />
       </Head>
 
@@ -69,7 +69,7 @@ export default function SitemapPage() {
           <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">Site Navigation</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Sitemap</h1>
           <p className="text-base text-gray-500 max-w-xl">
-            A complete overview of every page on JobsWorldwide — jump straight to what you're looking for.
+            A complete overview of every page on Online Jobs — jump straight to what you're looking for.
           </p>
         </div>
       </div>
