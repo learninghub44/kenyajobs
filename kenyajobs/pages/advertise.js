@@ -67,8 +67,8 @@ export default function Advertise() {
   return (
     <>
       <Head>
-        <title>Advertise & Post a Job | JobsWorldwide Kenya</title>
-        <meta name="description" content="Post a job on JobsWorldwide and reach thousands of active Kenyan and African job seekers. Affordable packages for employers of all sizes." />
+        <title>Advertise & Post a Job | Online Jobs Kenya</title>
+        <meta name="description" content="Post a job on Online Jobs and reach thousands of active Kenyan and African job seekers. Affordable packages for employers of all sizes." />
       </Head>
 
       {/* Header */}
@@ -86,7 +86,7 @@ export default function Advertise() {
 
         {/* Why us */}
         <section>
-          <p className="text-xs uppercase tracking-widest text-blue-600 mb-3 font-semibold">Why JobsWorldwide</p>
+          <p className="text-xs uppercase tracking-widest text-blue-600 mb-3 font-semibold">Why Online Jobs</p>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Why employers choose us</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {WHY_US.map(({ icon: Icon, title, body, color, bg }) => (
@@ -124,7 +124,7 @@ export default function Advertise() {
                   ))}
                 </ul>
                 <a
-                  href={`mailto:hello@jobsworldwide.online?subject=${encodeURIComponent(`Advertise - ${pkg.name} Package`)}`}
+                  href={`mailto:hello@onlinejobs.christech.co.ke?subject=${encodeURIComponent(`Advertise - ${pkg.name} Package`)}`}
                   className="text-center font-semibold text-sm py-2.5 px-4 rounded-xl transition-colors border border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   {pkg.cta}
@@ -211,8 +211,8 @@ export default function Advertise() {
           <Mail size={16} className="text-gray-400 flex-shrink-0" />
           <p className="text-sm text-gray-500">
             Prefer email? Reach us directly at{" "}
-            <a href="mailto:hello@jobsworldwide.online" className="text-blue-600 hover:underline font-medium">
-              hello@jobsworldwide.online
+            <a href="mailto:hello@onlinejobs.christech.co.ke" className="text-blue-600 hover:underline font-medium">
+              hello@onlinejobs.christech.co.ke
             </a>{" "}
             and we'll respond within 1 business day.
           </p>
