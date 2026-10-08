@@ -1,6 +1,6 @@
 // utils/api.js — Public API client for Online Jobs
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "https://onlinejobs.christech.co.ke").replace(/\/$/, "");
-// Routes through internal Next.js API routes to avoid CORS and hide keys
+// All public API requests use the official Online Jobs API origin.
 
 // ─────────────────────────────────────────
 // 1. REMOTIVE — Remote Jobs (No key needed)
@@ -8,8 +8,8 @@ const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "https://onlinejobs.ch
 export async function fetchRemoteJobs(category = "") {
   try {
     const url = category
-      ? `/api/remote-jobs?category=${category}`
-      : `/api/remote-jobs`;
+      ? `${API_BASE}/api/remote-jobs?category=${encodeURIComponent(category)}`
+      : `${API_BASE}/api/remote-jobs`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("Remotive fetch failed");
     return await res.json();
