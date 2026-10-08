@@ -49,23 +49,23 @@ export default function Footer() {
               <Link href="/">
                 <img
                   src="/logo-nav.svg"
-                  alt="JobsWorldwide"
+                  alt="Online Jobs"
                   style={{ height: "32px", width: "auto", filter: "brightness(0) invert(1)" }}
                 />
               </Link>
             </div>
 
             <p className="text-sm leading-relaxed mb-5 text-gray-400">
-              Aggregating live job listings from 30+ boards so you spend less time searching and more time applying.
+              A practical job discovery platform for Kenya and remote opportunities. Find roles, compare opportunities and apply through the original source.
             </p>
 
             <div className="space-y-2 mb-5">
               <a
-                href="mailto:hello@jobsworldwide.online"
+                href="mailto:support@christech.co.ke"
                 className="flex items-center gap-2 text-sm hover:text-white transition-colors"
               >
                 <Mail size={14} />
-                hello@jobsworldwide.online
+                hello@onlinejobs.christech.co.ke
               </a>
               <a
                 href="tel:+254701059192"
@@ -145,7 +145,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
-          <p>{new Date().getFullYear()} JobsWorldwide. All rights reserved.</p>
+          <p>{new Date().getFullYear()} Online Jobs. All rights reserved.</p>
           <div className="flex flex-wrap gap-5">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms</Link>
