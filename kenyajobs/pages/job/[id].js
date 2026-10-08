@@ -123,7 +123,7 @@ function cleanSectionText(value) {
   if (!value) return "";
   let text = Array.isArray(value) ? value.filter(Boolean).map(String).join("\n") : String(value);
   return text
-    .replace(/<br\s*\\/?>(?=\\S)/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/(p|div|li|h2|h3|h4)>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/gi, " ")
@@ -131,7 +131,7 @@ function cleanSectionText(value) {
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'")
     .replace(/[ \t]+/g, " ")
-    .replace(/\n[ \\t]+/g, "\n")
+    .replace(/\n[ \t]+/g, "\n")
     .trim();
 }
 
