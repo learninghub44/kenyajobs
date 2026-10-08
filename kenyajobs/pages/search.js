@@ -40,7 +40,7 @@ export default function SearchResults() {
   return (
     <>
       <Head>
-        <title>{q ? `"${q}" Jobs` : "Search Jobs"} | JobsWorldwide</title>
+        <title>{q ? `"${q}" Jobs` : "Search Jobs"} | Online Jobs</title>
         <meta name="description" content="Search thousands of jobs worldwide by title, company, or keyword." />
       </Head>
 
