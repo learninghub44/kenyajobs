@@ -145,7 +145,25 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
-          <p>{new Date().getFullYear()} Online Jobs. All rights reserved.</p>
+          <div className="text-center sm:text-left space-y-1.5">
+            <p>{new Date().getFullYear()} Online Jobs. All rights reserved.</p>
+            <p>
+              Built by{" "}
+              <a
+                href="https://www.christech.co.ke"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-white transition-colors font-medium"
+              >
+                ChrisTech
+              </a>
+              {" "}— need a website or web app?{" "}
+              <Link href="/contact" className="text-gray-300 hover:text-white transition-colors font-medium">
+                Reach us out
+              </Link>
+              .
+            </p>
+          </div>
           <div className="flex flex-wrap gap-5">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms</Link>
