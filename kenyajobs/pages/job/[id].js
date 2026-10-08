@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -93,10 +92,15 @@ export default function JobDetail() {
     const sourceLanguage = job.language || job.lang || job.originalLanguage || "";
     const sample = (title + " " + description).toLowerCase();
     const foreignMarkers = [
-      " français ", " français", " español ", " español", " deutsch ", " português ", " italiano ",
-      " arbeiten ", " deutschland ", " experiencia ", " requisitos ", " responsabilidades ",
-      " candidature ", " veuillez ", " poste ", " entreprise ", " emploi ", " compétences ",
-      " trabajo ", " salario ", " beneficios ", " candidato ", " experiencia "
+      " français ", " français", " espagnol ", " español ", " deutsch ", " deutsche ", " português ", " portugues ",
+      " italiano ", " nederlands ", " svenska ", " norsk ", " dansk ", " suomi ", " polski ", " čeština ",
+      " română ", " magyar ", " ελληνικά ", " русский ", " українська ", " العربية ", " 中文 ", " 日本語 ",
+      " travailler ", " arbeiten ", " deutschland ", " experiencia ", " requisitos ", " responsabilidades ",
+      " candidatura ", " candidature ", " veuillez ", " poste ", " entreprise ", " emploi ", " compétences ",
+      " trabajo ", " salario ", " beneficios ", " candidato ", " habilidades ", " requisitos ", " ofertas ",
+      " oferta ", " empleo ", " gesucht ", " bewerbung ", " aufgaben ", " anforderungen ", " qualifikationen ",
+      " vacante ", " rémunération ", " salaire ", " avantages ", " compétences ", " expérience ", " formation ",
+      " contrat ", " mission ", " recrutement ", " sociedad ", " empresa ", " puesto "
     ];
     const looksForeign = foreignMarkers.some(marker => sample.includes(marker)) ||
       (sourceLanguage && !String(sourceLanguage).toLowerCase().startsWith("en"));
@@ -129,7 +133,6 @@ export default function JobDetail() {
   if (notFound || !job) return (
     <main className="job-detail-page">
       <div className="job-not-found">
-        <Image src="/dream-job-signpost.jpg" alt="" width={640} height={426} className="job-not-found-image" />
         <h1>Job no longer available</h1>
         <p>This listing may have expired, been filled, or been removed from its original source.</p>
         <Link href="/" className="button-primary">Browse current jobs</Link>
