@@ -119,60 +119,117 @@ function timeAgo(dateStr) {
   return `Posted ${d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`;
 }
 
-function normalizeJobSection(value) {
+function cleanSectionText(value) {
   if (!value) return "";
-  if (Array.isArray(value)) return value.filter(Boolean).map(String).join("\n");
-  return String(value).trim();
+  let text = Array.isArray(value) ? value.filter(Boolean).map(String).join("\n") : String(value);
+  return text
+    .replace(/<br\\s*\\/?>(?=\\S)/gi, "\n")
+    .replace(/<\\/(p|div|li|h2|h3|h4)>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/[ \\t]+/g, " ")
+    .replace(/\\n[ \\t]+/g, "\n")
+    .trim();
+}
+
+function splitSectionItems(value) {
+  const text = cleanSectionText(value);
+  if (!text) return [];
+  return text
+    .split(/(?:\\n+|\\s*[•●▪◦]\\s*|\\s*(?:^|\\n)\\s*[-–—]\\s+|\\s*;\\s+)/)
+    .map(item => item.replace(/^[-–—•●▪◦]+\\s*/, "").trim())
+    .filter(item => item.length > 1);
+}
+
+function classifyDescription(rawDescription) {
+  const raw = cleanSectionText(rawDescription);
+  const lines = raw.split(/\\n+/).map(s => s.trim()).filter(Boolean);
+  const headingPattern = /^(about(?: the)? role|job description|description|role overview|overview|responsibilities|key responsibilities|duties|what you.?ll do|requirements|qualifications|job requirements|what we.?re looking for|skills|skills required|experience|education|benefits|perks|what we offer|we offer)\\s*:?\\s*$/i;
+  const buckets = {
+    "Job description": [],
+    "Responsibilities": [],
+    "Requirements": [],
+    "Benefits": []
+  };
+  let current = "Job description";
+
+  for (const line of lines) {
+    const heading = line.match(headingPattern);
+    if (heading) {
+      const key = heading[1].toLowerCase();
+      current = /responsib|duties|you.?ll do/.test(key)
+        ? "Responsibilities"
+        : /require|qualif|skill|experience|education|looking for/.test(key)
+          ? "Requirements"
+          : /benefit|perk|offer/.test(key)
+            ? "Benefits"
+            : "Job description";
+      continue;
+    }
+    buckets[current].push(line);
+  }
+
+  return Object.fromEntries(Object.entries(buckets)
+    .map(([title, items]) => [title, items.join("\n").trim()])
+    .filter(([, content]) => content));
 }
 
 function buildJobSections(job, description) {
-  const sections = [
-    ["Responsibilities", job.responsibilities || job.responsibility || job.duties || job.job_responsibilities],
-    ["Requirements", job.requirements || job.qualifications || job.job_requirements || job.skills_required],
-    ["Benefits", job.benefits || job.job_benefits || job.perks],
-  ].map(([title, value]) => ({ title, content: normalizeJobSection(value) })).filter(x => x.content);
+  const classified = classifyDescription(description);
 
-  const raw = String(description || "")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/(p|div|li|h2|h3|h4)>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&");
+  const explicit = {
+    "Responsibilities": job.responsibilities || job.responsibility || job.duties || job.job_responsibilities,
+    "Requirements": job.requirements || job.qualifications || job.job_requirements || job.skills_required,
+    "Benefits": job.benefits || job.job_benefits || job.perks
+  };
 
-  const blocks = raw.split(/\n+/).map(s => s.trim()).filter(Boolean);
-  const headingPattern = /^(about (the )?role|job description|description|responsibilities|key responsibilities|duties|requirements|qualifications|what you.?ll do|what we.?re looking for|benefits|perks|what we offer)\s*:?[\s-]*$/i;
-  let current = { title: "Job description", content: [] };
+  for (const [title, value] of Object.entries(explicit)) {
+    if (value) classified[title] = cleanSectionText(value);
+  }
 
-  for (const block of blocks) {
-    const match = block.match(headingPattern);
-    if (match) {
-      if (current.content.length) sections.push({ title: current.title, content: current.content.join("\n") });
-      const key = match[1].toLowerCase();
-      current = {
-        title: /responsib|duties|you.?ll do/.test(key) ? "Responsibilities"
-          : /require|qualif|looking for/.test(key) ? "Requirements"
-          : /benefit|perk|offer/.test(key) ? "Benefits"
-          : "Job description",
-        content: []
-      };
-    } else {
-      current.content.push(block);
+  const sections = [];
+  for (const title of ["Job description", "Responsibilities", "Requirements", "Benefits"]) {
+    const content = classified[title];
+    if (!content) continue;
+    const items = splitSectionItems(content);
+    sections.push({
+      title,
+      items: items.length > 1 ? items : [content]
+    });
+  }
+
+  // Do not invent benefits or requirements. If the source does not provide them,
+  // show a clear source-status message rather than misleading applicants.
+  for (const title of ["Responsibilities", "Requirements", "Benefits"]) {
+    if (!sections.some(section => section.title === title)) {
+      sections.push({
+        title,
+        items: [`${title} were not provided in the original listing.`]
+      });
     }
   }
-  if (current.content.length) sections.push({ title: current.title, content: current.content.join("\n") });
 
-  const unique = [];
-  for (const section of sections) {
-    const content = String(section.content || "").trim();
-    if (content && !unique.some(x => x.title === section.title && x.content === content)) {
-      unique.push({ title: section.title, content });
-    }
-  }
-  return unique;
+  return sections;
 }
 
-function SectionContent({ content }) {
-  return <div className="job-prose">{String(content).split(/\n+/).map((line, i) => <p key={i}>{line}</p>)}</div>;
+function SectionContent({ items }) {
+  return (
+    <div className="job-prose">
+      {items.map((item, i) => {
+        const text = String(item).trim();
+        const isNotice = /were not provided in the original listing\\.$/i.test(text);
+        return (
+          <p key={i} className={isNotice ? "job-section-notice" : undefined}>
+            {!isNotice && items.length > 1 ? <span className="job-bullet" aria-hidden="true">•</span> : null}
+            {text}
+          </p>
+        );
+      })}
+    </div>
+  );
 }
 
 function formatSalary(job) {
@@ -377,9 +434,7 @@ export default function JobDetail() {
               {buildJobSections(job, description).map((section, index) => (
                 <article className="job-description-panel" key={section.title + index}>
                   <div className="job-section-heading"><span /> <h2>{section.title}</h2></div>
-                  {index === 0 && !job.responsibilities && !job.requirements && !job.benefits
-                    ? <div className="job-prose" dangerouslySetInnerHTML={{ __html: safeDescription }} />
-                    : <SectionContent content={section.content} />}
+                  <SectionContent items={section.items} />
                 </article>
               ))}
 
