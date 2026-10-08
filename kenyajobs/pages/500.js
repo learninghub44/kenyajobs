@@ -24,8 +24,8 @@ export default function ServerError() {
         </div>
         <p className="mt-8 text-sm text-gray-400">
           If the problem persists, email us at{" "}
-          <a href="mailto:hello@jobsworldwide.online" className="text-blue-600 hover:underline inline-flex items-center gap-1">
-            <Mail size={13} /> hello@jobsworldwide.online
+          <a href="mailto:hello@onlinejobs.christech.co.ke" className="text-blue-600 hover:underline inline-flex items-center gap-1">
+            <Mail size={13} /> hello@onlinejobs.christech.co.ke
           </a>
         </p>
       </div>
