@@ -6,6 +6,77 @@ import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
 import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2 } from "lucide-react";
 
+
+function normalizeDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function schemaEmploymentType(type = "") {
+  const value = String(type).toLowerCase();
+  if (value.includes("full")) return "FULL_TIME";
+  if (value.includes("part")) return "PART_TIME";
+  if (value.includes("contract") || value.includes("freelance")) return "CONTRACTOR";
+  if (value.includes("temporary")) return "TEMPORARY";
+  if (value.includes("intern")) return "INTERN";
+  return null;
+}
+
+function buildJobPostingSchema(job, { title, description, company, location, type, remote, logo, applyUrl, salary }) {
+  const posted = normalizeDate(job.date || job.publication_date || job.job_posted_at_datetime_utc);
+  const min = job.annualSalaryMin ?? job.job_min_salary ?? job.salary_min;
+  const max = job.annualSalaryMax ?? job.job_max_salary ?? job.salary_max;
+  const currency = job.salaryCurrency || job.job_salary_currency || "";
+  const employmentType = schemaEmploymentType(type);
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title,
+    description: String(description).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim(),
+    url: `https://onlinejobs.christech.co.ke/job/${encodeURIComponent(job.id || job.job_id || "")}`,
+    hiringOrganization: {
+      "@type": "Organization",
+      name: String(company)
+    }
+  };
+
+  if (posted) schema.datePosted = posted;
+  if (logo) schema.hiringOrganization.logo = logo;
+  if (employmentType) schema.employmentType = employmentType;
+
+  if (remote) {
+    schema.jobLocationType = "TELECOMMUTE";
+  } else {
+    schema.jobLocation = {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: String(location)
+      }
+    };
+  }
+
+  if (min != null || max != null) {
+    const salaryValue = {};
+    if (min != null) salaryValue.minValue = Number(min);
+    if (max != null) salaryValue.maxValue = Number(max);
+    if (currency) salaryValue.currency = currency;
+    schema.baseSalary = {
+      "@type": "MonetaryAmount",
+      ...salaryValue,
+      value: {
+        "@type": "QuantitativeValue",
+        ...(min != null ? { minValue: Number(min) } : {}),
+        ...(max != null ? { maxValue: Number(max) } : {}),
+        ...(currency ? { unitText: "YEAR", currency } : {})
+      }
+    };
+  }
+
+  return schema;
+}
+
 function detectForeignLanguage(title = "", description = "", explicit = "") {
   const value = ` ${String(title)} ${String(description)} `.toLowerCase().replace(/<[^>]*>/g, " ");
   const declared = String(explicit || "").toLowerCase().trim();
@@ -175,6 +246,11 @@ export default function JobDetail() {
   const salary = formatSalary(job);
   const remote = location.toLowerCase().includes("remote") || type.toLowerCase().includes("remote");
   const logo = job.companyLogo || job.company_logo || job.employer_logo;
+  const canonicalUrl = `https://onlinejobs.christech.co.ke/job/${encodeURIComponent(id)}`;
+  const jobPostingSchema = buildJobPostingSchema(job, {
+    title, description, company, location, type, remote, logo, applyUrl, salary
+  });
+
   const safeDescription = typeof window !== "undefined"
     ? DOMPurify.sanitize(description, { ALLOWED_TAGS: ["p","br","ul","ol","li","strong","em","b","i","h2","h3","h4","a"], ALLOWED_ATTR: ["href","target","rel"] })
     : String(description).replace(/<script[\\s\\S]*?<\/script>/gi, "");
@@ -197,7 +273,15 @@ export default function JobDetail() {
         <meta name="description" content={`Apply for ${title} at ${company}. ${location}.`} />
         <meta property="og:title" content={`${title} at ${company}`} />
         <meta property="og:description" content={`${type} · ${location} — Online Jobs`} />
-        <meta property="og:url" content={`https://onlinejobs.christech.co.ke/job/${id}`} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta name="robots" content="index,follow,max-image-preview:large" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={logo || "https://onlinejobs.christech.co.ke/og-image.jpg"} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingSchema) }}
+        />
       </Head>
 
       <main className="job-detail-page">
