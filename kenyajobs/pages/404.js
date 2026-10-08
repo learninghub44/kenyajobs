@@ -7,7 +7,7 @@ export default function Custom404() {
   return (
     <>
       <Head>
-        <title>Page Not Found | JobsWorldwide</title>
+        <title>Page Not Found | Online Jobs</title>
         <meta name="robots" content="noindex" />
       </Head>
       <div className="max-w-lg mx-auto px-4 py-20 text-center">
