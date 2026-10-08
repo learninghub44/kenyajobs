@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
 import {
   Globe, Search, ShieldCheck, Zap, Mail, Users, Briefcase,
@@ -74,12 +73,7 @@ export default function About() {
       {/* ── PAGE HEADER ── */}
       <div className="relative bg-[#0b2233] text-white overflow-hidden">
         <div className="absolute inset-0">
-          <Image
-            src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1400&q=80&auto=format&fit=crop"
-            alt="Team working together"
-            fill className="object-cover opacity-20"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0b2233]/90 to-[#0b2233]/60" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0b2233]/90 to-[#0b2233]/60" />
         </div>
         <div className="relative max-w-4xl mx-auto px-6 py-20">
           <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">About us</p>
