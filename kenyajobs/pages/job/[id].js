@@ -283,27 +283,27 @@ export default function JobDetail() {
               {/* Job header card */}
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 <div className="h-20 sm:h-24" style={{ background: `linear-gradient(135deg, ${bg}, white)` }} />
-                <div className="px-7 pb-7 -mt-10">
-                  <div className="flex items-start gap-5 mb-6">
+                <div className="px-4 sm:px-7 pb-6 sm:pb-7 -mt-10">
+                  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5 mb-6">
                     {/* Company logo */}
                     {logoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={logoUrl}
                         alt={company}
-                        className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 border-4 border-white shadow-md bg-white"
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover flex-shrink-0 border-4 border-white shadow-md bg-white"
                         onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }}
                       />
                     ) : null}
-                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center font-bold text-2xl flex-shrink-0 border-4 border-white shadow-md"
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center font-bold text-2xl flex-shrink-0 border-4 border-white shadow-md"
                       style={{ backgroundColor: bg, color: fg, display: logoUrl ? "none" : "flex" }}>
                       {company.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0 pt-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-semibold text-sm mb-0.5" style={{ color: fg }}>{company}</p>
-                          <h1 className="text-2xl font-extrabold text-gray-900 leading-tight">{title}</h1>
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 min-w-0">
+                        <div className="min-w-0 w-full">
+                          <p className="font-semibold text-sm mb-0.5 break-words" style={{ color: fg }}>{company}</p>
+                          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight break-words [overflow-wrap:anywhere]">{title}</h1>
                           {source && <p className="text-xs text-gray-400 mt-1">via {source}</p>}
                         </div>
                         <ShareBar
