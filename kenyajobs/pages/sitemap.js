@@ -60,7 +60,7 @@ export default function SitemapPage() {
       <Head>
         <title>Sitemap | Online Jobs</title>
         <meta name="description" content="Browse all pages on Online Jobs — job categories, career resources, employer tools, and company information." />
-        <link rel="canonical" href="https://kenyajobs.vercel.app/sitemap" />
+        <link rel="canonical" href="https://onlinejobs.christech.co.ke/sitemap" />
       </Head>
 
       {/* Header */}
