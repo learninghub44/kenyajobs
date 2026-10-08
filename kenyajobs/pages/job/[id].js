@@ -6,6 +6,37 @@ import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
 import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2 } from "lucide-react";
 
+function detectForeignLanguage(title = "", description = "", explicit = "") {
+  const value = ` ${String(title)} ${String(description)} `.toLowerCase().replace(/<[^>]*>/g, " ");
+  const declared = String(explicit || "").toLowerCase().trim();
+  if (declared && !/^(en|eng|english)([-_]|$)/.test(declared)) return declared;
+
+  const scripts = [
+    ["ar", /[\u0600-\u06ff]/],
+    ["zh", /[\u4e00-\u9fff]/],
+    ["ja", /[\u3040-\u30ff]/],
+    ["ru", /[\u0400-\u04ff]/],
+    ["el", /[\u0370-\u03ff]/]
+  ];
+  for (const [language, pattern] of scripts) if (pattern.test(value)) return language;
+
+  const languages = {
+    fr: [" veuillez ", " poste ", " entreprise ", " emploi ", " compétences ", " candidature ", " salaire ", " expérience ", " formation ", " recrutement ", " rémunération ", " avantages ", " travailler ", " responsable ", " recherché "],
+    es: [" experiencia ", " requisitos ", " responsabilidades ", " trabajo ", " salario ", " beneficios ", " candidato ", " habilidades ", " ofertas ", " oferta ", " empleo ", " vacante ", " empresa ", " puesto ", " buscamos ", " conocimientos "],
+    de: [" arbeiten ", " deutschland ", " gesucht ", " bewerbung ", " aufgaben ", " anforderungen ", " qualifikationen ", " erfahrung ", " unternehmen ", " gehalt ", " stellenangebot ", " berufserfahrung "],
+    pt: [" português ", " portugues ", " experiência ", " requisitos ", " responsabilidades ", " candidatura ", " salário ", " benefícios ", " empresa ", " vaga ", " trabalho "],
+    it: [" italiano ", " esperienza ", " requisiti ", " responsabilità ", " candidatura ", " stipendio ", " azienda ", " lavoro ", " posizione "],
+    nl: [" nederlands ", " ervaring ", " vereisten ", " verantwoordelijkheden ", " sollicitatie ", " salaris ", " bedrijf ", " vacature "]
+  };
+
+  let best = { language: "", score: 0 };
+  for (const [language, words] of Object.entries(languages)) {
+    const score = words.reduce((n, word) => n + (value.includes(word) ? 1 : 0), 0);
+    if (score > best.score) best = { language, score };
+  }
+  return best.score >= 2 ? best.language : "";
+}
+
 function timeAgo(dateStr) {
   if (!dateStr) return "Recently posted";
   const d = new Date(dateStr);
@@ -271,4 +302,27 @@ export default function JobDetail() {
       </main>
     </>
   );
-}
+}  useEffect(() => {
+    if (!job) return;
+    const title = job.title || job.job_title || "";
+    const description = job.description || job.job_description || "";
+    const sourceLanguage = job.language || job.lang || job.originalLanguage || "";
+    const detectedLanguage = detectForeignLanguage(title, description, sourceLanguage);
+    if (!detectedLanguage) return;
+
+    let cancelled = false;
+    setTranslationLoading(true);
+    fetch("/api/translate-job", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description, language: detectedLanguage })
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!cancelled && data?.title && data?.description) setTranslatedJob(data);
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setTranslationLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [job]);
