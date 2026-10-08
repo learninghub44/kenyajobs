@@ -260,7 +260,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>JobsWorldwide — Find Jobs in Africa, Remote & Worldwide</title>
+        <title>Online Jobs — Find Jobs in Africa, Remote & Worldwide</title>
         <meta name="description" content="Find your dream job worldwide. Thousands of opportunities across Africa, Europe, Asia and beyond — remote, entry level, graduate and work from home." />
       </Head>
 
@@ -432,7 +432,7 @@ export default function Home() {
               <h2 className="text-xl font-bold text-white mb-1">Post a job — reach thousands of active candidates</h2>
               <p className="text-gray-300 text-sm max-w-md">Africa, East Africa, and global remote audiences — direct placements, no recruiter fees.</p>
             </div>
-            <a href="mailto:hello@jobsworldwide.online?subject=Post a Job"
+            <a href="mailto:hello@onlinejobs.christech.co.ke?subject=Post a Job"
               className="flex-shrink-0 bg-primary hover:bg-primary-hover text-white font-semibold px-6 py-3 rounded-lg transition-colors text-sm whitespace-nowrap flex items-center gap-2">
               <Briefcase size={16} />
               Get in touch
@@ -582,7 +582,7 @@ export default function Home() {
                 <span className="text-primary">Add to your home screen.</span>
               </h2>
               <p className="text-text-secondary text-base mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed">
-                JobsWorldwide works as a full app on your phone — no download required.
+                Online Jobs works as a full app on your phone — no download required.
                 Browse thousands of live jobs, get instant search, and apply in seconds.
               </p>
 
@@ -635,7 +635,7 @@ export default function Home() {
                         <div className="w-5 h-5 bg-primary rounded-md flex items-center justify-center">
                           <span className="text-white text-[8px] font-bold">JW</span>
                         </div>
-                        <span className="text-text-primary text-[8px] font-bold">JobsWorldwide</span>
+                        <span className="text-text-primary text-[8px] font-bold">Online Jobs</span>
                       </div>
                       <div className="bg-surface-muted rounded-lg px-2 py-1.5 flex items-center gap-1.5 border border-border">
                         <Search size={8} className="text-text-tertiary" />
