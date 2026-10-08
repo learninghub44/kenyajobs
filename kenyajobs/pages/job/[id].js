@@ -151,7 +151,7 @@ export default function JobDetail() {
   const logo = job.companyLogo || job.company_logo || job.employer_logo;
   const safeDescription = typeof window !== "undefined"
     ? DOMPurify.sanitize(description, { ALLOWED_TAGS: ["p","br","ul","ol","li","strong","em","b","i","h2","h3","h4","a"], ALLOWED_ATTR: ["href","target","rel"] })
-    : String(description).replace(/<script[\\s\\S]*?<\\/script>/gi, "");
+    : String(description).replace(/<script[\\s\\S]*?<\/script>/gi, "");
 
   const copyLink = async () => {
     try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch {}
