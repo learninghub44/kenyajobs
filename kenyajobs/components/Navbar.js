@@ -29,7 +29,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-8 text-xs">
           <p className="text-gray-300">The future of work gets decided by you. Tell us what matters to your career.</p>
           <div className="hidden sm:flex items-center gap-4">
-            <a href="mailto:hello@jobsworldwide.online" className="text-gray-300 hover:text-white transition-colors">hello@jobsworldwide.online</a>
+            <a href="mailto:support@christech.co.ke" className="text-gray-300 hover:text-white transition-colors">hello@onlinejobs.christech.co.ke</a>
             <span className="text-gray-500">|</span>
             <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link>
           </div>
@@ -42,7 +42,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0">
-            <Image src="/logo-nav.svg" alt="JobsWorldwide" width={200} height={32} className="h-8 w-auto" priority />
+            <Image src="/logo-nav.svg" alt="Online Jobs" width={200} height={32} className="h-8 w-auto" priority />
           </Link>
 
           {/* Desktop nav links */}
@@ -96,7 +96,7 @@ export default function Navbar() {
               Login
             </Link>
             <a
-              href="mailto:hello@jobsworldwide.online?subject=Post a Job"
+              href="mailto:hello@onlinejobs.christech.co.ke?subject=Post a Job"
               className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2"
             >
               <Briefcase size={16} />
@@ -153,7 +153,7 @@ export default function Navbar() {
               Login
             </Link>
             <a
-              href="mailto:hello@jobsworldwide.online?subject=Post a Job"
+              href="mailto:hello@onlinejobs.christech.co.ke?subject=Post a Job"
               className="flex items-center justify-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-3 rounded-lg"
             >
               <Briefcase size={16} />
