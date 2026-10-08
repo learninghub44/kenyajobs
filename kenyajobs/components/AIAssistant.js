@@ -208,6 +208,8 @@ export default function AIAssistant() {
   const [rateInfo, setRateInfo]       = useState({ remaining: 10, limited: false });
   const [copied, setCopied]           = useState(false);
   const [matchResults, setMatchResults] = useState(null); // { summary, matches[] }
+  const [dragPosition, setDragPosition] = useState(null);
+  const dragRef = useRef(null);
 
   // Avoid overlapping the cookie consent banner (fixed bottom-0, full-width) on first visit
   const [cookieBannerVisible, setCookieBannerVisible] = useState(false);
@@ -237,6 +239,34 @@ export default function AIAssistant() {
   );
 
   const messagesEndRef = useRef(null);
+
+  const startDrag = useCallback((e) => {
+    if (e.target.closest("button, input, textarea, a")) return;
+    const point = e.touches ? e.touches[0] : e;
+    const node = dragRef.current;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    const startX = point.clientX, startY = point.clientY;
+    const startLeft = rect.left, startTop = rect.top;
+    const move = (ev) => {
+      const p = ev.touches ? ev.touches[0] : ev;
+      if (ev.cancelable) ev.preventDefault();
+      setDragPosition({
+        left: Math.max(8, Math.min(window.innerWidth - rect.width - 8, startLeft + p.clientX - startX)),
+        top: Math.max(8, Math.min(window.innerHeight - rect.height - 8, startTop + p.clientY - startY)),
+      });
+    };
+    const stop = () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", stop);
+      window.removeEventListener("touchmove", move);
+      window.removeEventListener("touchend", stop);
+    };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", stop);
+    window.addEventListener("touchmove", move, { passive: false });
+    window.addEventListener("touchend", stop);
+  }, []);
   const inputRef       = useRef(null);
   const recognitionRef = useRef(null);
   const synthRef       = useRef(null);
@@ -493,10 +523,16 @@ export default function AIAssistant() {
 
       {/* ── Chat window ── */}
       {open && (
-        <div className={`fixed ${dockOffset} right-6 z-50 w-[400px] max-w-[calc(100vw-16px)] bg-white rounded-2xl shadow-2xl border border-gray-200/80 flex flex-col overflow-hidden transition-all duration-300 ${winHeight}`}>
+        <div
+          ref={dragRef}
+          onMouseDown={startDrag}
+          onTouchStart={startDrag}
+          style={dragPosition ? { left: dragPosition.left, top: dragPosition.top, right: "auto", bottom: "auto" } : undefined}
+          className={`fixed ${dragPosition ? "" : `${dockOffset} right-6`} z-50 w-[400px] max-w-[calc(100vw-16px)] bg-white rounded-2xl shadow-2xl border border-gray-200/80 flex flex-col overflow-hidden transition-all duration-300 ${winHeight}`}
+        >
 
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 flex-shrink-0">
+          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 flex-shrink-0 cursor-move select-none touch-none">
             <div className="flex items-center gap-3">
               <div className="relative w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center shadow-inner">
                 <AIBotIcon size={19} className="text-white" />
