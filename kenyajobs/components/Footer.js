@@ -65,7 +65,7 @@ export default function Footer() {
                 className="flex items-center gap-2 text-sm hover:text-white transition-colors"
               >
                 <Mail size={14} />
-                hello@onlinejobs.christech.co.ke
+                support@christech.co.ke
               </a>
               <a
                 href="tel:+254701059192"
