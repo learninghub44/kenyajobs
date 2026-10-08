@@ -6,12 +6,12 @@
    ────────────────────────────────────────────────────────────────────── */
 :root {
   /* Core palette — professional job board */
-  --background: #F5F5F5;
+  --background: #F7F8FA;
   --foreground: #1A1A2E;
 
   /* Surfaces */
   --surface: #FFFFFF;
-  --surface-muted: #F8F9FA;
+  --surface-muted: #F3F5F7;
   --surface-hover: #F0F0F0;
 
   /* Text */
@@ -157,7 +157,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: "Inter", var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 1rem;
