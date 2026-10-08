@@ -1,5 +1,5 @@
 <svg width="220" height="40" viewBox="0 0 220 40" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>JobsWorldwide</title>
+  <title>Online Jobs</title>
   <defs>
     <clipPath id="gcn">
       <circle cx="20" cy="20" r="18"/>
@@ -30,8 +30,8 @@
     font-family="'DM Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif"
     font-size="18" font-weight="700" fill="#1B1812" letter-spacing="-0.3">Jobs</text>
 
-  <!-- "Worldwide" -->
+  <!-- "Online Jobs" -->
   <text x="47" y="31"
     font-family="'IBM Plex Mono', ui-monospace, monospace"
-    font-size="9" font-weight="500" fill="#A32B1F" letter-spacing="2.2">WORLDWIDE</text>
+    font-size="9" font-weight="500" fill="#A32B1F" letter-spacing="2.2">ONLINE JOBS</text>
 </svg>
