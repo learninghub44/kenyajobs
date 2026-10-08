@@ -327,7 +327,7 @@ export default function Home() {
               <h2 className="text-xl font-bold text-white mb-1">Post a job — reach thousands of active candidates</h2>
               <p className="text-gray-300 text-sm max-w-md">Africa, East Africa, and global remote audiences — direct placements, no recruiter fees.</p>
             </div>
-            <a href="mailto:hello@onlinejobs.christech.co.ke?subject=Post a Job"
+            <a href="mailto:support@christech.co.ke?subject=Post a Job"
               className="flex-shrink-0 bg-primary hover:bg-primary-hover text-white font-semibold px-6 py-3 rounded-lg transition-colors text-sm whitespace-nowrap flex items-center gap-2">
               <Briefcase size={16} />
               Get in touch
