@@ -285,32 +285,33 @@ select:focus-visible {
 .job-search-input:focus { background:#fff; border-color:#9ca3af; box-shadow:0 0 0 2px rgba(23,26,33,.06); }
 /* ── Online Jobs: production job-board interface ───────────────────────── */
 .job-card {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
+  display: flex;
+  align-items: flex-start;
   gap: 18px;
   width: 100%;
-  padding: 20px 22px;
+  padding: 18px 20px;
   background: #fff;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 6px;
   color: inherit;
-  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+  transition: border-color .16s ease, background-color .16s ease;
 }
-.job-card:hover { border-color: #b8bec8; box-shadow: 0 8px 24px rgba(15,23,42,.06); transform: translateY(-1px); }
-.job-company-logo, .job-company-fallback { width: 52px; height: 52px; border-radius: 8px; object-fit: contain; border: 1px solid #e5e7eb; background: #fff; padding: 6px; align-items:center; justify-content:center; }
-.job-company-fallback { background:#f4f5f7; color:#30343b; font-size:14px; font-weight:700; }
-.job-card-main { min-width:0; }
+.job-card:hover { border-color: #aeb5bf; background: #fcfcfd; }
+.job-card-company { flex: 0 0 48px; }
+.job-company-logo, .job-company-fallback { width: 48px; height: 48px; border-radius: 6px; object-fit: contain; border: 1px solid #e2e5e9; background: #fff; padding: 5px; align-items:center; justify-content:center; }
+.job-company-fallback { background:#f5f6f7; color:#30343b; font-size:13px; font-weight:700; }
+.job-card-main { min-width:0; flex:1; }
 .job-card-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
-.job-company-name { display:flex; align-items:center; gap:6px; color:#69707d; font-size:12px; font-weight:600; margin-bottom:5px; }
-.job-card-title { margin:0; color:#151922; font-size:17px; line-height:1.35; letter-spacing:-.015em; }
-.job-card-arrow { display:flex; color:#69707d; flex:0 0 auto; margin-top:1px; }
+.job-company-name { display:flex; align-items:center; gap:6px; color:#69707d; font-size:13px; font-weight:600; margin-bottom:5px; }
+.job-card-title { margin:0; color:#151922; font-size:18px; line-height:1.32; letter-spacing:-.015em; }
+.job-card-arrow { display:flex; color:#69707d; flex:0 0 auto; margin-top:2px; }
 .job-card:hover .job-card-arrow { color:var(--primary); }
-.job-card-meta { display:flex; flex-wrap:wrap; gap:10px 16px; margin-top:12px; color:#69707d; font-size:12px; }
+.job-card-meta { display:flex; flex-wrap:wrap; gap:9px 15px; margin-top:11px; color:#69707d; font-size:13px; }
 .job-card-meta > span { display:inline-flex; align-items:center; gap:5px; }
 .job-card-meta .job-type { color:#3f4651; font-weight:600; }
 .job-card-meta .job-salary { color:#146c43; font-weight:600; }
-.job-card-excerpt { margin:12px 0 0; color:#69707d; font-size:13px; line-height:1.6; max-width:850px; }
-.job-card-footer { display:flex; align-items:center; gap:12px; margin-top:15px; padding-top:12px; border-top:1px solid #eef0f3; font-size:11px; }
+.job-card-excerpt { margin:11px 0 0; color:#69707d; font-size:14px; line-height:1.55; max-width:900px; }
+.job-card-footer { display:flex; align-items:center; gap:12px; margin-top:13px; padding-top:11px; border-top:1px solid #eef0f3; font-size:12px; }
 .job-source { color:#8a919d; }
 .job-translated { color:#166534; background:#f0fdf4; border:1px solid #bbf7d0; padding:3px 7px; border-radius:4px; font-weight:600; }
 .job-view { margin-left:auto; display:inline-flex; align-items:center; gap:5px; color:var(--primary); font-weight:700; }
@@ -326,9 +327,9 @@ select:focus-visible {
 .job-company-mark span { font-size:19px; }
 .job-detail-title-wrap { min-width:0; }
 .job-eyebrow { margin:0 0 6px; color:#7a818d; text-transform:uppercase; letter-spacing:.09em; font-size:10px; font-weight:700; }
-.job-detail-header h1 { margin:0; font-size:32px; line-height:1.15; letter-spacing:-.025em; color:#11151c; }
+.job-detail-header h1 { margin:0; font-size:34px; line-height:1.14; letter-spacing:-.025em; color:#11151c; }
 .job-company-link { display:inline-flex; align-items:center; gap:6px; margin-top:8px; color:#4e5662; font-size:14px; font-weight:600; }
-.job-meta-line { display:flex; flex-wrap:wrap; gap:12px 18px; margin-top:18px; color:#68707d; font-size:12px; }
+.job-meta-line { display:flex; flex-wrap:wrap; gap:12px 18px; margin-top:18px; color:#68707d; font-size:13px; }
 .job-meta-line span { display:inline-flex; align-items:center; gap:6px; }
 .translation-note { display:flex; align-items:center; gap:8px; margin:12px 0 0; padding:10px 12px; border:1px solid #ccebd8; background:#f3fbf6; color:#24613d; font-size:12px; border-radius:7px; }
 .translation-note.muted { border-color:#e3e6ea; background:#fff; color:#737b87; }
@@ -337,7 +338,7 @@ select:focus-visible {
 .job-section-heading { display:flex; align-items:center; gap:9px; margin-bottom:22px; }
 .job-section-heading > span { width:3px; height:20px; background:#171a21; display:block; border-radius:1px; }
 .job-section-heading h2 { margin:0; font-size:18px; letter-spacing:-.015em; }
-.job-prose { color:#3f4650; font-size:15px; line-height:1.8; }
+.job-prose { color:#3f4650; font-size:16px; line-height:1.82; }
 .job-prose h2,.job-prose h3,.job-prose h4 { color:#171a21; margin:28px 0 10px; font-size:17px; }
 .job-prose p { margin:0 0 16px; }
 .job-prose ul,.job-prose ol { padding-left:22px; margin:10px 0 18px; }
@@ -361,7 +362,7 @@ select:focus-visible {
 .summary-row > svg { flex:0 0 auto; margin-top:2px; }
 .summary-row div { min-width:0; }
 .summary-row span { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#9299a3; margin-bottom:3px; }
-.summary-row strong { display:block; color:#303640; font-size:12px; line-height:1.45; word-break:break-word; }
+.summary-row strong { display:block; color:#303640; font-size:13px; line-height:1.45; word-break:break-word; }
 .related-jobs { margin-top:34px; }
 .related-heading { display:flex; justify-content:space-between; align-items:end; gap:15px; margin-bottom:12px; }
 .related-heading h2 { margin:0; font-size:21px; }
@@ -398,4 +399,15 @@ select:focus-visible {
   .job-detail-header { display:block; }
   .job-company-mark { margin-bottom:16px; }
   .job-detail-header h1 { font-size:23px; }
+}
+
+@media (max-width: 620px) {
+  .job-card { gap: 12px; padding: 16px; }
+  .job-card-company { flex-basis: 42px; }
+  .job-company-logo, .job-company-fallback { width:42px; height:42px; }
+  .job-card-title { font-size:17px; }
+  .job-card-meta { font-size:12px; gap:7px 11px; }
+  .job-card-excerpt { font-size:13px; }
+  .job-detail-header h1 { font-size:28px; }
+  .job-prose { font-size:15px; }
 }
