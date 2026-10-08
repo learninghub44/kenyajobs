@@ -103,11 +103,11 @@ const BASE = "https://kenyajobs.vercel.app/api";
 
 async function get(path) {
   const res = await fetch(\`\${BASE}\${path}\`);
-  if (!res.ok) throw new Error(\`JobsWorldwide API error: \${res.status}\`);
+  if (!res.ok) throw new Error(\`Online Jobs API error: \${res.status}\`);
   return res.json();
 }
 
-export const JobsWorldwide = {
+export const Online Jobs = {
   africaJobs:    ()        => get("/africa-jobs"),
   remoteJobs:    (category) => get(\`/remote-jobs\${category ? \`?category=\${category}\` : ""}\`),
   entryLevel:    (page)     => get(\`/entry-level-jobs\${page ? \`?page=\${page}\` : ""}\`),
@@ -118,7 +118,7 @@ export const JobsWorldwide = {
 };
 
 // Usage:
-// const jobs = await JobsWorldwide.search("react developer");`;
+// const jobs = await Online Jobs.search("react developer");`;
 
 const CHANGELOG = [
   ["2026-06-20", "Added live in-browser request tester and multi-language code samples to these docs."],
@@ -325,10 +325,10 @@ export default function Developers() {
   return (
     <>
       <Head>
-        <title>Developer API | JobsWorldwide</title>
+        <title>Developer API | Online Jobs</title>
         <meta
           name="description"
-          content="Free public JSON API for pulling live job listings from JobsWorldwide — remote, Africa, entry-level, graduate, internship, and search endpoints."
+          content="Free public JSON API for pulling live job listings from Online Jobs — remote, Africa, entry-level, graduate, internship, and search endpoints."
         />
       </Head>
 
@@ -343,7 +343,7 @@ export default function Developers() {
             Build with our job data
           </h1>
           <p className="text-base text-slate-400 max-w-xl leading-relaxed">
-            JobsWorldwide exposes the same JSON endpoints our own frontend uses.
+            Online Jobs exposes the same JSON endpoints our own frontend uses.
             Pull live listings into your own app, bot, or dashboard — free, no
             API key required.
           </p>
