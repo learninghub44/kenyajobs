@@ -124,13 +124,13 @@ function cleanSectionText(value) {
   let text = Array.isArray(value) ? value.filter(Boolean).map(String).join("\n") : String(value);
   return text
     .replace(/<br\s*\\/?>(?=\\S)/gi, "\n")
-    .replace(/<\\/(p|div|li|h2|h3|h4)>/gi, "\n")
+    .replace(/<\/(p|div|li|h2|h3|h4)>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'")
-    .replace(/[ \\t]+/g, " ")
+    .replace(/[ \t]+/g, " ")
     .replace(/\n[ \\t]+/g, "\n")
     .trim();
 }
