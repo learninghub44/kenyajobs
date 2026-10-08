@@ -98,7 +98,7 @@ const CACHE_TIERS = [
   ["search-jobs", "5 min", "—", "Shorter window since results depend on the query string."],
 ];
 
-const SDK_SNIPPET = `// lib/jobsworldwide.js — tiny zero-dependency client
+const SDK_SNIPPET = `// lib/onlinejobs.js — tiny zero-dependency client
 const BASE = "https://kenyajobs.vercel.app/api";
 
 async function get(path) {
