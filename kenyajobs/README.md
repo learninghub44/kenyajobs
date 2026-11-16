@@ -1,87 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# JOBS HUB KENYA — Application
 
-## Online Jobs
+This directory contains the deployable Next.js application for **JOBS HUB KENYA**.
 
-**Official platform:** `https://onlinejobs.christech.co.ke`  
-**Public API:** `https://onlinejobs.christech.co.ke/api`
+- **Production site:** https://onlinejobs.christech.co.ke
+- **Framework:** Next.js Pages Router
+- **Runtime:** Node.js
+- **Database:** PostgreSQL
+- **Deployment root:** this directory (`kenyajobs/`)
 
-A job board that aggregates listings live from ~15 free job APIs/RSS feeds (Remotive, Jobicy, Arbeitnow, ReliefWeb, BrighterMonday, MyJobMag, JSearch, Adzuna, and more) and merges them with manually-posted jobs and sponsored listings managed through `/admin`.
+## Start here
 
-### Environment variables
-
-Copy `.env.example` to `.env.local` and fill in:
-
-| Variable | Required | Purpose |
-|---|---|---|
-| `DATABASE_URL` | Yes, for admin/manual jobs/ads | Standard Postgres connection string. Works with [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres), [Neon](https://neon.tech), [Supabase](https://supabase.com), or self-hosted. Tables are created automatically on first request — no separate migration step. |
-| `ADMIN_PASSWORD` | Yes, for `/admin` | Single shared password that gates the admin area. |
-| `SUPABASE_URL` (or `NEXT_PUBLIC_SUPABASE_URL`) | Required for event banner uploads | Supabase project URL used by the server-side event image uploader. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Required for event banner uploads | Server-only Supabase service-role key. Add it as a secret in the hosting provider; never expose it with a `NEXT_PUBLIC_` prefix. The uploader creates a public `event-posters` Storage bucket on first use. |
-| `SUPABASE_EVENT_BUCKET` | Optional | Override the Storage bucket name; defaults to `event-posters`. |
-| `ADMIN_SESSION_SECRET` | No | Used to sign the admin session cookie. Falls back to `ADMIN_PASSWORD` if unset. |
-| `NEXT_PUBLIC_ADSENSE_CLIENT` | No | Your AdSense publisher ID (`ca-pub-...`). When set, AdSense fills any ad slot that has no admin-managed sponsored listing. |
-| `RAPIDAPI_KEY`, `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` | No | Optional keys for the JSearch and Adzuna job sources — the site works without them, just with fewer sources. |
-| `CRON_SECRET` | No, but recommended | Shared secret that protects `/api/cron/refresh` from being called by anyone other than the scheduled job. See "Scheduled refresh" below. |
-
-Without `DATABASE_URL` set, the site still works exactly as before (live-pulled jobs only) — manual jobs and ads APIs fail soft and return empty results.
-
-### Scheduled refresh
-
-Job listings are cached at the edge for 30 minutes (`s-maxage=1800`). Without any extra setup, a fresh fetch only happens when a real visitor's request lands after that cache expires — meaning during low-traffic windows, listings can sit unchanged for hours until the next visitor triggers a refresh.
-
-To keep listings updating on a real clock regardless of traffic, this repo includes a GitHub Actions workflow (`.github/workflows/refresh-jobs.yml`) that pings `/api/cron/refresh` every 30 minutes. One-time setup:
-
-1. Set `CRON_SECRET` to any random string in your hosting provider's environment variables (Cloudflare Pages / Vercel / Render settings).
-2. In the GitHub repo, go to **Settings → Secrets and variables → Actions** and add two repository secrets:
-   - `SITE_URL` — your live site URL, e.g. `https://onlinejobs.christech.co.ke` (no trailing slash)
-   - `CRON_SECRET` — the same value you set in step 1
-3. That's it — the workflow runs automatically every 30 minutes. You can also trigger it manually from the **Actions** tab → "Refresh job listings" → "Run workflow".
-
-If `CRON_SECRET` is left unset entirely, the endpoint allows unauthenticated calls (useful for local testing), but this is not recommended in production since anyone could call it repeatedly and hammer the upstream RSS feeds and APIs.
-
-### Admin area
-
-Visit `/admin`, sign in with `ADMIN_PASSWORD`, and you can:
-- Post, edit, publish/unpublish, and delete manually-posted jobs, including salary, company logo/website, and which listing pages they appear on (homepage always; remote/entry-level/graduate/work-from-home optionally).
-- Create, edit, pause, and delete sponsored ads with a destination URL, optional image, placement, and priority.
-
-Manually-posted jobs are merged into the homepage, the four category pages, and search — sorted with featured jobs first. Sponsored ads render via the `AdSlot` component wherever it's placed, falling back to a Google AdSense unit (if `NEXT_PUBLIC_ADSENSE_CLIENT` is set) or a quiet placeholder.
-
-## Getting Started
-
-First, run the development server:
+From this directory:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start local development |
+| `npm run build` | Create a production build |
+| `npm run start` | Run the production build |
+| `npm run lint` | Run ESLint |
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## Main application areas
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+| Path | Responsibility |
+|---|---|
+| `pages/` | Public pages and Next.js file-based routes |
+| `pages/api/` | Server-side API endpoints |
+| `lib/` | Shared application logic, database access and helpers |
+| `styles/` | Global and shared styling |
+| `docs/` | Setup and maintenance guides |
+| `supabase/migrations/` | Versioned PostgreSQL migrations |
+| `public/` | Static assets served directly by Next.js |
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Do not move files out of `pages/` or rename route files without checking their URL and API dependencies. Keep server-only secrets in server-side environment variables.
 
-## Learn More
+## Current platform capabilities
 
-To learn more about Next.js, take a look at the following resources:
+The application includes:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+- Public job discovery and job detail pages.
+- Employer job submission with admin review before publication.
+- Paid job promotion packages and listing expiry/renewal management.
+- Event submissions, multi-event bundles, event pages and poster uploads.
+- Admin-managed career articles and blog publishing.
+- Admin controls for job distribution channels (WhatsApp and Telegram), where real channel destinations are configured.
+- Sponsored placements and site content management.
+- Search-engine metadata, sitemap and robots handling.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The admin area is protected by the application's password/session flow. This application does not currently use Supabase Auth for administrator sign-in.
 
-## Deploy on Vercel
+## Environment variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Set these in `.env.local` for local development and in the hosting provider for production. Do not commit `.env.local` or real secret values.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+| Variable | Required when | Notes |
+|---|---|---|
+| `DATABASE_URL` | Database-backed features | PostgreSQL connection string. The database helper also accepts `POSTGRES_URL` or `POSTGRES_URL_NON_POOLING`. |
+| `ADMIN_PASSWORD` | Admin access | Use a strong, unique password. |
+| `ADMIN_SESSION_SECRET` | Recommended for admin sessions | Use a separate random secret; do not reuse a public value. |
+| `SUPABASE_URL` | Event poster uploads | Supabase project URL. The upload handler also accepts `NEXT_PUBLIC_SUPABASE_URL`. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Event poster uploads | Server-only secret. Never use a `NEXT_PUBLIC_` prefix. |
+| `SUPABASE_EVENT_BUCKET` | Optional | Storage bucket name; defaults to `event-posters`. |
+| `CRON_SECRET` | Scheduled endpoints | Configure the same secret for the hosting cron and any external scheduled caller. |
+| `NEXT_PUBLIC_ADSENSE_CLIENT` | Optional advertising | AdSense publisher/client identifier. |
+| `RAPIDAPI_KEY`, `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` | Optional job-source integrations | Only needed when enabling the corresponding providers. |
+
+The exact behavior of optional integrations depends on their configuration. Do not add placeholder secrets to production.
+
+## Database setup
+
+The explicit baseline migration is:
+
+`supabase/migrations/20261116000100_initial_schema.sql`
+
+Follow [the Supabase setup guide](./docs/SUPABASE_DATABASE_SETUP.md). The migration is a repository file; it is **not** applied to a Supabase project just because it has been merged. Run it manually in the intended project's SQL Editor and verify the tables.
+
+The application also retains an idempotent runtime schema bootstrap in `lib/db.js`. Keep the migration and runtime schema aligned when database structures change.
+
+## Scheduled tasks
+
+The Vercel configuration in `vercel.json` defines the listing-expiry cron schedule. Review the endpoint and secret requirements before changing it. The job-feed refresh workflow, if enabled in GitHub Actions, is configured separately from the Vercel cron.
+
+## Documentation
+
+See [`docs/README.md`](./docs/README.md) for the documentation index, including database setup and repository structure.
+
+## Safety and maintenance rules
+
+- Keep credentials and service-role keys out of source control and client bundles.
+- Validate and authorize every admin/API action on the server.
+- Do not trust tenant, role, price or status values supplied by the browser.
+- Preserve existing database records when applying schema changes.
+- Add schema changes as versioned SQL migrations and keep `lib/db.js` compatible until the runtime bootstrap is intentionally retired.
+- Do not move route files or change deployment settings without checking build and URL behavior.
