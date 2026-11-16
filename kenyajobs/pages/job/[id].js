@@ -254,7 +254,7 @@ function SectionContent({ items }) {
 }
 
 function shortJobSummary(value, maxLength = 280) {
-  const plain = decodeEntities(String(value || "").replace(/<br\s*\\/?\s*>/gi, " ").replace(/<[^>]+>/g, " "))
+  const plain = decodeEntities(String(value || "").replace(/<br[^>]*>/gi, " ").replace(/<[^>]+>/g, " "))
     .replace(/\s+/g, " ").trim();
   if (!plain) return "";
   if (plain.length <= maxLength) return plain;
