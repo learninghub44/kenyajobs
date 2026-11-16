@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { LogOut, Briefcase, Megaphone, Activity, Radio } from "lucide-react";
+import { LogOut, Briefcase, Megaphone, Activity, Radio, FileText, Inbox } from "lucide-react";
 
 export default function AdminLayout({ children, active }) {
   const router = useRouter();
@@ -29,6 +29,8 @@ export default function AdminLayout({ children, active }) {
 
   const links = [
     { id: "jobs", href: "/admin/jobs", label: "Jobs", Icon: Briefcase },
+    { id: "blog", href: "/admin/blog", label: "Blog", Icon: FileText },
+    { id: "submissions", href: "/admin/submissions", label: "Job submissions", Icon: Inbox },
     { id: "ads", href: "/admin/ads", label: "Sponsored Ads", Icon: Megaphone },
     { id: "diagnostics", href: "/admin/diagnostics", label: "Source Status", Icon: Activity },
     { id: "distribution", href: "/admin/distribution", label: "Distribution", Icon: Radio },

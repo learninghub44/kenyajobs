@@ -88,39 +88,38 @@ function jobDetailUrl(job) {
 }
 
 export function formatJobAnnouncement(job = {}, category = "kenya") {
-  const title = cleanText(job.title || job.job_title || "Job opportunity", 160);
-  const company = cleanText(job.company || job.company_name || job.employer_name || "Company", 120);
-  const location = cleanText(job.location || job.candidate_required_location || job.job_city || "Not specified", 100);
-  const type = cleanText(job.type || job.job_type || job.employment_type || "Not specified", 80);
-  const salary = cleanText(job.salary || "", 100);
-  const experience = cleanText(job.experience || job.experience_level || job.seniority || "", 100);
-  const deadline = cleanText(job.application_deadline || job.deadline || job.expiryDate || job.expiry_date || "", 80);
-  const requirements = cleanText(job.requirements || job.qualifications || job.job_requirements || job.skills_required || "", 420);
-  const description = cleanText(job.description || job.job_description || "", 320);
-  const detailUrl = jobDetailUrl(job);
+  const title = cleanText(job.title || job.job_title || "Job opportunity", 140);
+  const company = cleanText(job.company || job.company_name || job.employer_name || "Company", 100);
+  const location = cleanText(job.location || job.candidate_required_location || job.job_city || "Not specified", 80);
+  const type = cleanText(job.type || job.job_type || job.employment_type || "Not specified", 60);
+  const jobId = String(job.id || job.job_id || "Not assigned");
+  const base = (process.env.SITE_URL || "https://onlinejobs.christech.co.ke").replace(/\/$/, "");
+  const detailUrl = jobDetailUrl(job) || base;
   const label = category === "remote" ? "WORLDWIDE REMOTE OPPORTUNITY" : category === "africa" ? "AFRICA JOB OPPORTUNITY" : "KENYA JOB OPPORTUNITY";
-  const source = cleanText(job.source || "Original employer / job board", 80);
-  const lines = [
-    `📢 ${label}`, "",
-    `💼 ${title}`,
-    `🏢 Employer: ${company}`,
-    `📍 Location: ${location}`,
-    `🕒 Employment: ${type}`,
-    salary ? `💰 Salary: ${salary}` : "",
-    experience ? `🎓 Experience: ${experience}` : "",
-    deadline ? `📅 Application deadline: ${deadline}` : "",
-    requirements ? `\n✅ KEY REQUIREMENTS\n${requirements}` : "",
-    description ? `\nABOUT THE ROLE\n${description}` : "",
-    `\n🔎 Source: ${source}`,
-    detailUrl ? `\n👉 VIEW FULL DETAILS & APPLY: ${detailUrl}` : `\n👉 Browse opportunities: ${(process.env.SITE_URL || "https://onlinejobs.christech.co.ke").replace(/\/$/, "")}`,
-    "",
-    "Open the job page to review the full description, requirements and application instructions. Applications are completed through the original employer or job-board link.",
-    "",
+  const parts = [
+    "📢 " + label, "",
+    "💼 " + title,
+    "🏢 Employer: " + company,
+    "📍 Location: " + location,
+    "🕒 Employment: " + type,
+    "🆔 Job ID: " + jobId,
+    job.salary ? "💰 Salary: " + cleanText(job.salary, 90) : "",
+    job.experience ? "🎓 Experience: " + cleanText(job.experience, 90) : "",
+    job.education ? "📚 Education: " + cleanText(job.education, 120) : "",
+    job.applicationDeadline || job.application_deadline ? "📅 Deadline: " + cleanText(job.applicationDeadline || job.application_deadline, 60) : "",
+    job.description ? "\nABOUT THE ROLE\n" + cleanText(job.description, 450) : "",
+    job.responsibilities ? "\nKEY RESPONSIBILITIES\n" + cleanText(job.responsibilities, 450) : "",
+    job.requirements ? "\nKEY REQUIREMENTS\n" + cleanText(job.requirements, 450) : "",
+    job.qualifications ? "\nQUALIFICATIONS\n" + cleanText(job.qualifications, 250) : "",
+    job.benefits ? "\nBENEFITS\n" + cleanText(job.benefits, 220) : "",
+    job.applicationInstructions || job.application_instructions ? "\nHOW TO APPLY\n" + cleanText(job.applicationInstructions || job.application_instructions, 260) : "",
+    "\n🔗 FULL JOB DETAILS & APPLY: " + detailUrl,
+    "🌐 Browse more opportunities: " + base,
+    "", "Check the full listing for complete details and application instructions.",
     "Follow JOBS HUB KENYA for more opportunities."
   ];
-  return lines.filter(Boolean).join("\n").slice(0, 3500);
+  return parts.filter(Boolean).join("\n").slice(0, 3900);
 }
-
 export async function enqueueJobs(jobs, route = "") {
   if (!Array.isArray(jobs) || jobs.length === 0) return { queued: 0 };
   const settings = await getSocialSettings();

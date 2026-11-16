@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
-import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2 } from "lucide-react";
+import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2, CalendarDays } from "lucide-react";
 
 
 function normalizeDate(value) {
@@ -223,7 +223,9 @@ function buildJobSections(job, description) {
   const explicit = {
     "Responsibilities": job.responsibilities || job.responsibility || job.duties || job.job_responsibilities,
     "Requirements": job.requirements || job.qualifications || job.job_requirements || job.skills_required,
-    "Benefits": job.benefits || job.job_benefits || job.perks
+    "Benefits": job.benefits || job.job_benefits || job.perks,
+    "Education": job.education || job.education_requirements,
+    "How to apply": job.applicationInstructions || job.application_instructions
   };
 
   for (const [title, value] of Object.entries(explicit)) {
@@ -232,7 +234,7 @@ function buildJobSections(job, description) {
 
   const sections = [];
 
-  for (const title of ["Job description", "Responsibilities", "Requirements", "Benefits"]) {
+  for (const title of ["Job description", "Responsibilities", "Requirements", "Education", "Benefits", "How to apply"]) {
     const content = classified[title];
     if (!content) continue;
 
@@ -409,6 +411,8 @@ export default function JobDetail() {
     [BriefcaseBusiness, "Job type", type],
     [Clock3, "Posted", timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc)],
     ...(salary ? [[Banknote, "Salary", salary]] : []),
+    ...(job.applicationDeadline || job.application_deadline ? [[CalendarDays, "Application deadline", job.applicationDeadline || job.application_deadline]] : []),
+    ...(job.experience ? [[BriefcaseBusiness, "Experience", job.experience]] : []),
   ];
 
   return (

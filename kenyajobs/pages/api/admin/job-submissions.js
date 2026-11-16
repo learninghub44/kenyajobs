@@ -1,0 +1,15 @@
+import {requireAdmin} from "@/lib/adminAuth";
+import {query} from "@/lib/db";
+import {createJob} from "@/lib/manualJobs";
+export default requireAdmin(async function handler(req,res){
+ try{
+  if(req.method==="GET"){const {rows}=await query("SELECT * FROM job_submissions ORDER BY created_at DESC LIMIT 200");return res.status(200).json(rows);}
+  if(req.method==="POST"){const id=Number((req.body||{}).id);if(!Number.isInteger(id)||id<1)return res.status(400).json({error:"Valid submission ID required."});
+   const {rows}=await query("SELECT * FROM job_submissions WHERE id=$1 AND status='pending'",[id]);if(!rows[0])return res.status(404).json({error:"Pending submission not found."});
+   const s=rows[0];const job=await createJob({title:s.title,company:s.company,location:s.location,type:s.type,salary:s.salary,description:s.description,requirements:s.requirements,responsibilities:s.responsibilities,applicationDeadline:s.application_deadline,url:s.application_url,applicationInstructions:s.application_instructions,published:true});
+   await query("UPDATE job_submissions SET status='approved',reviewed_at=now(),job_id=$2 WHERE id=$1",[id,job.id]);return res.status(200).json({ok:true,job});
+  }
+  if(req.method==="DELETE"){const id=Number((req.body||{}).id);await query("UPDATE job_submissions SET status='rejected',reviewed_at=now() WHERE id=$1 AND status='pending'",[id]);return res.status(200).json({ok:true});}
+  return res.status(405).json({error:"Method not allowed"});
+ }catch(e){console.error("admin job submissions:",e.message);return res.status(500).json({error:"Could not process submission."});}
+});

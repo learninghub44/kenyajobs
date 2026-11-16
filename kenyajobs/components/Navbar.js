@@ -73,7 +73,7 @@ export default function Navbar() {
               <Search size={18} />
             </Link>
             <a
-              href="mailto:support@christech.co.ke?subject=Post a Job"
+              href="/post-job"
               className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2"
             >
               <Briefcase size={16} />
@@ -121,7 +121,7 @@ export default function Navbar() {
           ))}
           <div className="mt-4 pt-4 border-t border-border flex flex-col gap-2">
             <a
-              href="mailto:support@christech.co.ke?subject=Post a Job"
+              href="/post-job"
               className="flex items-center justify-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-3 rounded-lg"
             >
               <Briefcase size={16} />
