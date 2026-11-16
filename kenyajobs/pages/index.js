@@ -396,8 +396,8 @@ export default function Home() {
             <p className="mt-2 text-sm leading-6 text-blue-100">Explore career fairs, tech meetups, workshops, conferences and professional trainings—or promote your own event.</p>
           </div>
           <div className="relative mt-5 flex flex-wrap gap-3 md:mt-0">
-            <Link href="/events" className="rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-[#071b55] transition hover:-translate-y-0.5">Explore events</Link>
-            <Link href="/submit-event" className="rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10">Promote an event · from KES 1,500</Link>
+            <Link href="/events" className="home-event-action home-event-action-primary rounded-xl px-5 py-3 text-sm font-extrabold transition hover:-translate-y-0.5">Explore events</Link>
+            <Link href="/submit-event" className="home-event-action home-event-action-secondary rounded-xl px-5 py-3 text-sm font-bold transition hover:-translate-y-0.5">Promote an event · from KES 1,500</Link>
           </div>
         </div>
       </section>
