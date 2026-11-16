@@ -123,6 +123,7 @@ async function ensureSchema() {
         id BIGSERIAL PRIMARY KEY,queue_id BIGINT NOT NULL REFERENCES job_distribution_queue(id) ON DELETE CASCADE,
         action TEXT NOT NULL,status TEXT NOT NULL,detail TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
+      CREATE UNIQUE INDEX IF NOT EXISTS manual_jobs_source_submission_idx ON manual_jobs(source_submission_id) WHERE source_submission_id IS NOT NULL;
       CREATE INDEX IF NOT EXISTS manual_jobs_published_idx ON manual_jobs(published);
       CREATE INDEX IF NOT EXISTS manual_jobs_expiry_idx ON manual_jobs(package_expires_at) WHERE published=true;
       CREATE INDEX IF NOT EXISTS ads_active_placement_idx ON ads(active,placement);
