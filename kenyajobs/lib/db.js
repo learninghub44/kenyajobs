@@ -37,15 +37,7 @@ async function ensureSchema() {
       CREATE TABLE IF NOT EXISTS job_submissions (
         id BIGSERIAL PRIMARY KEY,title TEXT NOT NULL,company TEXT NOT NULL,contact_name TEXT NOT NULL,email TEXT NOT NULL,
         location TEXT DEFAULT 'Kenya',type TEXT DEFAULT 'Full-time',salary TEXT,description TEXT NOT NULL,
-        requirements TEXT DEFAULT '',responsibilities TEXT DEFAULT '',application_deadline TEXT,application_url TEXT NOT NULL,
-        application_instructions TEXT DEFAULT '',status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
-        job_id TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
-      );
-      CREATE INDEX IF NOT EXISTS job_submissions_status_created_idx ON job_submissions(status,created_at DESC);
-      CREATE TABLE IF NOT EXISTS job_submissions (
-        id BIGSERIAL PRIMARY KEY,title TEXT NOT NULL,company TEXT NOT NULL,contact_name TEXT NOT NULL,email TEXT NOT NULL,
-        location TEXT DEFAULT 'Kenya',type TEXT DEFAULT 'Full-time',salary TEXT,description TEXT NOT NULL,
-        requirements TEXT DEFAULT '',responsibilities TEXT DEFAULT '',application_deadline TEXT,application_url TEXT NOT NULL,
+        requirements TEXT DEFAULT '',responsibilities TEXT DEFAULT '',qualifications TEXT DEFAULT '',experience TEXT DEFAULT '',education TEXT DEFAULT '',benefits TEXT DEFAULT '',company_website TEXT,company_logo TEXT,application_deadline TEXT,application_url TEXT NOT NULL,
         application_instructions TEXT DEFAULT '',status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
         job_id TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
       );
