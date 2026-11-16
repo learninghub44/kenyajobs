@@ -47,9 +47,9 @@ const EXPERIENCE_LEVELS = [
 ];
 
 const STATS = [
-  { value: "1,200+", label: "Active Jobs", icon: Briefcase },
-  { value: "30+", label: "Job Sources", icon: Building2 },
-  { value: "30+", label: "Countries", icon: Globe },
+  { value: "Live", label: "Job listings", icon: Briefcase },
+  { value: "Multiple", label: "Job feeds", icon: Building2 },
+  { value: "Local + global", label: "Opportunities", icon: Globe },
   { value: "Free", label: "Always Free", icon: CheckCircle2 },
 ];
 
@@ -108,8 +108,8 @@ const CAT_CARDS = [
 const HOW_IT_WORKS = [
   {
     step: "01",
-    title: "We scan 30+ job boards",
-    desc: "Every few hours we pull fresh listings from BrighterMonday, LinkedIn, Indeed, Remotive, Jobicy and dozens more.",
+    title: "We collect opportunities from configured job feeds",
+    desc: "Listings are gathered from configured employment feeds and refreshed as sources provide updates.",
     icon: Search,
   },
   {
@@ -329,7 +329,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-2 text-sm text-text-secondary">
               <Shield size={16} className="text-success" />
-              <span>Trusted by 50,000+ job seekers</span>
+              <span>Open access for job seekers</span>
             </div>
           </div>
         </div>
@@ -570,9 +570,9 @@ export default function Home() {
                     </div>
                     <div className="bg-surface-muted p-2 space-y-2">
                       {[
-                        { title: "Product Designer", co: "Safaricom", loc: "Remote", color: "bg-info-light text-info" },
-                        { title: "Software Engineer", co: "Google", loc: "Nairobi", color: "bg-success-light text-success" },
-                        { title: "Marketing Manager", co: "Equity Bank", loc: "Hybrid", color: "bg-warning-light text-[#E8710A]" },
+                        { title: "Example role", co: "Example employer", loc: "Remote", color: "bg-info-light text-info" },
+                        { title: "Example role", co: "Example employer", loc: "Nairobi", color: "bg-success-light text-success" },
+                        { title: "Example role", co: "Example employer", loc: "Hybrid", color: "bg-warning-light text-[#E8710A]" },
                       ].map((j, i) => (
                         <div key={i} className="bg-white rounded-lg p-2.5 border border-border">
                           <div className="flex items-start gap-2">
@@ -588,7 +588,7 @@ export default function Home() {
                         </div>
                       ))}
                       <div className="text-center pt-1">
-                        <span className="text-primary text-[7px] font-semibold">View 200+ more</span>
+                        <span className="text-primary text-[7px] font-semibold">Browse more live jobs</span>
                       </div>
                     </div>
                   </div>
