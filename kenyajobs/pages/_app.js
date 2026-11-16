@@ -13,6 +13,7 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SocialChannelLinks from "@/components/SocialChannelLinks";
 import AIAssistant from "@/components/AIAssistant";
 import CookieBanner from "@/components/CookieBanner";
 import Analytics from "@/components/Analytics";
@@ -21,6 +22,7 @@ export default function App({ Component, pageProps }) {
   return (
     <div className="min-h-screen bg-paper text-ink flex flex-col">
       <Navbar />
+      <SocialChannelLinks variant="banner" />
       <main className="flex-1">
         <Component {...pageProps} />
       </main>
