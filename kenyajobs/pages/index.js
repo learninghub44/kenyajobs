@@ -292,7 +292,7 @@ export default function Home() {
       </Head>
 
       {/* ── JOB SEARCH ─────────────────────────────────────────────────────── */}
-      <section className="relative bg-white border-b border-border">
+      <section className="home-hero relative bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-14">
           <div className="max-w-3xl">
             <p className="kicker mb-3">Online Jobs · Kenya & beyond</p>
