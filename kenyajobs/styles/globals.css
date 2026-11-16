@@ -727,3 +727,12 @@ button svg, a svg { flex-shrink:0; }
   .job-key-fact { padding:12px; }
   .job-description-panel { padding:18px; }
 }
+
+/* JOBS HUB KENYA — event CTA contrast and uploader styling */
+.events-page .event-action-primary,.events-page a.event-action-primary,.events-page button.event-action-primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#022FE2!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:1px solid #022FE2!important;box-shadow:0 8px 18px rgba(2,47,226,.18);transition:background .18s ease,transform .18s ease,box-shadow .18s ease}
+.events-page .event-action-primary:hover{background:#04249D!important;border-color:#04249D!important;color:#fff!important;-webkit-text-fill-color:#fff!important;transform:translateY(-1px);box-shadow:0 12px 24px rgba(2,47,226,.24)}
+.events-page .event-action-secondary{background:#fff!important;color:#142771!important;-webkit-text-fill-color:#142771!important;border:1px solid #DCE4F0!important}
+.events-page a.bg-white{background:#fff!important;color:#142771!important;-webkit-text-fill-color:#142771!important}
+.events-page a.bg-white:hover{background:#EDF2FF!important;color:#142771!important;-webkit-text-fill-color:#142771!important}
+.events-page button:disabled{opacity:.55;cursor:not-allowed}
+.events-page input[type=radio]{accent-color:#022FE2}
