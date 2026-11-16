@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Head from "next/head";
 import { LogOut, Briefcase, Megaphone, Activity, Radio, FileText, Inbox, Link2 } from "lucide-react";
 
 export default function AdminLayout({ children, active }) {
