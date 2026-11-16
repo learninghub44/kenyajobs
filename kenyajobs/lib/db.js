@@ -37,7 +37,7 @@ async function ensureSchema() {
       CREATE TABLE IF NOT EXISTS job_submissions (
         id BIGSERIAL PRIMARY KEY,title TEXT NOT NULL,company TEXT NOT NULL,contact_name TEXT NOT NULL,email TEXT NOT NULL,
         location TEXT DEFAULT 'Kenya',type TEXT DEFAULT 'Full-time',salary TEXT,description TEXT NOT NULL,
-        requirements TEXT DEFAULT '',responsibilities TEXT DEFAULT '',qualifications TEXT DEFAULT '',experience TEXT DEFAULT '',education TEXT DEFAULT '',benefits TEXT DEFAULT '',company_website TEXT,company_logo TEXT,application_deadline TEXT,application_url TEXT NOT NULL,
+        requirements TEXT DEFAULT '',responsibilities TEXT DEFAULT '',qualifications TEXT DEFAULT '',experience TEXT DEFAULT '',education TEXT DEFAULT '',benefits TEXT DEFAULT '',company_website TEXT,company_logo TEXT,categories TEXT[] NOT NULL DEFAULT '{}',application_deadline TEXT,application_url TEXT NOT NULL,
         application_instructions TEXT DEFAULT '',status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
         job_id TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
       );
@@ -48,6 +48,7 @@ async function ensureSchema() {
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS benefits TEXT DEFAULT '';
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS company_website TEXT;
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS company_logo TEXT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS categories TEXT[] NOT NULL DEFAULT '{}';
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS posting_link_id BIGINT;
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS ip_hash TEXT;
       CREATE INDEX IF NOT EXISTS job_submissions_ip_created_idx ON job_submissions(ip_hash,created_at DESC);
