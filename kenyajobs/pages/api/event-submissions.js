@@ -25,14 +25,16 @@ export default async function handler(req,res){
  if(f.description.length>p.limits.description)return res.status(400).json({error:"Your event description exceeds the "+p.limits.description+" character limit for this package."});
  const digits=f.phone.replace(/\D/g,"");if(digits.length<9||digits.length>15)return res.status(400).json({error:"Enter a valid phone number with country code."});
  try{
+  const existing=await query("SELECT id FROM event_submissions WHERE submission_key=$1",[submissionKey]);
+  if(existing.rows[0])return res.status(200).json({ok:true,reference:existing.rows[0].id,duplicate:true,package:{name:p.name,price:p.price,durationDays:p.durationDays}});
   const ip=String(req.headers["x-forwarded-for"]||req.socket?.remoteAddress||"unknown").split(",")[0];
   const ipHash=crypto.createHash("sha256").update((process.env.ADMIN_SESSION_SECRET||process.env.ADMIN_PASSWORD||"events-rate-limit")+":"+ip).digest("hex");
   const rate=await query("SELECT count(*)::int AS total FROM event_submissions WHERE ip_hash=$1 AND created_at>now()-interval '1 hour'",[ipHash]);
   if(rate.rows[0]?.total>=5)return res.status(429).json({error:"Too many event requests. Please try again later."});
-  const {rows}=await query(`INSERT INTO event_submissions(title,organiser,contact_name,email,phone,event_type,event_date,start_time,end_time,venue,location,description,ticket_price,registration_url,poster_url,website,ip_hash,package_code,package_price,package_duration_days)
-   VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20) RETURNING id`,
+  const {rows}=await query(`INSERT INTO event_submissions(title,organiser,contact_name,email,phone,event_type,event_date,start_time,end_time,venue,location,description,ticket_price,registration_url,poster_url,website,ip_hash,submission_key,package_code,package_price,package_duration_days)
+   VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21) ON CONFLICT(submission_key) WHERE submission_key IS NOT NULL DO NOTHING RETURNING id`,
    [f.title,f.organiser,f.contactName,f.email,f.phone,f.eventType,f.eventDate,f.startTime||null,f.endTime||null,f.venue||null,f.location,f.description,f.ticketPrice||null,f.registrationUrl||null,f.posterUrl||null,f.website||null,ipHash,submissionKey,p.code,p.price,p.durationDays]);
-  if(!rows[0]){const duplicate=await query("SELECT id FROM event_submissions WHERE submission_key=$1",[submissionKey]);if(duplicate.rows[0])return res.status(200).json({ok:true,reference:duplicate.rows[0].id,duplicate:true});return res.status(409).json({error:"This event request is already being processed."});}
+  if(!rows[0]){const duplicate=await query("SELECT id FROM event_submissions WHERE submission_key=$1",[submissionKey]);if(duplicate.rows[0])return res.status(200).json({ok:true,reference:duplicate.rows[0].id,duplicate:true,package:{name:p.name,price:p.price,durationDays:p.durationDays}});return res.status(409).json({error:"This event request is already being processed."});}
   return res.status(201).json({ok:true,reference:rows[0].id,package:{name:p.name,price:p.price,durationDays:p.durationDays},message:"The events team will contact you to confirm payment and schedule your promotion."});
  }catch(e){console.error("event submission:",e.message);return res.status(503).json({error:"We could not save this event request. Please try again later."});}
 }
