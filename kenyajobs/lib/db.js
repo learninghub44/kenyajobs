@@ -3,7 +3,7 @@ const CONNECTION_STRING = process.env.DATABASE_URL || process.env.POSTGRES_URL |
 let pool;
 function getPool() {
   if (!CONNECTION_STRING) throw new Error("No database connection string found. Set DATABASE_URL (or POSTGRES_URL) in your environment.");
-  if (!pool) { const local = /localhost|127\\.0\\.1/.test(CONNECTION_STRING); pool = new Pool({ connectionString: CONNECTION_STRING, ssl: local ? false : { rejectUnauthorized: false }, max: 5 }); }
+  if (!pool) { const local = /localhost|127\.0\.0\.1/.test(CONNECTION_STRING); pool = new Pool({ connectionString: CONNECTION_STRING, ssl: local ? false : { rejectUnauthorized: false }, max: 5 }); }
   return pool;
 }
 let schemaReady = null;
