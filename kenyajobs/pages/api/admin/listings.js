@@ -18,7 +18,7 @@ export default requireAdmin(async function handler(req,res){
    const p=getPackage(kind==="event"?"events":"jobs",String(b.packageCode||""));
    if(!p)return res.status(400).json({error:"Choose a valid renewal package."});
    if(kind==="event")await query("UPDATE events SET package_code=$2,package_price=$3,package_started_at=now(),package_expires_at=now()+($4 * interval '1 day'),featured_until=CASE WHEN $5>0 THEN now()+($5 * interval '1 day') ELSE NULL END,promotions_allowed=$6,promotions_used=0,published=true,renewal_status='active',updated_at=now() WHERE id=$1",[id,p.code,p.price,p.durationDays,p.limits.featuredDays,p.limits.promotions]);
-   else await query("UPDATE manual_jobs SET package_code=$2,package_price=$3,package_started_at=now(),package_expires_at=now()+($4||' days')::interval,published=true,featured=($5>0),renewal_status='active',updated_at=now() WHERE id=$1",[id,p.code,p.price,p.durationDays,p.limits.featuredDays]);
+   else await query("UPDATE manual_jobs SET package_code=$2,package_price=$3,package_started_at=now(),package_expires_at=now()+($4 * interval '1 day'),published=true,featured=($5>0),featured_until=CASE WHEN $5>0 THEN now()+($5 * interval '1 day') ELSE NULL END,renewal_status='active',updated_at=now() WHERE id=$1",[id,p.code,p.price,p.durationDays,p.limits.featuredDays]);
    return res.status(200).json({ok:true});
   }
   return res.status(405).json({error:"Method not allowed"});
