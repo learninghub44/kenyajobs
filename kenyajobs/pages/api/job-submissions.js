@@ -98,6 +98,7 @@ export default async function handler(req, res) {
   if (digits.length < 9 || digits.length > 15) return res.status(400).json({ error: "Enter a valid phone number with country code." });
   const selectedPackage = getPackage("jobs", fields.packageCode);
   if (!selectedPackage) return res.status(400).json({ error: "Choose a valid job promotion package." });
+  if (String(body.title||"").length > selectedPackage.limits.title || String(body.description||"").length > selectedPackage.limits.description) return res.status(400).json({ error: "The job title or description exceeds the selected package limits." });
   if (
     !validUrl(fields.url) ||
     (fields.companyWebsite && !validUrl(fields.companyWebsite)) ||
