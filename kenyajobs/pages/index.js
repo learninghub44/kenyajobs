@@ -509,7 +509,7 @@ export default function Home() {
               </h2>
               <p className="text-text-secondary text-base mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed">
                 Online Jobs works as a full app on your phone — no download required.
-                Browse thousands of live jobs, get instant search, and apply in seconds.
+                Browse available listings, search by role, and apply through the original employer or job board.
               </p>
 
               <div className="flex flex-wrap gap-2 justify-center lg:justify-start mb-8">
@@ -610,7 +610,7 @@ export default function Home() {
       </section>
 
       {/* ── TRUST STRIP ───────────────────────────────────────────────────── */}
-      <SourcesMarquee />
+      <SourcesMarquee jobs={baseJobs} />
     </>
   );
 }
