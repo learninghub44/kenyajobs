@@ -1,8 +1,8 @@
-import {useMemo,useRef,useState} from "react";
+import {useRef,useState} from "react";
 import Head from "next/head";
 import Link from "next/link";
 import {PACKAGES} from "@/lib/packages";
-import {CalendarDays,CheckCircle2,ArrowLeft,UploadCloud,ImagePlus,Trash2,Plus,LoaderCircle} from "lucide-react";
+import {CalendarDays,CheckCircle2,ArrowLeft,UploadCloud ,Trash2} from "lucide-react";
 const input="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100";
 const blankEvent=()=>({title:"",eventType:"Career fair",eventDate:"",startTime:"",endTime:"",venue:"",location:"Kenya",description:"",ticketPrice:"",registrationUrl:"",website:"",posterFile:null,posterPreview:""});
 const initialContact={organiser:"",contactName:"",email:"",phone:"",websiteTrap:""};
