@@ -20,7 +20,9 @@ export default async function handler(req,res){
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email))return res.status(400).json({error:"Enter a valid email address."});
  if(!/^\d{4}-\d{2}-\d{2}$/.test(f.eventDate)||f.eventDate<new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Nairobi"}).format(new Date()))return res.status(400).json({error:"Choose a valid future event date."});
  if(!validUrl(f.registrationUrl)||!validUrl(f.posterUrl)||!validUrl(f.website))return res.status(400).json({error:"Use valid http or https URLs."});
- const p=getPackage("events",f.packageCode);if(!p)return res.status(400).json({error:"Choose a valid event promotion package."});\n if(f.description.length>p.limits.description)return res.status(400).json({error:"Your event description exceeds the "+p.limits.description+" character limit for this package."});\n const digits=f.phone.replace(/\\D/g,"");if(digits.length<9||digits.length>15)return res.status(400).json({error:"Enter a valid phone number with country code."});
+ const p=getPackage("events",f.packageCode);if(!p)return res.status(400).json({error:"Choose a valid event promotion package."});
+ if(f.description.length>p.limits.description)return res.status(400).json({error:"Your event description exceeds the "+p.limits.description+" character limit for this package."});
+ const digits=f.phone.replace(/\D/g,"");if(digits.length<9||digits.length>15)return res.status(400).json({error:"Enter a valid phone number with country code."});
  try{
   const ip=String(req.headers["x-forwarded-for"]||req.socket?.remoteAddress||"unknown").split(",")[0];
   const ipHash=crypto.createHash("sha256").update((process.env.ADMIN_SESSION_SECRET||process.env.ADMIN_PASSWORD||"events-rate-limit")+":"+ip).digest("hex");
