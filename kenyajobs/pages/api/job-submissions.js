@@ -40,7 +40,7 @@ export default async function handler(req, res) {
       if (!rows[0]) return res.status(404).json({ error: "This posting link is invalid, expired, or has reached its usage limit." });
       return res.status(200).json({
         label: rows[0].label,
-        autoPublish: rows[0].auto_publish,
+        autoPublish: false,\n        reviewRequired: true,
         remaining: rows[0].max_uses - rows[0].uses,
       });
     } catch (error) {
