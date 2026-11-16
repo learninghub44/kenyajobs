@@ -1,6 +1,5 @@
 import crypto from "crypto";
 import { query } from "@/lib/db";
-import { createJob } from "@/lib/manualJobs";
 import { getPackage } from "@/lib/packages";
 
 const hash = (value) => crypto.createHash("sha256").update(value).digest("hex");
@@ -171,49 +170,13 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: "This submission is already being processed. Please refresh and check again." });
     }
 
-    let publishedJob = null;
-    let publishWarning = "";
-    if (false && link?.auto_publish) {
-      try {
-        publishedJob = await createJob({
-          title: fields.title,
-          company: fields.company,
-          location: fields.location,
-          type: fields.type,
-          salary: fields.salary,
-          description: fields.description,
-          requirements: fields.requirements,
-          responsibilities: fields.responsibilities,
-          qualifications: fields.qualifications,
-          experience: fields.experience,
-          education: fields.education,
-          benefits: fields.benefits,
-          categories: fields.categories,
-          applicationDeadline: fields.applicationDeadline,
-          url: fields.url,
-          applicationInstructions: fields.applicationInstructions,
-          companyWebsite: fields.companyWebsite,
-          companyLogo: fields.companyLogo,
-          published: true,
-        });
-        await query(
-          "UPDATE job_submissions SET status='approved',job_id=$2,reviewed_at=now() WHERE id=$1 AND status='pending'",
-          [saved.rows[0].id, publishedJob.id]
-        );
-      } catch (publishError) {
-        console.error("automatic employer publishing:", publishError.message);
-        publishWarning = "The submission was saved for admin review because automatic publishing is temporarily unavailable.";
-      }
-    }
-
     return res.status(201).json({
       ok: true,
       reference: saved.rows[0].id,
-      jobId: publishedJob?.id || null,
-      status: publishedJob ? "approved" : "pending",
-      autoPublished: Boolean(publishedJob),
+      status: "pending",
+      autoPublished: false,
       package: { name: selectedPackage.name, price: selectedPackage.price, durationDays: selectedPackage.durationDays },
-      message: publishWarning || "The admin team will contact you to confirm the package, payment and publication schedule.",
+      message: "The admin team will contact you to confirm the package, payment and publication schedule.",
     });
   } catch (error) {
     console.error("job submission:", error.message);
