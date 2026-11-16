@@ -14,7 +14,6 @@ import "@fontsource/ibm-plex-mono/500.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SocialChannelLinks from "@/components/SocialChannelLinks";
-import AIAssistant from "@/components/AIAssistant";
 import CookieBanner from "@/components/CookieBanner";
 import Analytics from "@/components/Analytics";
 
@@ -27,7 +26,7 @@ export default function App({ Component, pageProps }) {
         <Component {...pageProps} />
       </main>
       <Footer />
-      <AIAssistant />
+      <SocialChannelLinks variant="floating" />
       <CookieBanner />
       <Analytics />
     </div>

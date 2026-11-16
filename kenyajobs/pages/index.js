@@ -287,8 +287,22 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Online Jobs — Find Jobs in Africa, Remote & Worldwide</title>
-        <meta name="description" content="Find your dream job worldwide. Thousands of opportunities across Africa, Europe, Asia and beyond — remote, entry level, graduate and work from home." />
+        <title>JOBS HUB KENYA | Jobs in Kenya, Africa & Remote Careers</title>
+        <meta name="description" content="Discover job opportunities in Kenya, across Africa and worldwide remote roles. Explore current vacancies, read career advice and apply directly to employers." />
+        <meta name="keywords" content="jobs in Kenya, Kenya vacancies, careers, remote jobs, graduate jobs, internships, Africa jobs, JOBS HUB KENYA" />
+        <link rel="canonical" href="https://onlinejobs.christech.co.ke/" />
+        <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="JOBS HUB KENYA" />
+        <meta property="og:title" content="JOBS HUB KENYA | Jobs in Kenya, Africa & Remote Careers" />
+        <meta property="og:description" content="Discover current job opportunities and apply directly to employers." />
+        <meta property="og:url" content="https://onlinejobs.christech.co.ke/" />
+        <meta property="og:image" content="https://onlinejobs.christech.co.ke/og-image.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="JOBS HUB KENYA | Find your next opportunity" />
+        <meta name="twitter:description" content="Current vacancies in Kenya, Africa and remote markets." />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({"@context":"https://schema.org","@type":"WebSite","name":"JOBS HUB KENYA","url":"https://onlinejobs.christech.co.ke/","potentialAction":{"@type":"SearchAction","target":"https://onlinejobs.christech.co.ke/search?query={search_term_string}","query-input":"required name=search_term_string"}})}} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({"@context":"https://schema.org","@type":"Organization","name":"JOBS HUB KENYA","url":"https://onlinejobs.christech.co.ke/","sameAs":["https://whatsapp.com/channel/0029Vb9ItcdJf05hVwnE3w2C","https://t.me/+JN0rNZmNbGlkN2I0"]})}} />
       </Head>
 
       {/* ── JOB SEARCH ─────────────────────────────────────────────────────── */}
@@ -513,7 +527,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-2 justify-center lg:justify-start mb-8">
-                {["No sign-up needed", "Works offline", "Instant search", "Free forever"].map(f => (
+                {["No sign-up needed", "Instant search", "Free forever"].map(f => (
                   <span key={f} className="flex items-center gap-1.5 text-sm text-text-secondary bg-white border border-border px-3 py-1.5 rounded-lg">
                     <CheckCircle2 size={14} className="text-success" />
                     {f}

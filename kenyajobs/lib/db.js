@@ -37,19 +37,30 @@ async function ensureSchema() {
       CREATE TABLE IF NOT EXISTS job_submissions (
         id BIGSERIAL PRIMARY KEY,title TEXT NOT NULL,company TEXT NOT NULL,contact_name TEXT NOT NULL,email TEXT NOT NULL,
         location TEXT DEFAULT 'Kenya',type TEXT DEFAULT 'Full-time',salary TEXT,description TEXT NOT NULL,
-        requirements TEXT DEFAULT '',responsibilities TEXT DEFAULT '',application_deadline TEXT,application_url TEXT NOT NULL,
+        requirements TEXT DEFAULT '',responsibilities TEXT DEFAULT '',qualifications TEXT DEFAULT '',experience TEXT DEFAULT '',education TEXT DEFAULT '',benefits TEXT DEFAULT '',company_website TEXT,company_logo TEXT,categories TEXT[] NOT NULL DEFAULT '{}',application_deadline TEXT,application_url TEXT NOT NULL,
         application_instructions TEXT DEFAULT '',status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
         job_id TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
       );
       CREATE INDEX IF NOT EXISTS job_submissions_status_created_idx ON job_submissions(status,created_at DESC);
-      CREATE TABLE IF NOT EXISTS job_submissions (
-        id BIGSERIAL PRIMARY KEY,title TEXT NOT NULL,company TEXT NOT NULL,contact_name TEXT NOT NULL,email TEXT NOT NULL,
-        location TEXT DEFAULT 'Kenya',type TEXT DEFAULT 'Full-time',salary TEXT,description TEXT NOT NULL,
-        requirements TEXT DEFAULT '',responsibilities TEXT DEFAULT '',application_deadline TEXT,application_url TEXT NOT NULL,
-        application_instructions TEXT DEFAULT '',status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
-        job_id TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS qualifications TEXT DEFAULT '';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS experience TEXT DEFAULT '';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS education TEXT DEFAULT '';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS benefits TEXT DEFAULT '';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS company_website TEXT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS company_logo TEXT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS categories TEXT[] NOT NULL DEFAULT '{}';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS posting_link_id BIGINT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS ip_hash TEXT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS submission_key TEXT;
+      CREATE UNIQUE INDEX IF NOT EXISTS job_submissions_submission_key_idx ON job_submissions(submission_key) WHERE submission_key IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS job_submissions_ip_created_idx ON job_submissions(ip_hash,created_at DESC);
+      CREATE TABLE IF NOT EXISTS admin_login_attempts (ip_hash TEXT PRIMARY KEY,attempts INTEGER NOT NULL DEFAULT 0,window_started_at TIMESTAMPTZ NOT NULL DEFAULT now(),locked_until TIMESTAMPTZ);
+      CREATE TABLE IF NOT EXISTS job_posting_links (
+        id BIGSERIAL PRIMARY KEY,label TEXT NOT NULL,token_hash TEXT UNIQUE NOT NULL,auto_publish BOOLEAN NOT NULL DEFAULT false,
+        max_uses INTEGER NOT NULL DEFAULT 1,uses INTEGER NOT NULL DEFAULT 0,expires_at TIMESTAMPTZ,revoked_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
-      CREATE INDEX IF NOT EXISTS job_submissions_status_created_idx ON job_submissions(status,created_at DESC);
+      CREATE INDEX IF NOT EXISTS job_posting_links_active_idx ON job_posting_links(token_hash,expires_at) WHERE revoked_at IS NULL;
       CREATE TABLE IF NOT EXISTS ads (
         id TEXT PRIMARY KEY,title TEXT NOT NULL,company TEXT,description TEXT DEFAULT '',url TEXT NOT NULL,
         image_url TEXT,placement TEXT NOT NULL DEFAULT 'all',active BOOLEAN NOT NULL DEFAULT true,
