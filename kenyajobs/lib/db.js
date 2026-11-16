@@ -87,6 +87,7 @@ async function ensureSchema() {
         published BOOLEAN NOT NULL DEFAULT true,renewal_status TEXT NOT NULL DEFAULT 'active',
         source_submission_id BIGINT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
+      CREATE UNIQUE INDEX IF NOT EXISTS events_source_submission_idx ON events(source_submission_id) WHERE source_submission_id IS NOT NULL;
       CREATE INDEX IF NOT EXISTS events_published_date_idx ON events(published,event_date);
       CREATE INDEX IF NOT EXISTS events_expiry_idx ON events(package_expires_at) WHERE published=true;
       CREATE TABLE IF NOT EXISTS admin_login_attempts (ip_hash TEXT PRIMARY KEY,attempts INTEGER NOT NULL DEFAULT 0,window_started_at TIMESTAMPTZ NOT NULL DEFAULT now(),locked_until TIMESTAMPTZ);
