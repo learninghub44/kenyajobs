@@ -3,13 +3,8 @@ import { query } from "@/lib/db";
 export const DEFAULT_SOCIAL_SETTINGS = {
   whatsapp_channel_url: "https://whatsapp.com/channel/0029Vb9ItcdJf05hVwnE3w2C",
   telegram_channel_url: "https://t.me/+JN0rNZmNbGlkN2I0",
-  whatsapp_enabled: true,
-  telegram_enabled: true,
-  auto_queue: true,
-  approval_required: true,
-  kenya_enabled: true,
-  africa_enabled: true,
-  remote_enabled: true,
+  whatsapp_enabled: true, telegram_enabled: true, auto_queue: true,
+  approval_required: true, kenya_enabled: true, africa_enabled: true, remote_enabled: true,
 };
 
 export async function getSocialSettings() {
@@ -18,52 +13,40 @@ export async function getSocialSettings() {
 }
 
 export async function saveSocialSettings(input = {}) {
-  const allowed = [
-    "whatsapp_channel_url", "telegram_channel_url", "whatsapp_enabled",
-    "telegram_enabled", "auto_queue", "approval_required",
-    "kenya_enabled", "africa_enabled", "remote_enabled",
-  ];
-  const current = await getSocialSettings();
-  const next = { ...current };
-  for (const key of allowed) {
-    if (Object.prototype.hasOwnProperty.call(input, key)) next[key] = input[key];
-  }
-  for (const key of ["whatsapp_channel_url", "telegram_channel_url"]) {
+  const allowed = ["whatsapp_channel_url","telegram_channel_url","whatsapp_enabled","telegram_enabled","auto_queue","approval_required","kenya_enabled","africa_enabled","remote_enabled"];
+  const next = { ...(await getSocialSettings()) };
+  for (const key of allowed) if (Object.prototype.hasOwnProperty.call(input, key)) next[key] = input[key];
+  for (const [key, hosts] of Object.entries({
+    whatsapp_channel_url: ["whatsapp.com", "www.whatsapp.com"],
+    telegram_channel_url: ["t.me", "www.t.me", "telegram.me", "www.telegram.me"],
+  })) {
     const value = String(next[key] || "").trim();
-    if (value && (!/^https:\/\//i.test(value) || value.length > 500)) {
-      throw new Error(`${key} must be a valid HTTPS URL.`);
+    if (value) {
+      let parsed;
+      try { parsed = new URL(value); } catch { throw new Error(`${key} must be a valid channel URL.`); }
+      if (parsed.protocol !== "https:" || !hosts.includes(parsed.hostname.toLowerCase()) || value.length > 500) {
+        throw new Error(`${key} must use an official ${key.startsWith("whatsapp") ? "WhatsApp" : "Telegram"} channel domain.`);
+      }
     }
     next[key] = value;
   }
-  for (const key of ["whatsapp_enabled", "telegram_enabled", "auto_queue", "approval_required", "kenya_enabled", "africa_enabled", "remote_enabled"]) {
-    next[key] = Boolean(next[key]);
-  }
+  for (const key of ["whatsapp_enabled","telegram_enabled","auto_queue","approval_required","kenya_enabled","africa_enabled","remote_enabled"]) next[key] = Boolean(next[key]);
   await query(
     `INSERT INTO social_channel_settings
       (id, whatsapp_channel_url, telegram_channel_url, whatsapp_enabled, telegram_enabled, auto_queue, approval_required, kenya_enabled, africa_enabled, remote_enabled, updated_at)
      VALUES (1,$1,$2,$3,$4,$5,$6,$7,$8,$9,now())
      ON CONFLICT (id) DO UPDATE SET
-       whatsapp_channel_url=EXCLUDED.whatsapp_channel_url,
-       telegram_channel_url=EXCLUDED.telegram_channel_url,
-       whatsapp_enabled=EXCLUDED.whatsapp_enabled,
-       telegram_enabled=EXCLUDED.telegram_enabled,
-       auto_queue=EXCLUDED.auto_queue,
-       approval_required=EXCLUDED.approval_required,
-       kenya_enabled=EXCLUDED.kenya_enabled,
-       africa_enabled=EXCLUDED.africa_enabled,
-       remote_enabled=EXCLUDED.remote_enabled,
-       updated_at=now()`,
-    [next.whatsapp_channel_url, next.telegram_channel_url, next.whatsapp_enabled, next.telegram_enabled, next.auto_queue, next.approval_required, next.kenya_enabled, next.africa_enabled, next.remote_enabled]
+       whatsapp_channel_url=EXCLUDED.whatsapp_channel_url, telegram_channel_url=EXCLUDED.telegram_channel_url,
+       whatsapp_enabled=EXCLUDED.whatsapp_enabled, telegram_enabled=EXCLUDED.telegram_enabled,
+       auto_queue=EXCLUDED.auto_queue, approval_required=EXCLUDED.approval_required,
+       kenya_enabled=EXCLUDED.kenya_enabled, africa_enabled=EXCLUDED.africa_enabled,
+       remote_enabled=EXCLUDED.remote_enabled, updated_at=now()`,
+    [next.whatsapp_channel_url,next.telegram_channel_url,next.whatsapp_enabled,next.telegram_enabled,next.auto_queue,next.approval_required,next.kenya_enabled,next.africa_enabled,next.remote_enabled]
   );
   return next;
 }
 
-const AFRICAN_COUNTRIES = [
-  "kenya","uganda","tanzania","rwanda","burundi","ethiopia","somalia","south africa",
-  "nigeria","ghana","zambia","zimbabwe","malawi","mozambique","botswana","namibia",
-  "senegal","ivory coast","cote d'ivoire","cameroon","egypt","morocco","tunisia",
-  "algeria","sudan","south sudan","liberia","sierra leone","gambia","lesotho","eswatini"
-];
+const AFRICAN_COUNTRIES = ["kenya","uganda","tanzania","rwanda","burundi","ethiopia","somalia","south africa","nigeria","ghana","zambia","zimbabwe","malawi","mozambique","botswana","namibia","senegal","ivory coast","cote d'ivoire","cameroon","egypt","morocco","tunisia","algeria","sudan","south sudan","liberia","sierra leone","gambia","lesotho","eswatini"];
 const KENYA_LOCATIONS = ["kenya","nairobi","mombasa","kisumu","nakuru","eldoret","thika","bomet","nyeri","machakos","kiambu","kakamega","garissa","kilifi","meru"];
 
 export function classifyJob(job = {}, route = "") {
@@ -71,10 +54,23 @@ export function classifyJob(job = {}, route = "") {
   const location = String(job.location || job.candidate_required_location || job.job_city || "").toLowerCase();
   const type = String(job.type || job.job_type || job.employment_type || "").toLowerCase();
   if (hint.includes("remote") || /remote|work from home|worldwide|anywhere/.test(location + " " + type)) return "remote";
-  if (hint.includes("africa")) return "africa";
   if (KENYA_LOCATIONS.some((x) => location.includes(x))) return "kenya";
-  if (AFRICAN_COUNTRIES.some((x) => location.includes(x))) return "africa";
+  if (hint.includes("africa") || AFRICAN_COUNTRIES.some((x) => location.includes(x))) return "africa";
   return "";
+}
+
+function isExpired(job = {}) {
+  const expiry = job.expiryDate || job.expiry_date || job.application_deadline || job.deadline;
+  if (expiry) {
+    const date = new Date(expiry);
+    if (!Number.isNaN(date.getTime()) && date.getTime() < Date.now()) return true;
+  }
+  const posted = job.date || job.publication_date || job.job_posted_at_datetime_utc;
+  if (posted) {
+    const date = new Date(posted);
+    if (!Number.isNaN(date.getTime()) && Date.now() - date.getTime() > 45 * 86400000) return true;
+  }
+  return false;
 }
 
 export function formatJobAnnouncement(job = {}, category = "kenya") {
@@ -88,20 +84,7 @@ export function formatJobAnnouncement(job = {}, category = "kenya") {
   const jobUrl = id ? `${siteUrl}/job/${encodeURIComponent(id)}` : siteUrl;
   const label = category === "remote" ? "WORLDWIDE REMOTE JOB" : category === "africa" ? "AFRICA JOB OPPORTUNITY" : "KENYA JOB OPPORTUNITY";
   const source = String(job.source || "").trim();
-  return [
-    `📢 ${label}`,
-    "",
-    `💼 ${title}`,
-    `🏢 Company: ${company}`,
-    `📍 Location: ${location}`,
-    `🕒 Type: ${type}`,
-    salary ? `💰 Salary: ${salary}` : "",
-    source ? `🔎 Source: ${source}` : "",
-    "",
-    `Apply / Read full details: ${jobUrl}`,
-    "",
-    "Follow JOBS HUB KENYA for more verified opportunities.",
-  ].filter(Boolean).join("\n").slice(0, 3500);
+  return [`📢 ${label}`,"",`💼 ${title}`,`🏢 Company: ${company}`,`📍 Location: ${location}`,`🕒 Type: ${type}`,salary ? `💰 Salary: ${salary}` : "",source ? `🔎 Source: ${source}` : "","",`Apply / Read full details: ${jobUrl}`,"","Follow JOBS HUB KENYA for more verified opportunities."].filter(Boolean).join("\n").slice(0,3500);
 }
 
 export async function enqueueJobs(jobs, route = "") {
@@ -115,13 +98,11 @@ export async function enqueueJobs(jobs, route = "") {
   if (!channels.length) return { queued: 0 };
   let queued = 0;
   for (const job of jobs) {
-    if (!job || !(job.id || job.job_id)) continue;
+    if (!job || !(job.id || job.job_id) || isExpired(job)) continue;
     const category = classifyJob(job, route);
     if (!category || !settings[`${category}_enabled`]) continue;
     const jobId = String(job.id || job.job_id);
     for (const channel of channels) {
-      const text = formatJobAnnouncement(job, category);
-      const status = settings.approval_required ? "pending_approval" : "ready";
       const result = await query(
         `INSERT INTO job_distribution_queue (job_id, channel, category, payload, message, status, created_at, updated_at)
          VALUES ($1,$2,$3,$4::jsonb,$5,$6,now(),now())
@@ -129,9 +110,8 @@ export async function enqueueJobs(jobs, route = "") {
            category=EXCLUDED.category, payload=EXCLUDED.payload, message=EXCLUDED.message,
            status=CASE WHEN job_distribution_queue.status IN ('failed','pending_approval','ready') THEN EXCLUDED.status ELSE job_distribution_queue.status END,
            updated_at=now()
-         WHERE job_distribution_queue.status <> 'posted'
-         RETURNING id`,
-        [jobId, channel, category, JSON.stringify(job), text, status]
+         WHERE job_distribution_queue.status <> 'posted' RETURNING id`,
+        [jobId,channel,category,JSON.stringify(job),formatJobAnnouncement(job,category),settings.approval_required ? "pending_approval" : "ready"]
       );
       if (result.rowCount) queued += 1;
     }
@@ -140,34 +120,30 @@ export async function enqueueJobs(jobs, route = "") {
 }
 
 export async function listDistributionQueue({ limit = 100 } = {}) {
-  const { rows } = await query(
-    "SELECT id, job_id, channel, category, payload, message, status, error, created_at, updated_at, posted_at FROM job_distribution_queue ORDER BY created_at DESC LIMIT $1",
-    [Math.min(Math.max(Number(limit) || 100, 1), 200)]
-  );
+  const { rows } = await query("SELECT id, job_id, channel, category, payload, message, status, error, created_at, updated_at, posted_at FROM job_distribution_queue ORDER BY created_at DESC LIMIT $1",[Math.min(Math.max(Number(limit)||100,1),200)]);
   return rows;
 }
 
-export async function updateDistributionItem(id, status, error = null) {
-  const allowed = ["pending_approval", "ready", "posted", "failed"];
+export async function updateDistributionItem(id, status, error = null, expectedStatuses = null, action = "status_changed") {
+  const allowed = ["pending_approval","ready","posted","failed"];
   if (!allowed.includes(status)) throw new Error("Invalid distribution status.");
   const { rows } = await query(
-    `UPDATE job_distribution_queue SET status=$2, error=$3,
-       posted_at=CASE WHEN $2='posted' THEN now() ELSE posted_at END,
-       updated_at=now() WHERE id=$1 RETURNING id, job_id, channel, category, status, posted_at`,
-    [Number(id), status, error ? String(error).slice(0, 1000) : null]
+    `UPDATE job_distribution_queue SET status=$2,error=$3,
+       posted_at=CASE WHEN $2='posted' THEN now() ELSE posted_at END,updated_at=now()
+     WHERE id=$1 AND ($4::text[] IS NULL OR status=ANY($4::text[]))
+     RETURNING id,job_id,channel,category,status,posted_at`,
+    [Number(id),status,error ? String(error).slice(0,1000) : null,expectedStatuses]
   );
-  return rows[0] || null;
+  if (!rows[0]) return null;
+  await query("INSERT INTO job_distribution_logs (queue_id,action,status,detail) VALUES ($1,$2,$3,$4)",[Number(id),action,status,error ? String(error).slice(0,1000) : null]);
+  return rows[0];
 }
 
 export async function sendTelegramMessage(message) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) throw new Error("Telegram bot is not connected. Configure TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in the hosting environment.");
-  const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text: message, disable_web_page_preview: false }),
-  });
+  const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:chatId,text:message,disable_web_page_preview:false})});
   const data = await response.json().catch(() => ({}));
   if (!response.ok || !data.ok) throw new Error(data.description || `Telegram API returned HTTP ${response.status}`);
   return data.result;
