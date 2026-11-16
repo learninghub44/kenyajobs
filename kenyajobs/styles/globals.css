@@ -610,3 +610,77 @@ input,select,textarea { border-radius:10px; }
   .job-card-title { font-size:16px; }
   .job-card-excerpt { display:none; }
 }
+
+
+/* ── Reference-led job board redesign + accessible CTA contrast fixes ── */
+:root {
+  --background:#F5F7FC; --foreground:#121212; --surface:#FFFFFF;
+  --surface-muted:#F2F5FB; --surface-hover:#EAF0FC;
+  --text-primary:#121212; --text-secondary:#4D5B70; --text-tertiary:#778397;
+  --border:#E0E6F0; --border-light:#EDF1F7; --border-focus:#3A74DE;
+  --primary:#022FE2; --primary-hover:#04249D; --primary-light:#EAF0FF;
+  --primary-dark:#142771; --navy:#142771; --navy-light:#1E3A8A;
+  --accent:#3A74DE; --success:#147A55;
+}
+html { scroll-behavior:smooth; }
+body { background:#F5F7FC !important; color:#121212 !important; }
+.home-hero { background:linear-gradient(118deg,#142771 0%,#022FE2 78%,#3A74DE 100%) !important; }
+.home-hero > div { max-width:1240px; }
+.home-hero h1 { max-width:780px; font-size:clamp(42px,5.7vw,68px) !important; line-height:1.02 !important; }
+.home-hero .mt-8.max-w-5xl { max-width:100%; border-radius:14px !important; }
+.home-hero .job-search-input { min-height:60px; background:#F7F9FD !important; color:#14213D !important; border:1px solid #E1E7F1 !important; }
+.home-hero .job-search-input option { color:#14213D; background:#fff; }
+.home-hero button.bg-primary { background:#022FE2 !important; color:#fff !important; }
+.home-hero button.bg-primary:hover { background:#04249D !important; }
+#jobs-section { max-width:1240px; }
+#jobs-section .jobs-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; border:0; background:transparent; }
+#jobs-section .job-card { min-width:0; border:1px solid #E1E7F1 !important; border-radius:13px !important; padding:19px !important; }
+#jobs-section .job-card:hover { border-color:#9BB2F5 !important; }
+#jobs-section .job-card-title { font-size:17px; line-height:1.35; }
+#jobs-section .job-card-meta { display:flex; flex-wrap:wrap; }
+@media(max-width:760px) {
+  #jobs-section .jobs-list { grid-template-columns:1fr; }
+}
+@media(min-width:761px) {
+  #jobs-section .jobs-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+/* Never render a coloured CTA without readable text: explicit foreground/background pairs. */
+button.bg-primary, a.bg-primary, .bg-primary.text-white,
+button[class*="bg-primary"], a[class*="bg-primary"],
+.apply-button, .button-primary,
+.home-hero button, header a[href^="mailto:"],
+section.max-w-7xl.mx-auto.px-4.mt-8 a {
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  font-weight:700 !important;
+}
+button.bg-primary, a.bg-primary, button[class*="bg-primary"], a[class*="bg-primary"],
+.apply-button, .button-primary {
+  background-color:#022FE2 !important;
+}
+button.bg-primary:hover, a.bg-primary:hover, button[class*="bg-primary"]:hover,
+a[class*="bg-primary"]:hover, .apply-button:hover, .button-primary:hover {
+  background-color:#04249D !important;
+}
+button.bg-white, a.bg-white, button[class*="bg-white"], a[class*="bg-white"] {
+  color:#14213D !important; -webkit-text-fill-color:#14213D !important;
+}
+button:disabled { opacity:.55; cursor:not-allowed; }
+button svg, a svg { flex-shrink:0; }
+:where(button,a).text-white, :where(button,a) .text-white { color:#fff !important; -webkit-text-fill-color:#fff !important; }
+:where(button,a).text-text-primary, :where(button,a).text-text-secondary,
+:where(button,a).text-text-tertiary { -webkit-text-fill-color:currentColor; }
+:focus-visible { outline:3px solid rgba(58,116,222,.65) !important; outline-offset:3px !important; }
+
+/* Clear job-board surface hierarchy and stronger card affordance. */
+#jobs-section .job-card { box-shadow:0 5px 18px rgba(20,39,113,.055) !important; }
+#jobs-section .job-card:hover { transform:translateY(-3px); box-shadow:0 14px 30px rgba(20,39,113,.11) !important; }
+#jobs-section .job-card .job-card-title { color:#121212 !important; }
+#jobs-section .job-card .job-card-excerpt { color:#536176 !important; }
+#jobs-section .job-card .job-view { color:#022FE2 !important; }
+@media(prefers-reduced-motion:no-preference) {
+  .social-channel-banner .channel-cta { animation:channel-pop .55s cubic-bezier(.2,.8,.2,1) both; }
+  .social-channel-banner .channel-cta:nth-child(2) { animation-delay:100ms; }
+  @keyframes channel-pop { from { opacity:0; transform:translateY(8px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+}
