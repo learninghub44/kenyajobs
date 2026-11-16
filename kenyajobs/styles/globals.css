@@ -749,3 +749,60 @@ html body .events-page a.event-action-primary:hover,html body .events-page butto
 html body .events-page a.event-action-primary *,html body .events-page button.event-action-primary *,html body a.event-action-primary *,html body button.event-action-primary *{color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;stroke:currentColor}
 html body .events-page a.event-action-secondary,html body a.event-action-secondary,html body button.event-action-secondary{background-color:#FFFFFF!important;background-image:none!important;color:#142771!important;-webkit-text-fill-color:#142771!important;border:1px solid #DCE4F0!important}
 html body .events-page a.event-action-secondary *,html body a.event-action-secondary *,html body button.event-action-secondary *{color:#142771!important;-webkit-text-fill-color:#142771!important}
+
+
+/* Beyond Vacancies card — explicit high-contrast CTA colors, isolated from global utility overrides. */
+html body .home-hero ~ section .home-event-action,
+html body .home-event-action {
+  display:inline-flex !important;
+  min-height:48px;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px;
+  padding:13px 20px !important;
+  border:2px solid transparent !important;
+  border-radius:12px !important;
+  font-size:14px !important;
+  font-weight:800 !important;
+  line-height:1.25 !important;
+  text-decoration:none !important;
+  opacity:1 !important;
+  text-shadow:none !important;
+  -webkit-text-fill-color:currentColor !important;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease !important;
+}
+html body .home-event-action-primary {
+  background:#FFFFFF !important;
+  border-color:#FFFFFF !important;
+  color:#071B55 !important;
+  -webkit-text-fill-color:#071B55 !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.18) !important;
+}
+html body .home-event-action-primary:hover {
+  background:#EAF0FF !important;
+  border-color:#EAF0FF !important;
+  color:#071B55 !important;
+  -webkit-text-fill-color:#071B55 !important;
+  transform:translateY(-2px);
+}
+html body .home-event-action-secondary {
+  background:#3A74DE !important;
+  border-color:#8FB2FF !important;
+  color:#FFFFFF !important;
+  -webkit-text-fill-color:#FFFFFF !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.16) !important;
+}
+html body .home-event-action-secondary:hover {
+  background:#022FE2 !important;
+  border-color:#FFFFFF !important;
+  color:#FFFFFF !important;
+  -webkit-text-fill-color:#FFFFFF !important;
+  transform:translateY(-2px);
+}
+html body .home-event-action * {
+  color:inherit !important;
+  -webkit-text-fill-color:inherit !important;
+}
+@media(max-width:640px) {
+  html body .home-event-action { width:100%; min-height:50px; }
+}
