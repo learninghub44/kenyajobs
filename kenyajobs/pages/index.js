@@ -386,6 +386,22 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── EVENTS PROMOTION ───────────────────────────────────────────────── */}
+      <section className="mx-auto mt-8 max-w-7xl px-4">
+        <div className="relative overflow-hidden rounded-2xl bg-[#071b55] px-6 py-8 text-white sm:px-9 md:flex md:items-center md:justify-between">
+          <div className="pointer-events-none absolute -right-12 -top-20 h-64 w-64 rounded-full border-[30px] border-white/5" />
+          <div className="relative max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[.18em] text-blue-200">Beyond vacancies</p>
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">Discover events that move your career forward.</h2>
+            <p className="mt-2 text-sm leading-6 text-blue-100">Explore career fairs, tech meetups, workshops, conferences and professional trainings—or promote your own event.</p>
+          </div>
+          <div className="relative mt-5 flex flex-wrap gap-3 md:mt-0">
+            <Link href="/events" className="rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-[#071b55] transition hover:-translate-y-0.5">Explore events</Link>
+            <Link href="/submit-event" className="rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10">Promote an event · from KES 1,500</Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── JOBS SECTION ──────────────────────────────────────────────────── */}
       <section id="jobs-section" className="max-w-7xl mx-auto px-4 py-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
