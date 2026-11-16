@@ -223,7 +223,9 @@ function buildJobSections(job, description) {
   const explicit = {
     "Responsibilities": job.responsibilities || job.responsibility || job.duties || job.job_responsibilities,
     "Requirements": job.requirements || job.qualifications || job.job_requirements || job.skills_required,
-    "Benefits": job.benefits || job.job_benefits || job.perks,\n    "Education": job.education || job.education_requirements,\n    "How to apply": job.applicationInstructions || job.application_instructions
+    "Benefits": job.benefits || job.job_benefits || job.perks,
+    "Education": job.education || job.education_requirements,
+    "How to apply": job.applicationInstructions || job.application_instructions
   };
 
   for (const [title, value] of Object.entries(explicit)) {
@@ -408,7 +410,9 @@ export default function JobDetail() {
     [MapPin, "Location", location],
     [BriefcaseBusiness, "Job type", type],
     [Clock3, "Posted", timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc)],
-    ...(salary ? [[Banknote, "Salary", salary]] : []),\n    ...(job.applicationDeadline || job.application_deadline ? [[CalendarDays, "Application deadline", job.applicationDeadline || job.application_deadline]] : []),\n    ...(job.experience ? [[BriefcaseBusiness, "Experience", job.experience]] : []),
+    ...(salary ? [[Banknote, "Salary", salary]] : []),
+    ...(job.applicationDeadline || job.application_deadline ? [[CalendarDays, "Application deadline", job.applicationDeadline || job.application_deadline]] : []),
+    ...(job.experience ? [[BriefcaseBusiness, "Experience", job.experience]] : []),
   ];
 
   return (
