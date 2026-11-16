@@ -42,6 +42,21 @@ async function ensureSchema() {
         job_id TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
       );
       CREATE INDEX IF NOT EXISTS job_submissions_status_created_idx ON job_submissions(status,created_at DESC);
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS qualifications TEXT DEFAULT '';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS experience TEXT DEFAULT '';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS education TEXT DEFAULT '';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS benefits TEXT DEFAULT '';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS company_website TEXT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS company_logo TEXT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS posting_link_id BIGINT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS ip_hash TEXT;
+      CREATE INDEX IF NOT EXISTS job_submissions_ip_created_idx ON job_submissions(ip_hash,created_at DESC);
+      CREATE TABLE IF NOT EXISTS job_posting_links (
+        id BIGSERIAL PRIMARY KEY,label TEXT NOT NULL,token_hash TEXT UNIQUE NOT NULL,auto_publish BOOLEAN NOT NULL DEFAULT false,
+        max_uses INTEGER NOT NULL DEFAULT 1,uses INTEGER NOT NULL DEFAULT 0,expires_at TIMESTAMPTZ,revoked_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS job_posting_links_active_idx ON job_posting_links(token_hash,expires_at) WHERE revoked_at IS NULL;
       CREATE TABLE IF NOT EXISTS ads (
         id TEXT PRIMARY KEY,title TEXT NOT NULL,company TEXT,description TEXT DEFAULT '',url TEXT NOT NULL,
         image_url TEXT,placement TEXT NOT NULL DEFAULT 'all',active BOOLEAN NOT NULL DEFAULT true,
