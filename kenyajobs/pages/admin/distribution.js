@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Head from "next/head";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { MessageCircle, Send, Save, RefreshCw, Copy, ExternalLink, CheckCircle2, Clock3, AlertCircle, Radio } from "lucide-react";
+import { MessageCircle, Send, Save, RefreshCw, Copy, ExternalLink, CheckCircle2, Clock3, AlertCircle, Radio, ScanSearch } from "lucide-react";
 
 const defaults = {whatsapp_channel_url:"",telegram_channel_url:"",whatsapp_enabled:true,telegram_enabled:true,auto_queue:true,approval_required:true,kenya_enabled:true,africa_enabled:true,remote_enabled:true};
 const inputClass = "w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100";
@@ -11,6 +11,7 @@ export default function AdminDistribution() {
   const [queue,setQueue] = useState([]);
   const [botConfigured,setBotConfigured] = useState(false);
   const [loading,setLoading] = useState(true);
+  const [scanning,setScanning] = useState(false);
   const [saving,setSaving] = useState(false);
   const [busyId,setBusyId] = useState(null);
   const [error,setError] = useState("");

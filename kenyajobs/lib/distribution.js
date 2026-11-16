@@ -73,18 +73,52 @@ function isExpired(job = {}) {
   return false;
 }
 
-export function formatJobAnnouncement(job = {}, category = "kenya") {
-  const title = String(job.title || job.job_title || "Job opportunity").replace(/\s+/g, " ").trim();
-  const company = String(job.company || job.company_name || job.employer_name || "Company").replace(/\s+/g, " ").trim();
-  const location = String(job.location || job.candidate_required_location || job.job_city || "Not specified").replace(/\s+/g, " ").trim();
-  const type = String(job.type || job.job_type || job.employment_type || "Not specified").replace(/\s+/g, " ").trim();
-  const salary = String(job.salary || "").replace(/\s+/g, " ").trim();
-  const id = String(job.id || job.job_id || "");
+function cleanText(value, max = 420) {
+  const text = Array.isArray(value) ? value.filter(Boolean).join(", ") : String(value || "");
+  return text.replace(/<[^>]*>/g, " ").replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/&amp;/gi, "&").replace(/&quot;/gi, '"')
+    .replace(/\s+/g, " ").trim().slice(0, max);
+}
+
+function jobDetailUrl(job) {
+  const id = String(job.id || job.job_id || "").trim();
+  if (!id) return "";
   const siteUrl = (process.env.SITE_URL || "https://onlinejobs.christech.co.ke").replace(/\/$/, "");
-  const jobUrl = id ? `${siteUrl}/job/${encodeURIComponent(id)}` : siteUrl;
-  const label = category === "remote" ? "WORLDWIDE REMOTE JOB" : category === "africa" ? "AFRICA JOB OPPORTUNITY" : "KENYA JOB OPPORTUNITY";
-  const source = String(job.source || "").trim();
-  return [`📢 ${label}`,"",`💼 ${title}`,`🏢 Company: ${company}`,`📍 Location: ${location}`,`🕒 Type: ${type}`,salary ? `💰 Salary: ${salary}` : "",source ? `🔎 Source: ${source}` : "","",`Apply / Read full details: ${jobUrl}`,"","Follow JOBS HUB KENYA for more verified opportunities."].filter(Boolean).join("\n").slice(0,3500);
+  return `${siteUrl}/job/${encodeURIComponent(id)}`;
+}
+
+export function formatJobAnnouncement(job = {}, category = "kenya") {
+  const title = cleanText(job.title || job.job_title || "Job opportunity", 160);
+  const company = cleanText(job.company || job.company_name || job.employer_name || "Company", 120);
+  const location = cleanText(job.location || job.candidate_required_location || job.job_city || "Not specified", 100);
+  const type = cleanText(job.type || job.job_type || job.employment_type || "Not specified", 80);
+  const salary = cleanText(job.salary || "", 100);
+  const experience = cleanText(job.experience || job.experience_level || job.seniority || "", 100);
+  const deadline = cleanText(job.application_deadline || job.deadline || job.expiryDate || job.expiry_date || "", 80);
+  const requirements = cleanText(job.requirements || job.qualifications || job.job_requirements || job.skills_required || "", 420);
+  const description = cleanText(job.description || job.job_description || "", 320);
+  const detailUrl = jobDetailUrl(job);
+  const label = category === "remote" ? "WORLDWIDE REMOTE OPPORTUNITY" : category === "africa" ? "AFRICA JOB OPPORTUNITY" : "KENYA JOB OPPORTUNITY";
+  const source = cleanText(job.source || "Original employer / job board", 80);
+  const lines = [
+    `📢 ${label}`, "",
+    `💼 ${title}`,
+    `🏢 Employer: ${company}`,
+    `📍 Location: ${location}`,
+    `🕒 Employment: ${type}`,
+    salary ? `💰 Salary: ${salary}` : "",
+    experience ? `🎓 Experience: ${experience}` : "",
+    deadline ? `📅 Application deadline: ${deadline}` : "",
+    requirements ? `\n✅ KEY REQUIREMENTS\n${requirements}` : "",
+    description ? `\nABOUT THE ROLE\n${description}` : "",
+    `\n🔎 Source: ${source}`,
+    detailUrl ? `\n👉 VIEW FULL DETAILS & APPLY: ${detailUrl}` : `\n👉 Browse opportunities: ${(process.env.SITE_URL || "https://onlinejobs.christech.co.ke").replace(/\/$/, "")}`,
+    "",
+    "Open the job page to review the full description, requirements and application instructions. Applications are completed through the original employer or job-board link.",
+    "",
+    "Follow JOBS HUB KENYA for more opportunities."
+  ];
+  return lines.filter(Boolean).join("\n").slice(0, 3500);
 }
 
 export async function enqueueJobs(jobs, route = "") {
@@ -111,7 +145,7 @@ export async function enqueueJobs(jobs, route = "") {
       );
       if (result.rowCount) {
         queued += 1;
-        await query("INSERT INTO job_distribution_logs (queue_id,action,status,detail) VALUES ($1,'queued',$2,$3)", [result.rows[0].id, status, `Auto-queued from ${route || "manual job entry"}`]);
+        await query("INSERT INTO job_distribution_logs (queue_id,action,status,detail) VALUES ($1,'queued',$2,$3)", [result.rows[0].id, settings.approval_required ? "pending_approval" : "ready", `Auto-queued from ${route || "manual job entry"}`]);
       }
     }
   }
