@@ -39,7 +39,9 @@ export default function AdminLayout({ children, active }) {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <>
+      <Head><meta name="robots" content="noindex,nofollow" /><meta name="referrer" content="no-referrer" /></Head>
+      <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Admin</h1>
         <button onClick={handleLogout} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors">
@@ -58,5 +60,6 @@ export default function AdminLayout({ children, active }) {
       </nav>
       {children}
     </div>
+    </>
   );
 }
