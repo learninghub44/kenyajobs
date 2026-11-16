@@ -1,112 +1,82 @@
 // lib/db.js
-// Postgres connection pool. Works with any standard Postgres connection string —
-// Vercel Postgres, Neon, Supabase, or self-hosted. Set DATABASE_URL in the
-// environment (Vercel project settings) to whichever connection string your
-// provider gives you.
-//
-// Some providers also expose POSTGRES_URL / POSTGRES_PRISMA_URL (Vercel Postgres)
-// instead of DATABASE_URL — we fall back to those so this works out of the box
-// regardless of which integration was used to provision the database.
+// Shared PostgreSQL pool and idempotent schema bootstrap for serverless deployments.
 import { Pool } from "pg";
 
-const CONNECTION_STRING =
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL ||
-  process.env.POSTGRES_URL_NON_POOLING ||
-  "";
-
+const CONNECTION_STRING = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_URL_NON_POOLING || "";
 let pool;
-
 function getPool() {
-  if (!CONNECTION_STRING) {
-    throw new Error(
-      "No database connection string found. Set DATABASE_URL (or POSTGRES_URL) in your environment."
-    );
-  }
+  if (!CONNECTION_STRING) throw new Error("No database connection string found. Set DATABASE_URL (or POSTGRES_URL) in your environment.");
   if (!pool) {
     const isLocal = /localhost|127\.0\.0\.1/.test(CONNECTION_STRING);
-    pool = new Pool({
-      connectionString: CONNECTION_STRING,
-      // Vercel Postgres / Neon / Supabase all require SSL; local dev usually doesn't.
-      ssl: isLocal ? false : { rejectUnauthorized: false },
-      max: 5,
-    });
+    pool = new Pool({ connectionString: CONNECTION_STRING, ssl: isLocal ? false : { rejectUnauthorized: false }, max: 5 });
   }
   return pool;
 }
 
-// Schema bootstrap — runs once per cold start (serverless functions are reused
-// across requests until the instance recycles, so this keeps cost/latency low
-// without needing a separate migration step on deploy).
 let schemaReady = null;
-
 async function ensureSchema() {
   if (!schemaReady) {
-    schemaReady = getPool()
-      .query(`
-        CREATE TABLE IF NOT EXISTS manual_jobs (
-          id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
-          company TEXT NOT NULL,
-          location TEXT DEFAULT 'Worldwide',
-          type TEXT DEFAULT 'Full-time',
-          salary TEXT,
-          description TEXT DEFAULT '',
-          url TEXT NOT NULL,
-          company_logo TEXT,
-          company_website TEXT,
-          categories TEXT[] NOT NULL DEFAULT '{}',
-          featured BOOLEAN NOT NULL DEFAULT false,
-          published BOOLEAN NOT NULL DEFAULT true,
-          source TEXT NOT NULL DEFAULT 'JobsWorldwide',
-          created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        );
-
-        CREATE TABLE IF NOT EXISTS ads (
-          id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
-          company TEXT,
-          description TEXT DEFAULT '',
-          url TEXT NOT NULL,
-          image_url TEXT,
-          placement TEXT NOT NULL DEFAULT 'all',
-          active BOOLEAN NOT NULL DEFAULT true,
-          priority INTEGER NOT NULL DEFAULT 0,
-          created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        );
-
-        -- Snapshot of live-pulled jobs, written whenever any *-jobs API route resolves a
-        -- batch. This is what makes the job detail page reliable for shared links, new-tab
-        -- opens, and crawler visits: instead of re-querying every live source (which is
-        -- subject to per-source timeouts and upstream feeds rotating jobs out), the detail
-        -- page can do one fast, deterministic lookup here first.
-        CREATE TABLE IF NOT EXISTS live_job_cache (
-          id TEXT PRIMARY KEY,
-          data JSONB NOT NULL,
-          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        );
-
-        CREATE INDEX IF NOT EXISTS manual_jobs_published_idx ON manual_jobs (published);
-        CREATE INDEX IF NOT EXISTS ads_active_placement_idx ON ads (active, placement);
-        CREATE INDEX IF NOT EXISTS live_job_cache_updated_idx ON live_job_cache (updated_at);
-      `)
-      .catch((err) => {
-        // Let the next call retry instead of caching a failed bootstrap forever.
-        schemaReady = null;
-        throw err;
-      });
+    schemaReady = getPool().query(`
+      CREATE TABLE IF NOT EXISTS manual_jobs (
+        id TEXT PRIMARY KEY, title TEXT NOT NULL, company TEXT NOT NULL,
+        location TEXT DEFAULT 'Worldwide', type TEXT DEFAULT 'Full-time', salary TEXT,
+        description TEXT DEFAULT '', url TEXT NOT NULL, company_logo TEXT, company_website TEXT,
+        categories TEXT[] NOT NULL DEFAULT '{}', featured BOOLEAN NOT NULL DEFAULT false,
+        published BOOLEAN NOT NULL DEFAULT true, source TEXT NOT NULL DEFAULT 'JobsWorldwide',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE TABLE IF NOT EXISTS ads (
+        id TEXT PRIMARY KEY, title TEXT NOT NULL, company TEXT, description TEXT DEFAULT '',
+        url TEXT NOT NULL, image_url TEXT, placement TEXT NOT NULL DEFAULT 'all',
+        active BOOLEAN NOT NULL DEFAULT true, priority INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE TABLE IF NOT EXISTS live_job_cache (
+        id TEXT PRIMARY KEY, data JSONB NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE TABLE IF NOT EXISTS social_channel_settings (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        whatsapp_channel_url TEXT NOT NULL DEFAULT 'https://whatsapp.com/channel/0029Vb9ItcdJf05hVwnE3w2C',
+        telegram_channel_url TEXT NOT NULL DEFAULT 'https://t.me/+JN0rNZmNbGlkN2I0',
+        whatsapp_enabled BOOLEAN NOT NULL DEFAULT true,
+        telegram_enabled BOOLEAN NOT NULL DEFAULT true,
+        auto_queue BOOLEAN NOT NULL DEFAULT true,
+        approval_required BOOLEAN NOT NULL DEFAULT true,
+        kenya_enabled BOOLEAN NOT NULL DEFAULT true,
+        africa_enabled BOOLEAN NOT NULL DEFAULT true,
+        remote_enabled BOOLEAN NOT NULL DEFAULT true,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      INSERT INTO social_channel_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+      CREATE TABLE IF NOT EXISTS job_distribution_queue (
+        id BIGSERIAL PRIMARY KEY, job_id TEXT NOT NULL,
+        channel TEXT NOT NULL CHECK (channel IN ('whatsapp','telegram')),
+        category TEXT NOT NULL CHECK (category IN ('kenya','africa','remote')),
+        payload JSONB NOT NULL, message TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending_approval'
+          CHECK (status IN ('pending_approval','ready','posted','failed')),
+        error TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), posted_at TIMESTAMPTZ,
+        UNIQUE (job_id, channel)
+      );
+      CREATE TABLE IF NOT EXISTS job_distribution_logs (
+        id BIGSERIAL PRIMARY KEY,
+        queue_id BIGINT NOT NULL REFERENCES job_distribution_queue(id) ON DELETE CASCADE,
+        action TEXT NOT NULL, status TEXT NOT NULL, detail TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS manual_jobs_published_idx ON manual_jobs (published);
+      CREATE INDEX IF NOT EXISTS ads_active_placement_idx ON ads (active, placement);
+      CREATE INDEX IF NOT EXISTS live_job_cache_updated_idx ON live_job_cache (updated_at);
+      CREATE INDEX IF NOT EXISTS distribution_status_created_idx ON job_distribution_queue (status, created_at DESC);
+      CREATE INDEX IF NOT EXISTS distribution_channel_created_idx ON job_distribution_queue (channel, created_at DESC);
+      CREATE INDEX IF NOT EXISTS distribution_logs_queue_idx ON job_distribution_logs (queue_id, created_at DESC);
+    `).catch((err) => { schemaReady = null; throw err; });
   }
   return schemaReady;
 }
-
-// Run a query, guaranteeing the schema exists first.
 export async function query(text, params) {
   await ensureSchema();
   return getPool().query(text, params);
 }
-
-export function isDatabaseConfigured() {
-  return Boolean(CONNECTION_STRING);
-}
+export function isDatabaseConfigured() { return Boolean(CONNECTION_STRING); }
