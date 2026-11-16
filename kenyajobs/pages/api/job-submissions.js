@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { query } from "@/lib/db";
 import { createJob } from "@/lib/manualJobs";
+import { getPackage } from "@/lib/packages";
 
 const hash = (value) => crypto.createHash("sha256").update(value).digest("hex");
 const clip = (value, max = 5000) => String(value || "").trim().slice(0, max);
@@ -65,6 +66,8 @@ export default async function handler(req, res) {
     company: clip(body.company, 180),
     contactName: clip(body.contactName, 120),
     email: clip(body.email, 254).toLowerCase(),
+    phone: clip(body.phone, 30),
+    packageCode: clip(body.packageCode, 50),
     location: clip(body.location, 180) || "Kenya",
     type: clip(body.type, 80) || "Full-time",
     salary: clip(body.salary, 120),
@@ -85,12 +88,14 @@ export default async function handler(req, res) {
       : [],
   };
 
-  for (const key of ["title", "company", "contactName", "email", "description", "url"]) {
+  for (const key of ["title", "company", "contactName", "email", "phone", "description", "url", "packageCode"]) {
     if (!fields[key]) return res.status(400).json({ error: key + " is required." });
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
     return res.status(400).json({ error: "Enter a valid contact email." });
   }
+  const selectedPackage = getPackage("jobs", fields.packageCode);
+  if (!selectedPackage) return res.status(400).json({ error: "Choose a valid job promotion package." });
   if (
     !validUrl(fields.url) ||
     (fields.companyWebsite && !validUrl(fields.companyWebsite)) ||
@@ -143,9 +148,9 @@ export default async function handler(req, res) {
       `INSERT INTO job_submissions(
         title,company,contact_name,email,location,type,salary,description,requirements,responsibilities,
         qualifications,experience,education,benefits,application_deadline,application_url,application_instructions,
-        company_website,company_logo,categories,status,posting_link_id,ip_hash,submission_key
+        company_website,company_logo,categories,status,posting_link_id,ip_hash,submission_key,phone,package_code,package_price,package_duration_days
       ) VALUES(
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending',$21,$22,$23
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending',$21,$22,$23,$24,$25,$26,$27
       ) ON CONFLICT(submission_key) WHERE submission_key IS NOT NULL DO NOTHING RETURNING id,status,job_id`,
       [
         fields.title, fields.company, fields.contactName, fields.email, fields.location, fields.type,
@@ -153,7 +158,7 @@ export default async function handler(req, res) {
         fields.qualifications, fields.experience, fields.education, fields.benefits,
         fields.applicationDeadline || null, fields.url, fields.applicationInstructions,
         fields.companyWebsite || null, fields.companyLogo || null, fields.categories,
-        link?.id || null, ipHash, submissionKey,
+        link?.id || null, ipHash, submissionKey, fields.phone, selectedPackage.code, selectedPackage.price, selectedPackage.durationDays,
       ]
     );
 
@@ -168,7 +173,7 @@ export default async function handler(req, res) {
 
     let publishedJob = null;
     let publishWarning = "";
-    if (link?.auto_publish) {
+    if (false && link?.auto_publish) {
       try {
         publishedJob = await createJob({
           title: fields.title,
@@ -207,7 +212,8 @@ export default async function handler(req, res) {
       jobId: publishedJob?.id || null,
       status: publishedJob ? "approved" : "pending",
       autoPublished: Boolean(publishedJob),
-      message: publishWarning || undefined,
+      package: { name: selectedPackage.name, price: selectedPackage.price, durationDays: selectedPackage.durationDays },
+      message: publishWarning || "The admin team will contact you to confirm the package, payment and publication schedule.",
     });
   } catch (error) {
     console.error("job submission:", error.message);
