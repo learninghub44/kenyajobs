@@ -12,6 +12,7 @@ const NAV_LINKS = [
     { label: "Internships", href: "/internships" },
     { label: "Africa Jobs", href: "/africa-jobs" },
   ]},
+  { label: "Events", href: "/events" },
   { label: "Blog", href: "/blog" },
   { label: "Employers", href: "/advertise" },
   { label: "Help center", href: "/faq" },
