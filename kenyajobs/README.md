@@ -15,6 +15,9 @@ Copy `.env.example` to `.env.local` and fill in:
 |---|---|---|
 | `DATABASE_URL` | Yes, for admin/manual jobs/ads | Standard Postgres connection string. Works with [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres), [Neon](https://neon.tech), [Supabase](https://supabase.com), or self-hosted. Tables are created automatically on first request — no separate migration step. |
 | `ADMIN_PASSWORD` | Yes, for `/admin` | Single shared password that gates the admin area. |
+| `SUPABASE_URL` (or `NEXT_PUBLIC_SUPABASE_URL`) | Required for event banner uploads | Supabase project URL used by the server-side event image uploader. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Required for event banner uploads | Server-only Supabase service-role key. Add it as a secret in the hosting provider; never expose it with a `NEXT_PUBLIC_` prefix. The uploader creates a public `event-posters` Storage bucket on first use. |
+| `SUPABASE_EVENT_BUCKET` | Optional | Override the Storage bucket name; defaults to `event-posters`. |
 | `ADMIN_SESSION_SECRET` | No | Used to sign the admin session cookie. Falls back to `ADMIN_PASSWORD` if unset. |
 | `NEXT_PUBLIC_ADSENSE_CLIENT` | No | Your AdSense publisher ID (`ca-pub-...`). When set, AdSense fills any ad slot that has no admin-managed sponsored listing. |
 | `RAPIDAPI_KEY`, `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` | No | Optional keys for the JSearch and Adzuna job sources — the site works without them, just with fewer sources. |
