@@ -31,6 +31,7 @@ async function ensureSchema() {
       ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS package_code TEXT;
       ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS package_price INTEGER;
       ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS package_expires_at TIMESTAMPTZ;
+      ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS featured_until TIMESTAMPTZ;
       ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS package_started_at TIMESTAMPTZ;
       ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS renewal_status TEXT NOT NULL DEFAULT 'not_applicable';
       ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS source_submission_id BIGINT;
