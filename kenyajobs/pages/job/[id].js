@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
-import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2 } from "lucide-react";
+import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2, CalendarDays } from "lucide-react";
 
 
 function normalizeDate(value) {
@@ -408,7 +408,7 @@ export default function JobDetail() {
     [MapPin, "Location", location],
     [BriefcaseBusiness, "Job type", type],
     [Clock3, "Posted", timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc)],
-    ...(salary ? [[Banknote, "Salary", salary]] : []),
+    ...(salary ? [[Banknote, "Salary", salary]] : []),\n    ...(job.applicationDeadline || job.application_deadline ? [[CalendarDays, "Application deadline", job.applicationDeadline || job.application_deadline]] : []),\n    ...(job.experience ? [[BriefcaseBusiness, "Experience", job.experience]] : []),
   ];
 
   return (
