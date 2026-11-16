@@ -71,11 +71,13 @@ async function ensureSchema() {
         id BIGSERIAL PRIMARY KEY,title TEXT NOT NULL,organiser TEXT NOT NULL,contact_name TEXT NOT NULL,email TEXT NOT NULL,phone TEXT NOT NULL,
         event_type TEXT DEFAULT 'Other',event_date DATE NOT NULL,start_time TEXT,end_time TEXT,timezone TEXT DEFAULT 'Africa/Nairobi',
         venue TEXT,location TEXT DEFAULT 'Kenya',description TEXT NOT NULL,ticket_price TEXT,registration_url TEXT,poster_url TEXT,
-        website TEXT,ip_hash TEXT,package_code TEXT NOT NULL,package_price INTEGER NOT NULL,package_duration_days INTEGER NOT NULL,
+        website TEXT,ip_hash TEXT,submission_key TEXT,package_code TEXT NOT NULL,package_price INTEGER NOT NULL,package_duration_days INTEGER NOT NULL,
         payment_status TEXT NOT NULL DEFAULT 'awaiting_confirmation',status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
         event_id TEXT,admin_notes TEXT DEFAULT '',created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
       );
       ALTER TABLE event_submissions ADD COLUMN IF NOT EXISTS ip_hash TEXT;
+      ALTER TABLE event_submissions ADD COLUMN IF NOT EXISTS submission_key TEXT;
+      CREATE UNIQUE INDEX IF NOT EXISTS event_submissions_submission_key_idx ON event_submissions(submission_key) WHERE submission_key IS NOT NULL;
       CREATE INDEX IF NOT EXISTS event_submissions_ip_created_idx ON event_submissions(ip_hash,created_at DESC);
       CREATE INDEX IF NOT EXISTS event_submissions_status_created_idx ON event_submissions(status,created_at DESC);
       CREATE TABLE IF NOT EXISTS events (
