@@ -94,6 +94,8 @@ export default async function handler(req, res) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
     return res.status(400).json({ error: "Enter a valid contact email." });
   }
+  const digits = fields.phone.replace(/\D/g, "");
+  if (digits.length < 9 || digits.length > 15) return res.status(400).json({ error: "Enter a valid phone number with country code." });
   const selectedPackage = getPackage("jobs", fields.packageCode);
   if (!selectedPackage) return res.status(400).json({ error: "Choose a valid job promotion package." });
   if (
