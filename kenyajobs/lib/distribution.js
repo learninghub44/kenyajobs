@@ -96,7 +96,7 @@ export function formatJobAnnouncement(job = {}, category = "kenya") {
   const experience = cleanText(job.experience || job.experience_level || job.seniority || "", 100);
   const deadline = cleanText(job.application_deadline || job.deadline || job.expiryDate || job.expiry_date || "", 80);
   const requirements = cleanText(job.requirements || job.qualifications || job.job_requirements || job.skills_required || "", 420);
-  const description = cleanText(job.description || job.job_description || "", 320);
+  const description = cleanText(job.description || job.job_description || "", 420);\n  const responsibilities = cleanText(job.responsibilities || "", 420);\n  const education = cleanText(job.education || "", 140);\n  const benefits = cleanText(job.benefits || "", 300);\n  const instructions = cleanText(job.applicationInstructions || job.application_instructions || "", 300);\n  const jobId = String(job.id || job.job_id || "Not assigned");
   const detailUrl = jobDetailUrl(job);
   const label = category === "remote" ? "WORLDWIDE REMOTE OPPORTUNITY" : category === "africa" ? "AFRICA JOB OPPORTUNITY" : "KENYA JOB OPPORTUNITY";
   const source = cleanText(job.source || "Original employer / job board", 80);
@@ -105,9 +105,9 @@ export function formatJobAnnouncement(job = {}, category = "kenya") {
     `💼 ${title}`,
     `🏢 Employer: ${company}`,
     `📍 Location: ${location}`,
-    `🕒 Employment: ${type}`,
+    `🕒 Employment: ${type}`,\n    `🆔 Job ID: ${jobId}`,
     salary ? `💰 Salary: ${salary}` : "",
-    experience ? `🎓 Experience: ${experience}` : "",
+    experience ? `🎓 Experience: ${experience}` : "",\n    education ? `📚 Education: ${education}` : "",
     deadline ? `📅 Application deadline: ${deadline}` : "",
     requirements ? `\n✅ KEY REQUIREMENTS\n${requirements}` : "",
     description ? `\nABOUT THE ROLE\n${description}` : "",
