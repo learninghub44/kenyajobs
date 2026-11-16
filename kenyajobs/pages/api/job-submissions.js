@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { query } from "@/lib/db";
-import { createJob } from "@/lib/manualJobs";
+import { getPackage } from "@/lib/packages";
 
 const hash = (value) => crypto.createHash("sha256").update(value).digest("hex");
 const clip = (value, max = 5000) => String(value || "").trim().slice(0, max);
@@ -40,7 +40,8 @@ export default async function handler(req, res) {
       if (!rows[0]) return res.status(404).json({ error: "This posting link is invalid, expired, or has reached its usage limit." });
       return res.status(200).json({
         label: rows[0].label,
-        autoPublish: rows[0].auto_publish,
+        autoPublish: false,
+        reviewRequired: true,
         remaining: rows[0].max_uses - rows[0].uses,
       });
     } catch (error) {
@@ -65,6 +66,8 @@ export default async function handler(req, res) {
     company: clip(body.company, 180),
     contactName: clip(body.contactName, 120),
     email: clip(body.email, 254).toLowerCase(),
+    phone: clip(body.phone, 30),
+    packageCode: clip(body.packageCode, 50),
     location: clip(body.location, 180) || "Kenya",
     type: clip(body.type, 80) || "Full-time",
     salary: clip(body.salary, 120),
@@ -85,12 +88,17 @@ export default async function handler(req, res) {
       : [],
   };
 
-  for (const key of ["title", "company", "contactName", "email", "description", "url"]) {
+  for (const key of ["title", "company", "contactName", "email", "phone", "description", "url", "packageCode"]) {
     if (!fields[key]) return res.status(400).json({ error: key + " is required." });
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
     return res.status(400).json({ error: "Enter a valid contact email." });
   }
+  const digits = fields.phone.replace(/\D/g, "");
+  if (digits.length < 9 || digits.length > 15) return res.status(400).json({ error: "Enter a valid phone number with country code." });
+  const selectedPackage = getPackage("jobs", fields.packageCode);
+  if (!selectedPackage) return res.status(400).json({ error: "Choose a valid job promotion package." });
+  if (String(body.title||"").length > selectedPackage.limits.title || String(body.description||"").length > selectedPackage.limits.description) return res.status(400).json({ error: "The job title or description exceeds the selected package limits." });
   if (
     !validUrl(fields.url) ||
     (fields.companyWebsite && !validUrl(fields.companyWebsite)) ||
@@ -143,9 +151,9 @@ export default async function handler(req, res) {
       `INSERT INTO job_submissions(
         title,company,contact_name,email,location,type,salary,description,requirements,responsibilities,
         qualifications,experience,education,benefits,application_deadline,application_url,application_instructions,
-        company_website,company_logo,categories,status,posting_link_id,ip_hash,submission_key
+        company_website,company_logo,categories,status,posting_link_id,ip_hash,submission_key,phone,package_code,package_price,package_duration_days
       ) VALUES(
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending',$21,$22,$23
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending',$21,$22,$23,$24,$25,$26,$27
       ) ON CONFLICT(submission_key) WHERE submission_key IS NOT NULL DO NOTHING RETURNING id,status,job_id`,
       [
         fields.title, fields.company, fields.contactName, fields.email, fields.location, fields.type,
@@ -153,7 +161,7 @@ export default async function handler(req, res) {
         fields.qualifications, fields.experience, fields.education, fields.benefits,
         fields.applicationDeadline || null, fields.url, fields.applicationInstructions,
         fields.companyWebsite || null, fields.companyLogo || null, fields.categories,
-        link?.id || null, ipHash, submissionKey,
+        link?.id || null, ipHash, submissionKey, fields.phone, selectedPackage.code, selectedPackage.price, selectedPackage.durationDays,
       ]
     );
 
@@ -166,48 +174,13 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: "This submission is already being processed. Please refresh and check again." });
     }
 
-    let publishedJob = null;
-    let publishWarning = "";
-    if (link?.auto_publish) {
-      try {
-        publishedJob = await createJob({
-          title: fields.title,
-          company: fields.company,
-          location: fields.location,
-          type: fields.type,
-          salary: fields.salary,
-          description: fields.description,
-          requirements: fields.requirements,
-          responsibilities: fields.responsibilities,
-          qualifications: fields.qualifications,
-          experience: fields.experience,
-          education: fields.education,
-          benefits: fields.benefits,
-          categories: fields.categories,
-          applicationDeadline: fields.applicationDeadline,
-          url: fields.url,
-          applicationInstructions: fields.applicationInstructions,
-          companyWebsite: fields.companyWebsite,
-          companyLogo: fields.companyLogo,
-          published: true,
-        });
-        await query(
-          "UPDATE job_submissions SET status='approved',job_id=$2,reviewed_at=now() WHERE id=$1 AND status='pending'",
-          [saved.rows[0].id, publishedJob.id]
-        );
-      } catch (publishError) {
-        console.error("automatic employer publishing:", publishError.message);
-        publishWarning = "The submission was saved for admin review because automatic publishing is temporarily unavailable.";
-      }
-    }
-
     return res.status(201).json({
       ok: true,
       reference: saved.rows[0].id,
-      jobId: publishedJob?.id || null,
-      status: publishedJob ? "approved" : "pending",
-      autoPublished: Boolean(publishedJob),
-      message: publishWarning || undefined,
+      status: "pending",
+      autoPublished: false,
+      package: { name: selectedPackage.name, price: selectedPackage.price, durationDays: selectedPackage.durationDays },
+      message: "The admin team will contact you to confirm the package, payment and publication schedule.",
     });
   } catch (error) {
     console.error("job submission:", error.message);

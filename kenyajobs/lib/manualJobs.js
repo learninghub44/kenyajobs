@@ -14,18 +14,18 @@ function rowToJob(row) {
     applicationInstructions: row.application_instructions || "", applicationDeadline: row.application_deadline || "",
     source: row.source || "Online Jobs", salary: row.salary || undefined,
     companyLogo: row.company_logo || undefined, companyWebsite: row.company_website || undefined,
-    categories: row.categories || [], featured: Boolean(row.featured), published: Boolean(row.published), manual: true,
+    categories: row.categories || [], featured: Boolean(row.featured_until ? new Date(row.featured_until)>new Date() : row.featured), packageCode:row.package_code||null, packagePrice:row.package_price||null, packageExpiresAt:row.package_expires_at||null, renewalStatus:row.renewal_status||null, published: Boolean(row.published), manual: true,
   };
 }
 export function newManualJobId() { return `manual-${crypto.randomUUID()}`; }
 export async function listPublishedJobs({ category, search } = {}) {
-  const conditions = ["published = true"], params = [];
+  const conditions = ["published = true", "(package_expires_at IS NULL OR package_expires_at > now())"], params = [];
   if (category) { params.push(category); conditions.push(`$${params.length} = ANY(categories)`); }
   if (search) { params.push(`%${search}%`); conditions.push(`(title ILIKE $${params.length} OR company ILIKE $${params.length})`); }
   const { rows } = await query(`SELECT * FROM manual_jobs WHERE ${conditions.join(" AND ")} ORDER BY featured DESC, created_at DESC`, params);
   return rows.map(rowToJob);
 }
-export async function getPublishedJobById(id) { const { rows } = await query("SELECT * FROM manual_jobs WHERE id=$1 AND published=true", [id]); return rows[0] ? rowToJob(rows[0]) : null; }
+export async function getPublishedJobById(id) { const { rows } = await query("SELECT * FROM manual_jobs WHERE id=$1 AND published=true AND (package_expires_at IS NULL OR package_expires_at>now())", [id]); return rows[0] ? rowToJob(rows[0]) : null; }
 export async function listAllJobs() { const { rows } = await query("SELECT * FROM manual_jobs ORDER BY created_at DESC"); return rows.map(rowToJob); }
 export async function getJobById(id) { const { rows } = await query("SELECT * FROM manual_jobs WHERE id=$1", [id]); return rows[0] ? rowToJob(rows[0]) : null; }
 const values = (d) => [d.title, d.company, d.location || "Worldwide", d.type || "Full-time", d.salary || null,
@@ -36,8 +36,8 @@ const values = (d) => [d.title, d.company, d.location || "Worldwide", d.type || 
 export async function createJob(data) {
   const id = newManualJobId(), v = values(data);
   const { rows } = await query(`INSERT INTO manual_jobs
-    (id,title,company,location,type,salary,description,url,company_logo,company_website,categories,featured,published,source,requirements,responsibilities,qualifications,experience,education,benefits,application_instructions,application_deadline)
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22) RETURNING *`, [id,...v]);
+    (id,title,company,location,type,salary,description,url,company_logo,company_website,categories,featured,published,source,requirements,responsibilities,qualifications,experience,education,benefits,application_instructions,application_deadline,source_submission_id)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23) RETURNING *`, [id,...v,data.sourceSubmissionId||null]);
   const job = rowToJob(rows[0]); if (job.published) await enqueueJobs([job], "manual"); return job;
 }
 export async function updateJob(id, data) {

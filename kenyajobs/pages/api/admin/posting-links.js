@@ -16,7 +16,7 @@ export default requireAdmin(async function handler(req,res) {
       if(!label)return res.status(400).json({error:"Give this posting link a name."});
       const token=crypto.randomBytes(32).toString("base64url");
       const expires=days?new Date(Date.now()+days*86400000):null;
-      const {rows}=await query("INSERT INTO job_posting_links(label,token_hash,auto_publish,max_uses,expires_at) VALUES($1,$2,$3,$4,$5) RETURNING id,label,auto_publish,max_uses,uses,expires_at,created_at",[label,hash(token),body.autoPublish === true,maxUses,expires]);
+      const {rows}=await query("INSERT INTO job_posting_links(label,token_hash,auto_publish,max_uses,expires_at) VALUES($1,$2,$3,$4,$5) RETURNING id,label,auto_publish,max_uses,uses,expires_at,created_at",[label,hash(token),false,maxUses,expires]);
       return res.status(201).json({...rows[0],url:baseUrl()+"/post-job?invite="+token});
     }
     if(req.method==="DELETE"){
