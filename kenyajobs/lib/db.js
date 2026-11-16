@@ -28,6 +28,12 @@ async function ensureSchema() {
       ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS benefits TEXT DEFAULT '';
       ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS application_instructions TEXT DEFAULT '';
       ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS application_deadline TEXT;
+      ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS package_code TEXT;
+      ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS package_price INTEGER;
+      ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS package_expires_at TIMESTAMPTZ;
+      ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS package_started_at TIMESTAMPTZ;
+      ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS renewal_status TEXT NOT NULL DEFAULT 'not_applicable';
+      ALTER TABLE manual_jobs ADD COLUMN IF NOT EXISTS source_submission_id BIGINT;
       CREATE TABLE IF NOT EXISTS blog_posts (
         id BIGSERIAL PRIMARY KEY,slug TEXT UNIQUE NOT NULL,title TEXT NOT NULL,excerpt TEXT DEFAULT '',
         category TEXT DEFAULT 'Career Advice',content TEXT NOT NULL,cover_image TEXT DEFAULT '',
@@ -42,6 +48,12 @@ async function ensureSchema() {
         job_id TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
       );
       CREATE INDEX IF NOT EXISTS job_submissions_status_created_idx ON job_submissions(status,created_at DESC);
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS phone TEXT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS package_code TEXT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS package_price INTEGER;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS package_duration_days INTEGER;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS payment_status TEXT NOT NULL DEFAULT 'awaiting_confirmation';
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS admin_notes TEXT DEFAULT '';
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS qualifications TEXT DEFAULT '';
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS experience TEXT DEFAULT '';
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS education TEXT DEFAULT '';
@@ -54,6 +66,26 @@ async function ensureSchema() {
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS submission_key TEXT;
       CREATE UNIQUE INDEX IF NOT EXISTS job_submissions_submission_key_idx ON job_submissions(submission_key) WHERE submission_key IS NOT NULL;
       CREATE INDEX IF NOT EXISTS job_submissions_ip_created_idx ON job_submissions(ip_hash,created_at DESC);
+      CREATE TABLE IF NOT EXISTS event_submissions (
+        id BIGSERIAL PRIMARY KEY,title TEXT NOT NULL,organiser TEXT NOT NULL,contact_name TEXT NOT NULL,email TEXT NOT NULL,phone TEXT NOT NULL,
+        event_type TEXT DEFAULT 'Other',event_date DATE NOT NULL,start_time TEXT,end_time TEXT,timezone TEXT DEFAULT 'Africa/Nairobi',
+        venue TEXT,location TEXT DEFAULT 'Kenya',description TEXT NOT NULL,ticket_price TEXT,registration_url TEXT,poster_url TEXT,
+        website TEXT,package_code TEXT NOT NULL,package_price INTEGER NOT NULL,package_duration_days INTEGER NOT NULL,
+        payment_status TEXT NOT NULL DEFAULT 'awaiting_confirmation',status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
+        event_id TEXT,admin_notes TEXT DEFAULT '',created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
+      );
+      CREATE INDEX IF NOT EXISTS event_submissions_status_created_idx ON event_submissions(status,created_at DESC);
+      CREATE TABLE IF NOT EXISTS events (
+        id TEXT PRIMARY KEY,title TEXT NOT NULL,slug TEXT UNIQUE NOT NULL,organiser TEXT NOT NULL,event_type TEXT DEFAULT 'Other',
+        event_date DATE NOT NULL,start_time TEXT,end_time TEXT,timezone TEXT DEFAULT 'Africa/Nairobi',venue TEXT,location TEXT DEFAULT 'Kenya',
+        description TEXT NOT NULL,ticket_price TEXT,registration_url TEXT,poster_url TEXT,website TEXT,
+        package_code TEXT,package_price INTEGER,package_started_at TIMESTAMPTZ,package_expires_at TIMESTAMPTZ,
+        featured_until TIMESTAMPTZ,promotions_allowed INTEGER NOT NULL DEFAULT 0,promotions_used INTEGER NOT NULL DEFAULT 0,
+        published BOOLEAN NOT NULL DEFAULT true,renewal_status TEXT NOT NULL DEFAULT 'active',
+        source_submission_id BIGINT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS events_published_date_idx ON events(published,event_date);
+      CREATE INDEX IF NOT EXISTS events_expiry_idx ON events(package_expires_at) WHERE published=true;
       CREATE TABLE IF NOT EXISTS admin_login_attempts (ip_hash TEXT PRIMARY KEY,attempts INTEGER NOT NULL DEFAULT 0,window_started_at TIMESTAMPTZ NOT NULL DEFAULT now(),locked_until TIMESTAMPTZ);
       CREATE TABLE IF NOT EXISTS job_posting_links (
         id BIGSERIAL PRIMARY KEY,label TEXT NOT NULL,token_hash TEXT UNIQUE NOT NULL,auto_publish BOOLEAN NOT NULL DEFAULT false,
@@ -86,6 +118,7 @@ async function ensureSchema() {
         action TEXT NOT NULL,status TEXT NOT NULL,detail TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
       CREATE INDEX IF NOT EXISTS manual_jobs_published_idx ON manual_jobs(published);
+      CREATE INDEX IF NOT EXISTS manual_jobs_expiry_idx ON manual_jobs(package_expires_at) WHERE published=true;
       CREATE INDEX IF NOT EXISTS ads_active_placement_idx ON ads(active,placement);
       CREATE INDEX IF NOT EXISTS live_job_cache_updated_idx ON live_job_cache(updated_at);
       CREATE INDEX IF NOT EXISTS distribution_status_created_idx ON job_distribution_queue(status,created_at DESC);
