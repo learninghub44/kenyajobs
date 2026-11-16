@@ -34,6 +34,14 @@ async function ensureSchema() {
         author TEXT DEFAULT 'JOBS HUB KENYA',status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','published')),
         published_at TIMESTAMPTZ,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
+      CREATE TABLE IF NOT EXISTS job_submissions (
+        id BIGSERIAL PRIMARY KEY,title TEXT NOT NULL,company TEXT NOT NULL,contact_name TEXT NOT NULL,email TEXT NOT NULL,
+        location TEXT DEFAULT 'Kenya',type TEXT DEFAULT 'Full-time',salary TEXT,description TEXT NOT NULL,
+        requirements TEXT DEFAULT '',responsibilities TEXT DEFAULT '',application_deadline TEXT,application_url TEXT NOT NULL,
+        application_instructions TEXT DEFAULT '',status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
+        job_id TEXT,created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
+      );
+      CREATE INDEX IF NOT EXISTS job_submissions_status_created_idx ON job_submissions(status,created_at DESC);
       CREATE TABLE IF NOT EXISTS ads (
         id TEXT PRIMARY KEY,title TEXT NOT NULL,company TEXT,description TEXT DEFAULT '',url TEXT NOT NULL,
         image_url TEXT,placement TEXT NOT NULL DEFAULT 'all',active BOOLEAN NOT NULL DEFAULT true,
