@@ -150,7 +150,7 @@ function cleanSectionText(value) {
 
   // Many job feeds put a section label and its content on the same line.
   const labels = "about(?: the)? (?:role|job|company)|job description|role overview|position summary|key responsibilities|responsibilities|what you.?ll do|what you.?ll need|what we.?re looking for|minimum qualifications|preferred qualifications|job requirements|requirements|qualifications|skills(?: required)?|experience|education|benefits(?: and perks)?|perks|what we offer|compensation|salary|how to apply|application instructions|application process|work schedule|location";
-  text = text.replace(new RegExp("(^|[\\n.!?])\s*(" + labels + ")\s*:?\s*(?=\\S)", "gi"), "$1\\n$2\\n");
+  text = text.replace(new RegExp("(^|[\\n.!?])\\s*(" + labels + ")\\s*:?\\s*(?=\\S)", "gi"), "$1\\n$2\\n");
 
   return text.replace(/\n{3,}/g, "\n\n").trim();
 }
