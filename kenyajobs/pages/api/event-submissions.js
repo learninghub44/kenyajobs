@@ -22,11 +22,11 @@ export default async function handler(req,res){
  try{
   const ip=String(req.headers["x-forwarded-for"]||req.socket?.remoteAddress||"unknown").split(",")[0];
   const ipHash=crypto.createHash("sha256").update((process.env.ADMIN_SESSION_SECRET||process.env.ADMIN_PASSWORD||"events-rate-limit")+":"+ip).digest("hex");
-  const rate=await query("SELECT count(*)::int AS total FROM event_submissions WHERE phone=$1 AND created_at>now()-interval '1 hour'",[f.phone]);
+  const rate=await query("SELECT count(*)::int AS total FROM event_submissions WHERE ip_hash=$1 AND created_at>now()-interval '1 hour'",[ipHash]);
   if(rate.rows[0]?.total>=5)return res.status(429).json({error:"Too many event requests. Please try again later."});
-  const {rows}=await query(`INSERT INTO event_submissions(title,organiser,contact_name,email,phone,event_type,event_date,start_time,end_time,venue,location,description,ticket_price,registration_url,poster_url,website,package_code,package_price,package_duration_days)
-   VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) RETURNING id`,
-   [f.title,f.organiser,f.contactName,f.email,f.phone,f.eventType,f.eventDate,f.startTime||null,f.endTime||null,f.venue||null,f.location,f.description,f.ticketPrice||null,f.registrationUrl||null,f.posterUrl||null,f.website||null,p.code,p.price,p.durationDays]);
+  const {rows}=await query(`INSERT INTO event_submissions(title,organiser,contact_name,email,phone,event_type,event_date,start_time,end_time,venue,location,description,ticket_price,registration_url,poster_url,website,ip_hash,package_code,package_price,package_duration_days)
+   VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20) RETURNING id`,
+   [f.title,f.organiser,f.contactName,f.email,f.phone,f.eventType,f.eventDate,f.startTime||null,f.endTime||null,f.venue||null,f.location,f.description,f.ticketPrice||null,f.registrationUrl||null,f.posterUrl||null,f.website||null,ipHash,p.code,p.price,p.durationDays]);
   return res.status(201).json({ok:true,reference:rows[0].id,package:{name:p.name,price:p.price,durationDays:p.durationDays},message:"The events team will contact you to confirm payment and schedule your promotion."});
  }catch(e){console.error("event submission:",e.message);return res.status(503).json({error:"We could not save this event request. Please try again later."});}
 }
