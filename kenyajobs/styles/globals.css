@@ -736,3 +736,6 @@ button svg, a svg { flex-shrink:0; }
 .events-page a.bg-white:hover{background:#EDF2FF!important;color:#142771!important;-webkit-text-fill-color:#142771!important}
 .events-page button:disabled{opacity:.55;cursor:not-allowed}
 .events-page input[type=radio]{accent-color:#022FE2}
+
+.job-quick-summary{border-left:4px solid #3A74DE;background:#F8FAFF}.job-quick-summary>p{margin:0;color:#46536A;font-size:14px;line-height:1.75;max-width:78ch}
+@media(max-width:640px){.job-quick-summary{padding:17px}}
