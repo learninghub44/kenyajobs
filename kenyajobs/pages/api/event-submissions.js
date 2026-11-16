@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import {query} from "@/lib/db";
+import {query,withTransaction} from "@/lib/db";
 import {getPackage} from "@/lib/packages";
 const clip=(v,n=5000)=>String(v||"").trim().slice(0,n);
 const validUrl=(v)=>{if(!v)return true;try{const u=new URL(v);return ["http:","https:"].includes(u.protocol)&&!u.username&&!u.password;}catch{return false;}};
@@ -30,21 +30,24 @@ export default async function handler(req,res){
   prepared.push(f);
  }
  try{
-  const groupKey=submissionKey;
-  const existing=await query("SELECT id FROM event_submissions WHERE group_key=$1 ORDER BY id",[groupKey]);
-  if(existing.rows.length)return res.status(200).json({ok:true,reference:existing.rows[0].id,duplicate:true,package:{name:p.name,price:p.price,durationDays:p.durationDays,eventCount:count}});
-  const ip=String(req.headers["x-forwarded-for"]||req.socket?.remoteAddress||"unknown").split(",")[0];
-  const ipHash=crypto.createHash("sha256").update((process.env.ADMIN_SESSION_SECRET||process.env.ADMIN_PASSWORD||"events-rate-limit")+":"+ip).digest("hex");
-  const rate=await query("SELECT count(*)::int AS total FROM event_submissions WHERE ip_hash=$1 AND created_at>now()-interval '1 hour'",[ipHash]);
-  if(rate.rows[0]?.total>=5)return res.status(429).json({error:"Too many event requests. Please try again later."});
-  const ids=[];
-  for(let i=0;i<prepared.length;i++){const f=prepared[i],key=groupKey+"-"+(i+1);
-   const {rows}=await query(`INSERT INTO event_submissions(title,organiser,contact_name,email,phone,event_type,event_date,start_time,end_time,venue,location,description,ticket_price,registration_url,poster_url,website,ip_hash,submission_key,package_code,package_price,package_duration_days,group_key,package_event_count)
-    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23) ON CONFLICT(submission_key) WHERE submission_key IS NOT NULL DO NOTHING RETURNING id`,
-    [f.title,contact.organiser,contact.contactName,contact.email,contact.phone,f.eventType,f.eventDate,f.startTime||null,f.endTime||null,f.venue||null,f.location,f.description,f.ticketPrice||null,f.registrationUrl||null,f.posterUrl||null,f.website||null,ipHash,key,p.code,p.price,p.durationDays,groupKey,count]);
-   if(rows[0])ids.push(rows[0].id);else{const dup=await query("SELECT id FROM event_submissions WHERE submission_key=$1",[key]);if(dup.rows[0])ids.push(dup.rows[0].id);else throw new Error("Could not save every event in the bundle.");}
-  }
-  return res.status(201).json({ok:true,reference:ids[0],references:ids,package:{name:p.name,price:p.price,durationDays:p.durationDays,eventCount:count},message:"Your event bundle has been received. Our events team will contact you to confirm the total payment before publishing."});
- }catch(e){console.error("event submission:",e.message);return res.status(503).json({error:"We could not save the complete event bundle. Please try again later."});}
+  const result=await withTransaction(async client=>{
+   const groupKey=submissionKey;
+   const existing=await client.query("SELECT id FROM event_submissions WHERE group_key=$1 ORDER BY id",[groupKey]);
+   if(existing.rows.length)return {ids:existing.rows.map(x=>x.id),duplicate:true};
+   const ip=String(req.headers["x-forwarded-for"]||req.socket?.remoteAddress||"unknown").split(",")[0];
+   const ipHash=crypto.createHash("sha256").update((process.env.ADMIN_SESSION_SECRET||process.env.ADMIN_PASSWORD||"events-rate-limit")+":"+ip).digest("hex");
+   const rate=await client.query("SELECT count(DISTINCT COALESCE(group_key,submission_key,id::text))::int AS total FROM event_submissions WHERE ip_hash=$1 AND created_at>now()-interval '1 hour'",[ipHash]);
+   if(rate.rows[0]?.total>=5)throw Object.assign(new Error("Too many event requests. Please try again later."),{statusCode:429});
+   const ids=[];
+   for(let i=0;i<prepared.length;i++){const f=prepared[i],key=groupKey+"-"+(i+1);
+    const {rows}=await client.query(`INSERT INTO event_submissions(title,organiser,contact_name,email,phone,event_type,event_date,start_time,end_time,venue,location,description,ticket_price,registration_url,poster_url,website,ip_hash,submission_key,package_code,package_price,package_duration_days,group_key,package_event_count)
+     VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23) RETURNING id`,
+     [f.title,contact.organiser,contact.contactName,contact.email,contact.phone,f.eventType,f.eventDate,f.startTime||null,f.endTime||null,f.venue||null,f.location,f.description,f.ticketPrice||null,f.registrationUrl||null,f.posterUrl||null,f.website||null,ipHash,key,p.code,p.price,p.durationDays,groupKey,count]);
+    ids.push(rows[0].id);
+   }
+   return {ids,duplicate:false};
+  });
+  return res.status(result.duplicate?200:201).json({ok:true,reference:result.ids[0],references:result.ids,duplicate:result.duplicate,package:{name:p.name,price:p.price,durationDays:p.durationDays,eventCount:count},message:"Your event bundle has been received. Our events team will contact you to confirm the total payment before publishing."});
+ }catch(e){console.error("event submission:",e.message);return res.status(e.statusCode||503).json({error:e.statusCode===429?e.message:"We could not save the complete event bundle. Please try again later."});}
 }
 export const config={api:{bodyParser:{sizeLimit:"1mb"}}};
