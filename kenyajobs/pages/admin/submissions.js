@@ -2,7 +2,7 @@ import {useEffect,useState} from "react";
 import Head from "next/head";
 import AdminLayout from "@/components/admin/AdminLayout";
 import {Mail,MessageCircle} from "lucide-react";
-const waNumber=(v)=>{let n=String(v||"").replace(/\\D/g,"");if(n.startsWith("0"))n="254"+n.slice(1);if(n.startsWith("7")||n.startsWith("1"))n="254"+n;return n;};
+const waNumber=(v)=>{let n=String(v||"").replace(/\D/g,"");if(n.startsWith("0"))n="254"+n.slice(1);if(n.startsWith("7")||n.startsWith("1"))n="254"+n;return n;};
 export default function JobSubmissions(){
  const [items,setItems]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState(""),[busy,setBusy]=useState(null);
  async function load(){setLoading(true);try{const r=await fetch("/api/admin/job-submissions");const d=await r.json();if(!r.ok)throw Error(d.error||"Could not load submissions");setItems(Array.isArray(d)?d:[]);}catch(e){setError(e.message);}finally{setLoading(false);}}
