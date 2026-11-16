@@ -41,8 +41,8 @@ export default async function handler(req,res){
   }
   const status=job?"approved":"pending";
   const {rows}=await query(`INSERT INTO job_submissions(title,company,contact_name,email,location,type,salary,description,requirements,responsibilities,qualifications,experience,education,benefits,application_deadline,application_url,application_instructions,company_website,company_logo,categories,status,job_id,posting_link_id,ip_hash,reviewed_at)
-   VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,CASE WHEN $21='approved' THEN now() ELSE NULL END) RETURNING id`,
-   [fields.title,fields.company,fields.contactName,fields.email,fields.location,fields.type,fields.salary||null,fields.description,fields.requirements,fields.responsibilities,fields.qualifications,fields.experience,fields.education,fields.benefits,fields.applicationDeadline||null,fields.url,fields.applicationInstructions,fields.companyWebsite||null,fields.companyLogo||null,fields.categories,status,job?.id||null,link?.id||null,ipHash]);
+   VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25) RETURNING id`,
+   [fields.title,fields.company,fields.contactName,fields.email,fields.location,fields.type,fields.salary||null,fields.description,fields.requirements,fields.responsibilities,fields.qualifications,fields.experience,fields.education,fields.benefits,fields.applicationDeadline||null,fields.url,fields.applicationInstructions,fields.companyWebsite||null,fields.companyLogo||null,fields.categories,status,job?.id||null,link?.id||null,ipHash,job?new Date():null]);
   return res.status(201).json({ok:true,reference:rows[0].id,jobId:job?.id||null,status,autoPublished:Boolean(job)});
  }catch(e){console.error("job submission:",e.message);return res.status(503).json({error:"We could not save this job. Please try again later."});}
 }
