@@ -134,34 +134,23 @@ function cleanSectionText(value) {
   let text = Array.isArray(value) ? value.filter(Boolean).map(String).join("\n") : String(value);
 
   text = text
-    .replace(/<br\s*\/?>(?!\n)/gi, "\n")
-    .replace(/<\/(p|div|li|h1|h2|h3|h4|h5)>/gi, "\n")
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/<\/(?:p|div|li|h[1-6]|section|article|tr)>/gi, "\n")
+    .replace(/<li\b[^>]*>/gi, "• ")
     .replace(/<[^>]+>/g, "")
     .replace(/\*\*(.+?)\*\*/g, "$1")
     .replace(/__([^_]+?)__/g, "$1");
 
   text = decodeEntities(text)
+    .replace(/\u00a0/g, " ")
     .replace(/[ \t]+/g, " ")
     .replace(/\n[ \t]+/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 
-  const headingMarkers = [
-    "Position Summary...",
-    "What you'll do...",
-    "What you’ll do...",
-    "Minimum Qualifications...",
-    "Preferred Qualifications...",
-    "Primary Location...",
-    "Benefits",
-    "Benefits include",
-    "At Sam's Club, we offer competitive pay"
-  ];
-
-  for (const marker of headingMarkers) {
-    const escaped = marker.replace(/[.*+?^()|[\]\\]/g, "\\$&");
-    text = text.replace(new RegExp("\\s*" + escaped + "\\s*", "gi"), "\n" + marker + "\n");
-  }
+  // Many job feeds put a section label and its content on the same line.
+  const labels = "about(?: the)? (?:role|job|company)|job description|role overview|position summary|key responsibilities|responsibilities|what you.?ll do|what you.?ll need|what we.?re looking for|minimum qualifications|preferred qualifications|job requirements|requirements|qualifications|skills(?: required)?|experience|education|benefits(?: and perks)?|perks|what we offer|compensation|salary|how to apply|application instructions|application process|work schedule|location";
+  text = text.replace(new RegExp("(^|[\\n.!?])\\s*(" + labels + ")\\s*:?\\s*(?=\\S)", "gi"), "$1\\n$2\\n");
 
   return text.replace(/\n{3,}/g, "\n\n").trim();
 }
@@ -179,35 +168,38 @@ function splitSectionItems(value) {
 function classifyDescription(rawDescription) {
   const raw = cleanSectionText(rawDescription);
   const lines = raw.split(/\n+/).map(s => s.trim()).filter(Boolean);
-
-  const headingPattern = /^(about(?: the)? role|job description|description|position summary|role overview|overview|responsibilities|key responsibilities|duties|what you.?ll do|minimum qualifications|preferred qualifications|requirements|qualifications|job requirements|what we.?re looking for|skills|skills required|experience|education|benefits|benefits include|perks|what we offer|we offer|primary location)\s*:?\s*\.*$/i;
+  const headingPattern = /^(about(?: the)? (?:role|job|company)|job description|description|position summary|role overview|overview|responsibilities|key responsibilities|duties|what you.?ll do|what you.?ll need|minimum qualifications|preferred qualifications|requirements|qualifications|job requirements|what we.?re looking for|skills(?: required)?|experience|education|benefits(?: and perks)?|perks|what we offer|compensation|salary|how to apply|application instructions|application process|work schedule|location|primary location)\s*:?\s*$/i;
   const buckets = {
     "Job description": [],
     "Responsibilities": [],
     "Requirements": [],
+    "Qualifications": [],
+    "Education": [],
     "Benefits": [],
-    "Location": []
+    "Compensation": [],
+    "How to apply": [],
+    "Location": [],
+    "Work schedule": []
   };
-
   let current = "Job description";
 
   for (const line of lines) {
     const heading = line.match(headingPattern);
-
     if (heading) {
       const key = heading[1].toLowerCase();
-
       if (/responsib|duties|you.?ll do/.test(key)) current = "Responsibilities";
-      else if (/minimum qualifications|preferred qualifications|require|qualif|skill|experience|education|looking for/.test(key)) current = "Requirements";
+      else if (/minimum qualifications|preferred qualifications|qualif/.test(key)) current = "Qualifications";
+      else if (/require|skill|experience|looking for|you.?ll need/.test(key)) current = "Requirements";
+      else if (/education/.test(key)) current = "Education";
       else if (/benefit|perk|offer/.test(key)) current = "Benefits";
-      else if (/primary location/.test(key)) current = "Location";
+      else if (/compensation|salary/.test(key)) current = "Compensation";
+      else if (/apply|application/.test(key)) current = "How to apply";
+      else if (/location/.test(key)) current = "Location";
+      else if (/schedule/.test(key)) current = "Work schedule";
       else current = "Job description";
-
       continue;
     }
-
-    if (current === "Location") buckets.Location.push(line);
-    else buckets[current].push(line);
+    buckets[current].push(line);
   }
 
   return Object.fromEntries(
@@ -219,12 +211,13 @@ function classifyDescription(rawDescription) {
 
 function buildJobSections(job, description) {
   const classified = classifyDescription(description);
-
   const explicit = {
     "Responsibilities": job.responsibilities || job.responsibility || job.duties || job.job_responsibilities,
-    "Requirements": job.requirements || job.qualifications || job.job_requirements || job.skills_required,
+    "Requirements": job.requirements || job.job_requirements || job.skills_required,
+    "Qualifications": job.qualifications || job.minimum_qualifications || job.preferred_qualifications,
     "Benefits": job.benefits || job.job_benefits || job.perks,
     "Education": job.education || job.education_requirements,
+    "Compensation": job.compensation || job.salary_details,
     "How to apply": job.applicationInstructions || job.application_instructions
   };
 
@@ -233,18 +226,12 @@ function buildJobSections(job, description) {
   }
 
   const sections = [];
-
-  for (const title of ["Job description", "Responsibilities", "Requirements", "Education", "Benefits", "How to apply"]) {
+  for (const title of ["Job description", "Responsibilities", "Requirements", "Qualifications", "Education", "Benefits", "Compensation", "How to apply"]) {
     const content = classified[title];
     if (!content) continue;
-
     const items = splitSectionItems(content);
-    sections.push({
-      title,
-      items: items.length > 1 ? items : [content]
-    });
+    sections.push({ title, items: items.length > 1 ? items : [content] });
   }
-
   return sections;
 }
 
@@ -466,6 +453,21 @@ export default function JobDetail() {
               {translationLoading && !translatedJob && (
                 <div className="translation-note muted">Preparing the English version of this listing…</div>
               )}
+
+              <section className="job-key-facts" aria-label="Job overview">
+                {[
+                  ["Salary", salary || "Not disclosed"],
+                  ["Employment type", type],
+                  ["Experience", job.experience || job.experience_level || "Not specified"],
+                  ["Education", job.education || job.education_requirements || "Not specified"],
+                  ["Deadline", job.applicationDeadline || job.application_deadline || "Not specified"]
+                ].map(([label, value]) => (
+                  <div className="job-key-fact" key={label}>
+                    <span>{label}</span>
+                    <strong>{value}</strong>
+                  </div>
+                ))}
+              </section>
 
               {buildJobSections(job, description).map((section, index) => (
                 <article className="job-description-panel" key={section.title + index}>
