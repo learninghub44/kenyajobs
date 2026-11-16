@@ -47,7 +47,7 @@ const EXPERIENCE_LEVELS = [
 ];
 
 const STATS = [
-  { value: "Live", label: "Job listings", icon: Briefcase },
+  { value: "0", label: "Listings loaded", icon: Briefcase },
   { value: "Multiple", label: "Job feeds", icon: Building2 },
   { value: "Local + global", label: "Opportunities", icon: Globe },
   { value: "Free", label: "Always Free", icon: CheckCircle2 },
@@ -322,7 +322,7 @@ export default function Home() {
               {STATS.map(({ value, label, icon: Icon }) => (
                 <div key={label} className="hidden md:flex items-center gap-2">
                   <Icon size={16} className="text-primary" />
-                  <span className="text-sm font-semibold text-text-primary">{value}</span>
+                  <span className="text-sm font-semibold text-text-primary">{label === "Listings loaded" ? baseJobs.length.toLocaleString() : value}</span>
                   <span className="text-sm text-text-tertiary">{label}</span>
                 </div>
               ))}
