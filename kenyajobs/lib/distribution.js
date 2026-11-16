@@ -106,14 +106,13 @@ export async function enqueueJobs(jobs, route = "") {
       const result = await query(
         `INSERT INTO job_distribution_queue (job_id, channel, category, payload, message, status, created_at, updated_at)
          VALUES ($1,$2,$3,$4::jsonb,$5,$6,now(),now())
-         ON CONFLICT (job_id, channel) DO UPDATE SET
-           category=EXCLUDED.category, payload=EXCLUDED.payload, message=EXCLUDED.message,
-           status=CASE WHEN job_distribution_queue.status IN ('failed','pending_approval','ready') THEN EXCLUDED.status ELSE job_distribution_queue.status END,
-           updated_at=now()
-         WHERE job_distribution_queue.status <> 'posted' RETURNING id`,
+         ON CONFLICT (job_id, channel) DO NOTHING RETURNING id`,
         [jobId,channel,category,JSON.stringify(job),formatJobAnnouncement(job,category),settings.approval_required ? "pending_approval" : "ready"]
       );
-      if (result.rowCount) queued += 1;
+      if (result.rowCount) {
+        queued += 1;
+        await query("INSERT INTO job_distribution_logs (queue_id,action,status,detail) VALUES ($1,'queued',$2,$3)", [result.rows[0].id, status, `Auto-queued from ${route || "manual job entry"}`]);
+      }
     }
   }
   return { queued };
