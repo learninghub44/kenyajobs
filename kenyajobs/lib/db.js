@@ -2,24 +2,13 @@
 // Shared PostgreSQL pool and idempotent schema bootstrap for serverless deployments.
 import { Pool } from "pg";
 
-const CONNECTION_STRING =
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL ||
-  process.env.POSTGRES_URL_NON_POOLING ||
-  "";
-
+const CONNECTION_STRING = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_URL_NON_POOLING || "";
 let pool;
 function getPool() {
-  if (!CONNECTION_STRING) {
-    throw new Error("No database connection string found. Set DATABASE_URL (or POSTGRES_URL) in your environment.");
-  }
+  if (!CONNECTION_STRING) throw new Error("No database connection string found. Set DATABASE_URL (or POSTGRES_URL) in your environment.");
   if (!pool) {
-    const isLocal = /localhost|127\\.0\\.1/.test(CONNECTION_STRING);
-    pool = new Pool({
-      connectionString: CONNECTION_STRING,
-      ssl: isLocal ? false : { rejectUnauthorized: false },
-      max: 5,
-    });
+    const isLocal = /localhost|127\.0\.0\.1/.test(CONNECTION_STRING);
+    pool = new Pool({ connectionString: CONNECTION_STRING, ssl: isLocal ? false : { rejectUnauthorized: false }, max: 5 });
   }
   return pool;
 }
@@ -36,18 +25,15 @@ async function ensureSchema() {
         published BOOLEAN NOT NULL DEFAULT true, source TEXT NOT NULL DEFAULT 'JobsWorldwide',
         created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
-
       CREATE TABLE IF NOT EXISTS ads (
         id TEXT PRIMARY KEY, title TEXT NOT NULL, company TEXT, description TEXT DEFAULT '',
         url TEXT NOT NULL, image_url TEXT, placement TEXT NOT NULL DEFAULT 'all',
         active BOOLEAN NOT NULL DEFAULT true, priority INTEGER NOT NULL DEFAULT 0,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
-
       CREATE TABLE IF NOT EXISTS live_job_cache (
         id TEXT PRIMARY KEY, data JSONB NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
-
       CREATE TABLE IF NOT EXISTS social_channel_settings (
         id INTEGER PRIMARY KEY CHECK (id = 1),
         whatsapp_channel_url TEXT NOT NULL DEFAULT 'https://whatsapp.com/channel/0029Vb9ItcdJf05hVwnE3w2C',
@@ -61,43 +47,36 @@ async function ensureSchema() {
         remote_enabled BOOLEAN NOT NULL DEFAULT true,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
-
       INSERT INTO social_channel_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
-
       CREATE TABLE IF NOT EXISTS job_distribution_queue (
-        id BIGSERIAL PRIMARY KEY,
-        job_id TEXT NOT NULL,
+        id BIGSERIAL PRIMARY KEY, job_id TEXT NOT NULL,
         channel TEXT NOT NULL CHECK (channel IN ('whatsapp','telegram')),
         category TEXT NOT NULL CHECK (category IN ('kenya','africa','remote')),
-        payload JSONB NOT NULL,
-        message TEXT NOT NULL,
+        payload JSONB NOT NULL, message TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'pending_approval'
           CHECK (status IN ('pending_approval','ready','posted','failed')),
-        error TEXT,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-        posted_at TIMESTAMPTZ,
+        error TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), posted_at TIMESTAMPTZ,
         UNIQUE (job_id, channel)
       );
-
+      CREATE TABLE IF NOT EXISTS job_distribution_logs (
+        id BIGSERIAL PRIMARY KEY,
+        queue_id BIGINT NOT NULL REFERENCES job_distribution_queue(id) ON DELETE CASCADE,
+        action TEXT NOT NULL, status TEXT NOT NULL, detail TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
       CREATE INDEX IF NOT EXISTS manual_jobs_published_idx ON manual_jobs (published);
       CREATE INDEX IF NOT EXISTS ads_active_placement_idx ON ads (active, placement);
       CREATE INDEX IF NOT EXISTS live_job_cache_updated_idx ON live_job_cache (updated_at);
       CREATE INDEX IF NOT EXISTS distribution_status_created_idx ON job_distribution_queue (status, created_at DESC);
       CREATE INDEX IF NOT EXISTS distribution_channel_created_idx ON job_distribution_queue (channel, created_at DESC);
-    `).catch((err) => {
-      schemaReady = null;
-      throw err;
-    });
+      CREATE INDEX IF NOT EXISTS distribution_logs_queue_idx ON job_distribution_logs (queue_id, created_at DESC);
+    `).catch((err) => { schemaReady = null; throw err; });
   }
   return schemaReady;
 }
-
 export async function query(text, params) {
   await ensureSchema();
   return getPool().query(text, params);
 }
-
-export function isDatabaseConfigured() {
-  return Boolean(CONNECTION_STRING);
-}
+export function isDatabaseConfigured() { return Boolean(CONNECTION_STRING); }
