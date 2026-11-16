@@ -76,6 +76,9 @@ async function ensureSchema() {
         event_id TEXT,admin_notes TEXT DEFAULT '',created_at TIMESTAMPTZ NOT NULL DEFAULT now(),reviewed_at TIMESTAMPTZ
       );
       ALTER TABLE event_submissions ADD COLUMN IF NOT EXISTS ip_hash TEXT;
+      ALTER TABLE event_submissions ADD COLUMN IF NOT EXISTS group_key TEXT;
+      ALTER TABLE event_submissions ADD COLUMN IF NOT EXISTS package_event_count INTEGER NOT NULL DEFAULT 1;
+      CREATE INDEX IF NOT EXISTS event_submissions_group_key_idx ON event_submissions(group_key);
       ALTER TABLE event_submissions ADD COLUMN IF NOT EXISTS submission_key TEXT;
       CREATE UNIQUE INDEX IF NOT EXISTS event_submissions_submission_key_idx ON event_submissions(submission_key) WHERE submission_key IS NOT NULL;
       CREATE INDEX IF NOT EXISTS event_submissions_ip_created_idx ON event_submissions(ip_hash,created_at DESC);
