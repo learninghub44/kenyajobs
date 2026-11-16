@@ -10,7 +10,8 @@ export default function AdminDistribution() {
   const [settings,setSettings] = useState(defaults);
   const [queue,setQueue] = useState([]);
   const [botConfigured,setBotConfigured] = useState(false);
-  const [loading,setLoading] = useState(true);\n  const [scanning,setScanning] = useState(false);
+  const [loading,setLoading] = useState(true);
+  const [scanning,setScanning] = useState(false);
   const [saving,setSaving] = useState(false);
   const [busyId,setBusyId] = useState(null);
   const [error,setError] = useState("");
