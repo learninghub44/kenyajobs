@@ -146,7 +146,7 @@ export default async function handler(req, res) {
         company_website,company_logo,categories,status,posting_link_id,ip_hash,submission_key
       ) VALUES(
         $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending',$21,$22,$23
-      ) ON CONFLICT(submission_key) DO NOTHING RETURNING id,status,job_id`,
+      ) ON CONFLICT(submission_key) WHERE submission_key IS NOT NULL DO NOTHING RETURNING id,status,job_id`,
       [
         fields.title, fields.company, fields.contactName, fields.email, fields.location, fields.type,
         fields.salary || null, fields.description, fields.requirements, fields.responsibilities,
