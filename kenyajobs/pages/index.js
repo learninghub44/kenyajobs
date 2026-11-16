@@ -288,8 +288,8 @@ export default function Home() {
     <>
       <Head>
         <title>JOBS HUB KENYA | Jobs in Kenya, Africa & Remote Careers</title>
-        <meta name="description" content="Discover job opportunities in Kenya, across Africa and worldwide remote roles. Explore current vacancies, read career advice and apply directly to employers." />
-        <meta name="keywords" content="jobs in Kenya, Kenya vacancies, careers, remote jobs, graduate jobs, internships, Africa jobs, JOBS HUB KENYA" />
+        <meta name="description" content="Discover job opportunities in Kenya, across Africa and worldwide remote roles, plus career fairs, workshops and professional events. Apply directly to employers and discover what is happening next." />
+        <meta name="keywords" content="jobs in Kenya, Kenya vacancies, careers, remote jobs, graduate jobs, internships, Africa jobs, events in Kenya, career fairs, JOBS HUB KENYA" />
         <link rel="canonical" href="https://onlinejobs.christech.co.ke/" />
         <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
         <meta property="og:type" content="website" />
