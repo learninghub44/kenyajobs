@@ -6,6 +6,7 @@ const clip=(value,max=5000)=>String(value||"").trim().slice(0,max);
 function validUrl(value){try{const u=new URL(value);return ["http:","https:"].includes(u.protocol)&&Boolean(u.hostname)&&!u.username&&!u.password;}catch{return false;}}
 export default async function handler(req,res){
  if(req.method==="GET"){
+  res.setHeader("Cache-Control","private, no-store, max-age=0");
   const token=String(req.query.invite||"");
   if(!/^[A-Za-z0-9_-]{40,60}$/.test(token))return res.status(404).json({error:"This posting link is invalid or expired."});
   try{const {rows}=await query("SELECT id,label,auto_publish,max_uses,uses,expires_at FROM job_posting_links WHERE token_hash=$1 AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>now()) AND uses<max_uses",[hash(token)]);
