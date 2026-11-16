@@ -223,7 +223,7 @@ function buildJobSections(job, description) {
   const explicit = {
     "Responsibilities": job.responsibilities || job.responsibility || job.duties || job.job_responsibilities,
     "Requirements": job.requirements || job.qualifications || job.job_requirements || job.skills_required,
-    "Benefits": job.benefits || job.job_benefits || job.perks
+    "Benefits": job.benefits || job.job_benefits || job.perks,\n    "Education": job.education || job.education_requirements,\n    "How to apply": job.applicationInstructions || job.application_instructions
   };
 
   for (const [title, value] of Object.entries(explicit)) {
@@ -232,7 +232,7 @@ function buildJobSections(job, description) {
 
   const sections = [];
 
-  for (const title of ["Job description", "Responsibilities", "Requirements", "Benefits"]) {
+  for (const title of ["Job description", "Responsibilities", "Requirements", "Education", "Benefits", "How to apply"]) {
     const content = classified[title];
     if (!content) continue;
 
