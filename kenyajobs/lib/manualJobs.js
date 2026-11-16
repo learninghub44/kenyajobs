@@ -20,7 +20,7 @@ function rowToJob(row) {
 export function newManualJobId() { return `manual-${crypto.randomUUID()}`; }
 export async function listPublishedJobs({ category, search } = {}) {
   const conditions = ["published = true"], params = [];
-  if (category) { params.push(category); conditions.push(`${params.length} = ANY(categories)`); }
+  if (category) { params.push(category); conditions.push(`$${params.length} = ANY(categories)`); }
   if (search) { params.push(`%${search}%`); conditions.push(`(title ILIKE $${params.length} OR company ILIKE $${params.length})`); }
   const { rows } = await query(`SELECT * FROM manual_jobs WHERE ${conditions.join(" AND ")} ORDER BY featured DESC, created_at DESC`, params);
   return rows.map(rowToJob);
