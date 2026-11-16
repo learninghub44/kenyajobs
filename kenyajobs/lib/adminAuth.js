@@ -83,10 +83,15 @@ export function clearSessionCookie() {
 // Drop this in front of any API route handler to require a valid admin session.
 export function requireAdmin(handler) {
   return async function (req, res) {
+    if (req.headers["sec-fetch-site"] === "cross-site") {
+      res.status(403).json({ error: "Cross-site requests are not allowed." });
+      return;
+    }
     if (!isAdminRequest(req)) {
       res.status(401).json({ error: "Not authenticated" });
       return;
     }
+    res.setHeader("Cache-Control", "private, no-store, max-age=0");
     return handler(req, res);
   };
 }
