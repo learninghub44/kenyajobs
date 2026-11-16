@@ -684,3 +684,46 @@ button svg, a svg { flex-shrink:0; }
   .social-channel-banner .channel-cta:nth-child(2) { animation-delay:100ms; }
   @keyframes channel-pop { from { opacity:0; transform:translateY(8px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
 }
+
+
+/* Structured job details: clear hierarchy for overview, salary and role sections. */
+.job-key-facts {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:10px;
+  margin:0 0 18px;
+}
+.job-key-fact {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  min-width:0;
+  padding:15px 16px;
+  border:1px solid #DCE5F2;
+  border-radius:13px;
+  background:#fff;
+  box-shadow:0 4px 14px rgba(20,39,113,.035);
+}
+.job-key-fact > span {
+  color:#738098;
+  font-size:11px;
+  font-weight:750;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.job-key-fact > strong {
+  color:#14213D;
+  font-size:14px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.job-key-fact:first-child > strong { color:#147A55; font-size:16px; }
+.job-description-panel { padding:24px 26px; margin-bottom:14px; background:#fff; }
+.job-section-heading { margin-bottom:14px; }
+.job-prose { color:#46536A; font-size:14px; }
+.job-prose p { white-space:pre-line; overflow-wrap:anywhere; }
+@media(max-width:640px) {
+  .job-key-facts { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .job-key-fact { padding:12px; }
+  .job-description-panel { padding:18px; }
+}
