@@ -253,6 +253,16 @@ function SectionContent({ items }) {
   );
 }
 
+function shortJobSummary(value, maxLength = 280) {
+  const plain = decodeEntities(String(value || "").replace(/<br\\s*\\/?\\s*>/gi, " ").replace(/<[^>]+>/g, " "))
+    .replace(/\\s+/g, " ").trim();
+  if (!plain) return "";
+  if (plain.length <= maxLength) return plain;
+  const shortened = plain.slice(0, maxLength);
+  const boundary = shortened.lastIndexOf(" ");
+  return (boundary > 180 ? shortened.slice(0, boundary) : shortened).replace(/[,:;–—-]+$/, "") + "…";
+}
+
 function formatSalary(job) {
   if (job.salary && typeof job.salary === "string") return job.salary;
   const min = job.annualSalaryMin ?? job.job_min_salary ?? job.salary_min;
@@ -468,6 +478,13 @@ export default function JobDetail() {
                   </div>
                 ))}
               </section>
+
+              {shortJobSummary(description) && (
+                <section className="job-description-panel job-quick-summary">
+                  <div className="job-section-heading"><span /><h2>Job at a glance</h2></div>
+                  <p>{shortJobSummary(description)}</p>
+                </section>
+              )}
 
               {buildJobSections(job, description).map((section, index) => (
                 <article className="job-description-panel" key={section.title + index}>
