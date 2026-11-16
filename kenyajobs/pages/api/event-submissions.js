@@ -6,7 +6,9 @@ const validUrl=(v)=>{if(!v)return true;try{const u=new URL(v);return ["http:","h
 export default async function handler(req,res){
  if(req.method==="GET"){
   res.setHeader("Cache-Control","no-store");
-  const {rows}=await query("SELECT id,title,organiser,event_type,event_date,start_time,end_time,venue,location,description,ticket_price,registration_url,poster_url,website,package_code,package_price,package_expires_at,featured_until FROM events WHERE published=true AND package_expires_at>now() AND event_date>=CURRENT_DATE ORDER BY (featured_until>now()) DESC,event_date ASC LIMIT 100");
+  const fields="id,title,slug,organiser,event_type,event_date,start_time,end_time,venue,location,description,ticket_price,registration_url,poster_url,website,package_code,package_price,package_expires_at,featured_until";
+  if(req.query.slug){const {rows}=await query("SELECT "+fields+" FROM events WHERE slug=$1 AND published=true AND package_expires_at>now() AND event_date>=CURRENT_DATE",[String(req.query.slug)]);return rows[0]?res.status(200).json(rows[0]):res.status(404).json({error:"Event not found."});}
+  const {rows}=await query("SELECT "+fields+" FROM events WHERE published=true AND package_expires_at>now() AND event_date>=CURRENT_DATE ORDER BY (featured_until>now()) DESC,event_date ASC LIMIT 100");
   return res.status(200).json(rows);
  }
  if(req.method!=="POST")return res.status(405).json({error:"Method not allowed"});
