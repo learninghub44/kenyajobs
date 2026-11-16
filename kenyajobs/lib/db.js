@@ -51,6 +51,8 @@ async function ensureSchema() {
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS categories TEXT[] NOT NULL DEFAULT '{}';
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS posting_link_id BIGINT;
       ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS ip_hash TEXT;
+      ALTER TABLE job_submissions ADD COLUMN IF NOT EXISTS submission_key TEXT;
+      CREATE UNIQUE INDEX IF NOT EXISTS job_submissions_submission_key_idx ON job_submissions(submission_key) WHERE submission_key IS NOT NULL;
       CREATE INDEX IF NOT EXISTS job_submissions_ip_created_idx ON job_submissions(ip_hash,created_at DESC);
       CREATE TABLE IF NOT EXISTS admin_login_attempts (ip_hash TEXT PRIMARY KEY,attempts INTEGER NOT NULL DEFAULT 0,window_started_at TIMESTAMPTZ NOT NULL DEFAULT now(),locked_until TIMESTAMPTZ);
       CREATE TABLE IF NOT EXISTS job_posting_links (
