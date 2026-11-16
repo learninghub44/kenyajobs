@@ -19,7 +19,7 @@ export default function SocialChannelLinks({ variant = "banner" }) {
   ].filter(Boolean);
   if (!items.length) return null;
 
-  if (variant === "footer") return (
+  if (variant === "floating") return (\n    <div className="fixed bottom-5 right-4 z-[60] flex flex-col items-end gap-3 sm:bottom-7 sm:right-6" aria-label="Join our job alert channels">\n      {items.map(({ href, label, short, Icon, tone }) => (\n        <a key={tone} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}\n          className={`group inline-flex min-h-12 items-center gap-2.5 rounded-full border px-4 py-3 text-sm font-extrabold shadow-[0_10px_30px_rgba(10,25,60,.22)] transition duration-200 hover:-translate-y-1 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-blue-300 ${tone === "whatsapp" ? "border-[#18B968] bg-[#20C875] text-[#082B1B] hover:bg-[#35E18B]" : "border-white bg-[#142771] text-white hover:bg-[#2144A7]"}`}\n        >\n          <Icon size={18} aria-hidden="true" /><span>{label}</span><ArrowUpRight size={14} />\n        </a>\n      ))}\n    </div>\n  );\n\n  if (variant === "footer") return (
     <div className="mt-4 flex flex-wrap items-center gap-2">
       {items.map(({ href, label, Icon, tone }) => (
         <a key={tone} href={href} target="_blank" rel="noopener noreferrer"
