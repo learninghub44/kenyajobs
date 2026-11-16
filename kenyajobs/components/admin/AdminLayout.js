@@ -30,7 +30,8 @@ export default function AdminLayout({ children, active }) {
   const links = [
     { id: "jobs", href: "/admin/jobs", label: "Jobs", Icon: Briefcase },
     { id: "blog", href: "/admin/blog", label: "Blog", Icon: FileText },
-    { id: "submissions", href: "/admin/submissions", label: "Job submissions", Icon: Inbox },\n    { id: "posting-links", href: "/admin/posting-links", label: "Employer links", Icon: Link2 },
+    { id: "submissions", href: "/admin/submissions", label: "Job submissions", Icon: Inbox },
+    { id: "posting-links", href: "/admin/posting-links", label: "Employer links", Icon: Link2 },
     { id: "ads", href: "/admin/ads", label: "Sponsored Ads", Icon: Megaphone },
     { id: "diagnostics", href: "/admin/diagnostics", label: "Source Status", Icon: Activity },
     { id: "distribution", href: "/admin/distribution", label: "Distribution", Icon: Radio },
