@@ -13,7 +13,7 @@ SET dedupe_key = md5(
       BTRIM(REGEXP_REPLACE(COALESCE(payload->>'title',payload->>'job_title',''),'[^[:alnum:]]+',' ','g')),
       BTRIM(REGEXP_REPLACE(COALESCE(payload->>'company',payload->>'company_name',payload->>'employer_name',''),'[^[:alnum:]]+',' ','g')),
       BTRIM(REGEXP_REPLACE(COALESCE(payload->>'location',payload->>'candidate_required_location',payload->>'job_city',''),'[^[:alnum:]]+',' ','g'))
-    ), '\\s+', ' ', 'g'))
+    ), '[[:space:]]+', ' ', 'g'))
   END
 )
 WHERE dedupe_key IS NULL OR dedupe_key = '';
