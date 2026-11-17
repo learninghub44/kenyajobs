@@ -8,7 +8,7 @@ export default requireAdmin(async function handler(req, res) {
       res.status(200).json(jobs);
     } catch (err) {
       console.error("admin/jobs GET error:", err.message);
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: "Could not load jobs. Please try again." });
     }
     return;
   }
@@ -24,7 +24,7 @@ export default requireAdmin(async function handler(req, res) {
       res.status(201).json(job);
     } catch (err) {
       console.error("admin/jobs POST error:", err.message);
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: "Could not save the job. Please try again." });
     }
     return;
   }
