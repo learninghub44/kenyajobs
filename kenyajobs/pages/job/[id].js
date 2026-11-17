@@ -112,11 +112,8 @@ function timeAgo(dateStr) {
   if (!dateStr) return "Recently posted";
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return "Recently posted";
-  const days = Math.max(0, Math.floor((Date.now() - d.getTime()) / 86400000));
-  if (days === 0) return "Posted today";
-  if (days === 1) return "Posted yesterday";
-  if (days < 7) return `Posted ${days} days ago`;
-  return `Posted ${d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`;
+  // Use a fixed UTC date instead of Date.now()/browser-local time so SSR and hydration match.
+  return `Posted ${d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}`;
 }
 
 function decodeEntities(value) {
@@ -268,8 +265,8 @@ function formatSalary(job) {
   const min = job.annualSalaryMin ?? job.job_min_salary ?? job.salary_min;
   const max = job.annualSalaryMax ?? job.job_max_salary ?? job.salary_max;
   const currency = job.salaryCurrency || job.job_salary_currency || "";
-  if (min && max) return `${currency} ${Number(min).toLocaleString()} – ${Number(max).toLocaleString()}`.trim();
-  if (min) return `${currency} ${Number(min).toLocaleString()}+`.trim();
+  if (min && max) return `${currency} ${Number(min).toLocaleString("en-GB")} – ${Number(max).toLocaleString("en-GB")}`.trim();
+  if (min) return `${currency} ${Number(min).toLocaleString("en-GB")}+`.trim();
   return null;
 }
 
