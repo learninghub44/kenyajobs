@@ -2,6 +2,7 @@ import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cachedFetch } from "@/lib/apiResponseCache";
 import { attachSalaries } from "@/utils/extractSalary";
 import crypto from "crypto";
+import { filterEmploymentVacancies } from "@/lib/jobValidation";
 
 function hashId(input) {
   return crypto.createHash("sha1").update(String(input)).digest("hex").slice(0, 16);
@@ -407,11 +408,11 @@ export default async function handler(req, res) {
   // This route is the heaviest fan-out (RSS feeds + rss2json.com proxy calls for
   // LinkedIn/Indeed/Kenya feeds), so it gets a longer fresh window than the other
   // job routes to minimize how often we hit the free rss2json.com rate limit.
-  const unique = await cachedFetch("africa-jobs", fetchAll, {
+  const fetched = await cachedFetch("africa-jobs", fetchAll, {
     freshMs: 20 * 60 * 1000,   // 20 min fully fresh
     staleMs: 2 * 60 * 60 * 1000, // up to 2h stale-while-revalidate
     minLength: 150, // below this, treat as a degraded/partial fetch and retry sooner
   });
 
-  res.status(200).json(unique);
+  res.status(200).json(filterEmploymentVacancies(fetched));
 }
