@@ -370,9 +370,9 @@ export default function Terms() {
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 mt-2">
               <p className="font-semibold text-gray-900 mb-1">Online Jobs</p>
               <p className="text-sm text-gray-500 mb-3">Global job aggregation platform</p>
-              <a href="mailto:hello@onlinejobs.christech.co.ke"
+              <a href="mailto:support@christech.co.ke"
                 className="text-blue-600 hover:underline font-medium text-base">
-                hello@onlinejobs.christech.co.ke
+                support@christech.co.ke
               </a>
               <p className="text-sm text-gray-400 mt-2">We aim to respond to all enquiries within 2–3 business days.</p>
             </div>
