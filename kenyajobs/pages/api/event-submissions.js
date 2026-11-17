@@ -1,10 +1,12 @@
 import crypto from "crypto";
 import {query,withTransaction} from "@/lib/db";
 import {getPackage} from "@/lib/packages";
+const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 const clip=(v,n=5000)=>String(v||"").trim().slice(0,n);
 const validUrl=(v)=>{if(!v)return true;try{const u=new URL(v);return ["http:","https:"].includes(u.protocol)&&!u.username&&!u.password;}catch{return false;}};
 export default async function handler(req,res){
  if(req.method==="GET"){
+  if(req.query.invite){const token=String(req.query.invite);if(!/^[A-Za-z0-9_-]{40,60}$/.test(token))return res.status(404).json({error:"This event invitation is invalid or expired."});try{const {rows}=await query("SELECT label,max_uses,uses FROM job_posting_links WHERE token_hash=$1 AND submission_type='event' AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>now()) AND uses<max_uses",[hash(token)]);return rows[0]?res.status(200).json({label:rows[0].label,remaining:rows[0].max_uses-rows[0].uses}):res.status(404).json({error:"This event invitation is invalid, expired or fully used."});}catch{return res.status(503).json({error:"Could not verify this event invitation."});}}
   res.setHeader("Cache-Control","no-store");
   try {
   const fields="id,title,slug,organiser,event_type,event_date,start_time,end_time,venue,location,description,ticket_price,registration_url,poster_url,website,package_code,package_price,package_expires_at,featured_until";
@@ -17,7 +19,7 @@ export default async function handler(req,res){
   }
  }
  if(req.method!=="POST")return res.status(405).json({error:"Method not allowed"});
- const b=req.body||{},submissionKey=clip(b.submissionKey,80),events=Array.isArray(b.events)?b.events:[b];
+ const b=req.body||{},submissionKey=clip(b.submissionKey,80),postingToken=clip(b.postingToken,80),events=Array.isArray(b.events)?b.events:[b];
  if(!/^[A-Za-z0-9_-]{20,80}$/.test(submissionKey))return res.status(400).json({error:"Refresh the form and try submitting again."});
  if(clip(b.websiteTrap,200))return res.status(200).json({ok:true,reference:"received"});
  const count=events.length,p=getPackage("events",clip(b.packageCode,50));
@@ -36,6 +38,8 @@ export default async function handler(req,res){
  }
  try{
   const result=await withTransaction(async client=>{
+   let invite=null;
+   if(postingToken){if(!/^[A-Za-z0-9_-]{40,60}$/.test(postingToken))throw Object.assign(new Error("This event invitation is invalid."),{statusCode:400});const found=await client.query("SELECT id,max_uses,uses FROM job_posting_links WHERE token_hash=$1 AND submission_type='event' AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>now()) AND uses<max_uses FOR UPDATE",[hash(postingToken)]);invite=found.rows[0];if(!invite)throw Object.assign(new Error("This event invitation is invalid, expired or fully used."),{statusCode:400});}
    const groupKey=submissionKey;
    const existing=await client.query("SELECT id FROM event_submissions WHERE group_key=$1 ORDER BY id",[groupKey]);
    if(existing.rows.length)return {ids:existing.rows.map(x=>x.id),duplicate:true};
@@ -50,6 +54,7 @@ export default async function handler(req,res){
      [f.title,contact.organiser,contact.contactName,contact.email,contact.phone,f.eventType,f.eventDate,f.startTime||null,f.endTime||null,f.venue||null,f.location,f.description,f.ticketPrice||null,f.registrationUrl||null,f.posterUrl||null,f.website||null,ipHash,key,p.code,p.price,p.durationDays,groupKey,count]);
     ids.push(rows[0].id);
    }
+   if(invite)await client.query("UPDATE job_posting_links SET uses=uses+1 WHERE id=$1",[invite.id]);
    return {ids,duplicate:false};
   });
   return res.status(result.duplicate?200:201).json({ok:true,reference:result.ids[0],references:result.ids,duplicate:result.duplicate,package:{name:p.name,price:p.price,durationDays:p.durationDays,eventCount:count},message:"Your event bundle has been received. Our events team will contact you to confirm the total payment before publishing."});
