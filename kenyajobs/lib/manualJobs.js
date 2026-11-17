@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { query } from "@/lib/db";
 import { enqueueJobs } from "@/lib/distribution";
+import { filterEmploymentVacancies } from "@/lib/jobValidation";
 
 const VALID_CATEGORIES = ["remote", "entry", "graduate", "wfh", "general"];
 function sanitizeCategories(categories) { return Array.isArray(categories) ? categories.filter((c) => VALID_CATEGORIES.includes(c)) : []; }
@@ -23,9 +24,9 @@ export async function listPublishedJobs({ category, search } = {}) {
   if (category) { params.push(category); conditions.push(`$${params.length} = ANY(categories)`); }
   if (search) { params.push(`%${search}%`); conditions.push(`(title ILIKE $${params.length} OR company ILIKE $${params.length})`); }
   const { rows } = await query(`SELECT * FROM manual_jobs WHERE ${conditions.join(" AND ")} ORDER BY featured DESC, created_at DESC`, params);
-  return rows.map(rowToJob);
+  return filterEmploymentVacancies(rows.map(rowToJob));
 }
-export async function getPublishedJobById(id) { const { rows } = await query("SELECT * FROM manual_jobs WHERE id=$1 AND published=true AND (package_expires_at IS NULL OR package_expires_at>now())", [id]); return rows[0] ? rowToJob(rows[0]) : null; }
+export async function getPublishedJobById(id) { const { rows } = await query("SELECT * FROM manual_jobs WHERE id=$1 AND published=true AND (package_expires_at IS NULL OR package_expires_at>now())", [id]); const job = rows[0] ? rowToJob(rows[0]) : null; return job && filterEmploymentVacancies([job]).length ? job : null; }
 export async function listAllJobs() { const { rows } = await query("SELECT * FROM manual_jobs ORDER BY created_at DESC"); return rows.map(rowToJob); }
 export async function getJobById(id) { const { rows } = await query("SELECT * FROM manual_jobs WHERE id=$1", [id]); return rows[0] ? rowToJob(rows[0]) : null; }
 const values = (d) => [d.title, d.company, d.location || "Worldwide", d.type || "Full-time", d.salary || null,
