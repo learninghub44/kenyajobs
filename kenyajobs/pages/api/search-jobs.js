@@ -1,3 +1,4 @@
+import { filterEmploymentVacancies } from "@/lib/jobValidation";
 // Search: The Muse + Remotive + Jobicy + JSearch (if key)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
@@ -99,11 +100,11 @@ export default async function handler(req, res) {
   ];
 
   const results = await Promise.allSettled(sources);
-  const jobs = attachSalaries(
+  const jobs = filterEmploymentVacancies(attachSalaries(
     results
       .filter(r => r.status === "fulfilled")
       .flatMap(r => r.value)
-  );
+  ));
 
   cacheJobs(jobs);
   res.status(200).json(jobs);
