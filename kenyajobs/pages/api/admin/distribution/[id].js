@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/adminAuth";
 import { query } from "@/lib/db";
-import { updateDistributionItem, sendTelegramMessage, isEmploymentVacancy } from "@/lib/distribution";
+import { updateDistributionItem, sendTelegramMessage } from "@/lib/distribution";
+import { isEmploymentVacancy } from "@/lib/jobValidation";
 
 export default requireAdmin(async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
