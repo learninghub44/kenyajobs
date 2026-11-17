@@ -58,14 +58,14 @@ export default function AdminLayout({ children, active }) {
         </header>
         <nav aria-label="Admin navigation" className="mb-6 hidden gap-1.5 overflow-x-auto rounded-xl border border-gray-200 bg-white p-2 shadow-sm md:flex">
           {links.map(({id,href,label,Icon}) => (
-            <Link key={id} href={href} aria-current={active===id ? "page" : undefined} className={\`inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors \${active===id ? "bg-green-700 text-white" : "text-gray-600 hover:bg-green-50 hover:text-green-800"}\`}>
+            <Link key={id} href={href} aria-current={active===id ? "page" : undefined} className={"inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors " + (active===id ? "bg-green-700 text-white" : "text-gray-600 hover:bg-green-50 hover:text-green-800")}>
               <Icon size={15}/>{label}
             </Link>
           ))}
         </nav>
         {mobileNavOpen && <nav id="admin-mobile-navigation" aria-label="Mobile admin navigation" className="mb-5 grid grid-cols-2 gap-2 rounded-xl border border-gray-200 bg-white p-3 shadow-lg sm:grid-cols-3 md:hidden">
           {links.map(({id,href,label,Icon}) => (
-            <Link key={id} href={href} onClick={() => setMobileNavOpen(false)} aria-current={active===id ? "page" : undefined} className={\`flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold \${active===id ? "bg-green-700 text-white" : "bg-gray-50 text-gray-700 hover:bg-green-50"}\`}>
+            <Link key={id} href={href} onClick={() => setMobileNavOpen(false)} aria-current={active===id ? "page" : undefined} className={"flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-semibold " + (active===id ? "bg-green-700 text-white" : "bg-gray-50 text-gray-700 hover:bg-green-50")}>
               <Icon size={15} className="shrink-0"/><span>{label}</span>
             </Link>
           ))}
