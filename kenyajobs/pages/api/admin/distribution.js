@@ -25,10 +25,10 @@ export default requireAdmin(async function handler(req, res) {
         if (!response.ok) throw new Error(`${route}: HTTP ${response.status}`);
         const jobs = await response.json();
         const result = await enqueueJobs(Array.isArray(jobs) ? jobs : [], route);
-        return { route, seen: Array.isArray(jobs) ? jobs.length : 0, queued: result.queued || 0 };
+        return { route, ...result };
       }));
       const sources = results.map((r, i) => r.status === "fulfilled" ? r.value : { route: SOURCE_ROUTES[i], error: r.reason?.message || "Scan failed" });
-      return res.status(200).json({ ok: sources.some((s) => !s.error), queued: sources.reduce((n, s) => n + (s.queued || 0), 0), sources });
+      return res.status(200).json({ ok: sources.some((s) => !s.error), queued: sources.reduce((n, s) => n + (s.queued || 0), 0), rejected: sources.reduce((n, s) => n + (s.rejected || 0), 0), sources });
     }
     return res.status(405).json({ error: "Method not allowed" });
   } catch (error) {
