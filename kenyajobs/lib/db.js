@@ -156,3 +156,7 @@ export async function withTransaction(callback) {
 }
 export async function query(sql, params) { await ensureSchema(); return getPool().query(sql, params); }
 export function isDatabaseConfigured() { return Boolean(CONNECTION_STRING); }
+
+// Execute a database query without running the full application schema bootstrap.
+// Used by authentication paths so unrelated schema changes cannot block sign-in.
+export async function rawQuery(sql, params) { return getPool().query(sql, params); }
