@@ -33,6 +33,6 @@ export default requireAdmin(async function handler(req, res) {
   } catch (error) {
     console.error("distribution action error:",error.message);
     await updateDistributionItem(id,"failed",error.message,["ready"],"send_failed").catch(()=>{});
-    return res.status(502).json({error:error.message || "Distribution action failed."});
+    return res.status(502).json({error:"Could not complete that distribution action. Please try again."});
   }
 });
