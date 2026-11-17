@@ -14,10 +14,10 @@ export default function AdminLayout({ children, active }) {
       .then((r) => r.json())
       .then((d) => {
         if (cancelled) return;
-        if (!d.authenticated) router.replace("/admin");
+        if (!d.authenticated) router.replace("/login/admin/management");
         else setReady(true);
       })
-      .catch(() => { if (!cancelled) router.replace("/admin"); });
+      .catch(() => { if (!cancelled) router.replace("/login/admin/management"); });
     return () => { cancelled = true; };
   }, [router]);
 
