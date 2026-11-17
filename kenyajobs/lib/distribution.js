@@ -1,4 +1,27 @@
-import { query } from "@/lib/db";
+import { query, rawQuery } from "@/lib/db";
+
+let socialSchemaReady;
+async function ensureSocialSettingsTable() {
+  if (!socialSchemaReady) {
+    socialSchemaReady = (async () => {
+      await rawQuery(`CREATE TABLE IF NOT EXISTS social_channel_settings (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        whatsapp_channel_url TEXT NOT NULL DEFAULT 'https://whatsapp.com/channel/0029Vb9ItcdJf05hVwnE3w2C',
+        telegram_channel_url TEXT NOT NULL DEFAULT 'https://t.me/+JN0rNZmNbGlkN2I0',
+        whatsapp_enabled BOOLEAN NOT NULL DEFAULT true,
+        telegram_enabled BOOLEAN NOT NULL DEFAULT true,
+        auto_queue BOOLEAN NOT NULL DEFAULT true,
+        approval_required BOOLEAN NOT NULL DEFAULT true,
+        kenya_enabled BOOLEAN NOT NULL DEFAULT true,
+        africa_enabled BOOLEAN NOT NULL DEFAULT true,
+        remote_enabled BOOLEAN NOT NULL DEFAULT true,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )`);
+      await rawQuery("INSERT INTO social_channel_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING");
+    })().catch((error) => { socialSchemaReady = null; throw error; });
+  }
+  return socialSchemaReady;
+}
 
 export const DEFAULT_SOCIAL_SETTINGS = {
   whatsapp_channel_url: "https://whatsapp.com/channel/0029Vb9ItcdJf05hVwnE3w2C",
@@ -8,7 +31,8 @@ export const DEFAULT_SOCIAL_SETTINGS = {
 };
 
 export async function getSocialSettings() {
-  const { rows } = await query("SELECT * FROM social_channel_settings WHERE id = 1");
+  await ensureSocialSettingsTable();
+  const { rows } = await rawQuery("SELECT * FROM social_channel_settings WHERE id = 1");
   return { ...DEFAULT_SOCIAL_SETTINGS, ...(rows[0] || {}) };
 }
 
@@ -31,7 +55,8 @@ export async function saveSocialSettings(input = {}) {
     next[key] = value;
   }
   for (const key of ["whatsapp_enabled","telegram_enabled","auto_queue","approval_required","kenya_enabled","africa_enabled","remote_enabled"]) next[key] = Boolean(next[key]);
-  await query(
+  await ensureSocialSettingsTable();
+  await rawQuery(
     `INSERT INTO social_channel_settings
       (id, whatsapp_channel_url, telegram_channel_url, whatsapp_enabled, telegram_enabled, auto_queue, approval_required, kenya_enabled, africa_enabled, remote_enabled, updated_at)
      VALUES (1,$1,$2,$3,$4,$5,$6,$7,$8,$9,now())
