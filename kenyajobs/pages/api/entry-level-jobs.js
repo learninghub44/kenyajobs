@@ -8,7 +8,14 @@ async function fetchAll(page) {
   const sources = [
     // 1. The Muse — free, no key, has entry level filter
     fetchWithTimeout(`https://www.themuse.com/api/public/jobs?level=Entry+Level&page=${page}&descending=true`, {}, 5000)
-      .then(r => r.json())
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const contentType = r.headers.get("content-type") || "";
+        if (!contentType.toLowerCase().includes("json")) {
+          throw new Error(`Expected JSON from The Muse, received ${contentType || "unknown content type"}`);
+        }
+        return r.json();
+      })
       .then(d => (d.results || []).map(j => ({
         id: `muse-${j.id}`,
         title: j.name,
