@@ -1,3 +1,4 @@
+import { filterEmploymentVacancies } from "@/lib/jobValidation";
 // Providers: Remotive + Jobicy + Arbeitnow (all free, no key)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
@@ -84,8 +85,9 @@ export default async function handler(req, res) {
 
   res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
 
-  const jobs = await cachedFetch(`remote-jobs:${category}`, () => fetchAll(category));
+  const fetchedJobs = await cachedFetch(`remote-jobs:${category}`, () => fetchAll(category));
 
+  const jobs = filterEmploymentVacancies(fetchedJobs);
   cacheJobs(jobs);
   res.status(200).json(jobs);
 }
