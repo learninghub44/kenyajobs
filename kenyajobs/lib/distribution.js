@@ -175,16 +175,16 @@ export async function enqueueJobs(jobs, route = "") {
   for (const job of jobs) {
     if (!job || !(job.id || job.job_id) || isExpired(job)) continue;
     const category = classifyJob(job, route);
-    if (!category || !settings[\`${category}_enabled\`]) continue;
+    if (!category || !settings[category + "_enabled"]) continue;
     const jobId = String(job.id || job.job_id);
     const dedupeKey = jobDedupeKey(job);
     if (seenInBatch.has(dedupeKey)) continue;
     seenInBatch.add(dedupeKey);
     for (const channel of channels) {
       const result = await query(
-        \`INSERT INTO job_distribution_queue (job_id, dedupe_key, channel, category, payload, message, status, created_at, updated_at)
-         VALUES ($1,$2,$3,$4,$5::jsonb,$6,$7,now(),now())
-         ON CONFLICT (channel, dedupe_key) DO NOTHING RETURNING id\`,
+        "INSERT INTO job_distribution_queue (job_id, dedupe_key, channel, category, payload, message, status, created_at, updated_at) " +
+        "VALUES ($1,$2,$3,$4,$5::jsonb,$6,$7,now(),now()) " +
+        "ON CONFLICT (channel, dedupe_key) DO NOTHING RETURNING id",
         [jobId,dedupeKey,channel,category,JSON.stringify(job),formatJobAnnouncement(job,category),settings.approval_required ? "pending_approval" : "ready"]
       );
       if (result.rowCount) {
