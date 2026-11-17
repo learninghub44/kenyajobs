@@ -5,7 +5,7 @@ export default function AdminEntry() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/admin/login");
+    router.replace("/login/admin/management");
   }, [router]);
 
   return null;
