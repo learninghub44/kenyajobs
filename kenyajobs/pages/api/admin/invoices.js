@@ -5,7 +5,7 @@ import { sendApiError } from "@/lib/dbErrors";
 const clip=(v,n=2000)=>String(v??"").trim().slice(0,n);
 const money=v=>{const n=Number(v);return Number.isFinite(n)&&n>=0?Math.round(n*100)/100:null;};
 const hash=v=>crypto.createHash("sha256").update(v).digest("hex");
-const siteBase=req=>(process.env.NEXT_PUBLIC_SITE_URL||("https://"+String(req.headers.host||"onlinejobs.christech.co.ke").replace(/[^a-zA-Z0-9.:-]/g,""))).replace(/\/$/,"");
+const siteBase=()=>(process.env.NEXT_PUBLIC_SITE_URL||"https://onlinejobs.christech.co.ke").replace(/\/$/,"");
 function build(body){
  const name=clip(body.customerName,180),email=clip(body.customerEmail,254).toLowerCase();
  if(!name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw Object.assign(new Error("Customer name and a valid email are required."),{statusCode:400});
@@ -25,13 +25,13 @@ async function issueShare(req,id,sendEmail){
  const raw=crypto.randomBytes(32).toString("base64url"),tokenHash=hash(raw);
  const updated=await query("UPDATE invoices SET share_token_hash=$2,shared_at=now(),status=CASE WHEN status='draft' THEN 'sent' ELSE status END,sent_at=COALESCE(sent_at,now()),updated_at=now() WHERE id=$1 AND status<>'void' RETURNING "+fields,[id,tokenHash]);
  if(!updated.rows[0])return {error:"Invoice not found or is void."};
- const shareUrl=siteBase(req)+"/invoice/"+raw;
+ const shareUrl=siteBase()+"/invoice/"+raw;
  if(!sendEmail)return {invoice:updated.rows[0],shareUrl};
  const key=process.env.RESEND_API_KEY,from=process.env.RESEND_FROM_EMAIL||process.env.EMAIL_FROM;
  if(!key||!from)return {invoice:updated.rows[0],shareUrl,emailSent:false,emailError:"Invoice link created, but email is not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL in Vercel."};
  const inv=updated.rows[0],currency=inv.currency||"KES";
  const fmt=n=>new Intl.NumberFormat("en-KE",{style:"currency",currency,maximumFractionDigits:2}).format(Number(n||0));
- const logo=process.env.NEXT_PUBLIC_ZETU_BUSINESS_LOGO_URL||"";
+ const logo=siteBase()+"/zetubiz-logo.svg";
  const html=`<div style="font-family:Arial,sans-serif;color:#17221d;max-width:620px;margin:auto;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden"><div style="padding:26px 30px;background:#103c2b;color:white">${logo?'<img src="'+logo+'" alt="Zetu Business Solutions" style="max-height:48px;max-width:190px;object-fit:contain">':'<strong style="font-size:21px">ZETU BUSINESS SOLUTIONS</strong>'}<p style="margin:8px 0 0;color:#d5e7dc">Invoice available</p></div><div style="padding:30px"><p>Hello ${inv.customer_name.replace(/[&<>"]/g,"")},</p><p>Your invoice <strong>${inv.invoice_number}</strong> is ready. You can securely view, print or download it using the link below.</p><div style="padding:18px;background:#f5f8f6;border-radius:12px;margin:20px 0"><p style="margin:0;color:#66756d;font-size:12px">AMOUNT DUE</p><strong style="font-size:28px">${fmt(Number(inv.total)-Number(inv.amount_paid))}</strong><p style="margin:8px 0 0;font-size:13px">Due date: ${String(inv.due_date).slice(0,10)}</p></div><p><a href="${shareUrl}" style="display:inline-block;background:#17633f;color:white;text-decoration:none;padding:13px 20px;border-radius:8px;font-weight:bold">View & download invoice</a></p><p style="font-size:12px;color:#66756d">If the button does not work, copy this link: ${shareUrl}</p></div></div>`;
  const response=await fetch("https://api.resend.com/emails",{method:"POST",headers:{Authorization:"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({from,to:[inv.customer_email],subject:"Invoice "+inv.invoice_number+" from Zetu Business Solutions",html})});
  if(!response.ok){const detail=await response.text().catch(()=>"");return {invoice:inv,shareUrl,emailSent:false,emailError:"Invoice link created, but email delivery failed: "+detail.slice(0,300)};}
@@ -44,8 +44,8 @@ export default requireAdmin(async function handler(req,res){
    const b=req.body||{},v=build(b),currency=b.currency==="USD"?"USD":"KES";
    let related={type:null,id:null,title:null,url:null};
    if(b.relatedType&&b.relatedId){
-    if(b.relatedType==="job"){const r=await query("SELECT id,title,company FROM manual_jobs WHERE id=$1 AND published=true",[String(b.relatedId)]);if(!r.rows[0])return res.status(400).json({error:"The selected published job could not be found."});related={type:"job",id:r.rows[0].id,title:r.rows[0].title,url:siteBase(req)+"/job/"+encodeURIComponent(r.rows[0].id)};}
-    else if(b.relatedType==="event"){const r=await query("SELECT id,title,slug FROM events WHERE id=$1 AND published=true",[String(b.relatedId)]);if(!r.rows[0])return res.status(400).json({error:"The selected published event could not be found."});related={type:"event",id:r.rows[0].id,title:r.rows[0].title,url:siteBase(req)+"/events/"+encodeURIComponent(r.rows[0].slug)};}
+    if(b.relatedType==="job"){const r=await query("SELECT id,title,company FROM manual_jobs WHERE id=$1 AND published=true",[String(b.relatedId)]);if(!r.rows[0])return res.status(400).json({error:"The selected published job could not be found."});related={type:"job",id:r.rows[0].id,title:r.rows[0].title,url:siteBase()+"/job/"+encodeURIComponent(r.rows[0].id)};}
+    else if(b.relatedType==="event"){const r=await query("SELECT id,title,slug FROM events WHERE id=$1 AND published=true",[String(b.relatedId)]);if(!r.rows[0])return res.status(400).json({error:"The selected published event could not be found."});related={type:"event",id:r.rows[0].id,title:r.rows[0].title,url:siteBase()+"/events/"+encodeURIComponent(r.rows[0].slug)};}
     else return res.status(400).json({error:"Invalid linked listing type."});
    }
    const {rows}=await query(`INSERT INTO invoices(customer_name,customer_company,customer_email,customer_phone,customer_address,currency,due_date,items,subtotal,tax_rate,tax_amount,discount,total,status,amount_paid,payment_method,payment_reference,payment_instructions,notes,terms,sent_at,paid_at,related_type,related_id,related_title,related_url)
