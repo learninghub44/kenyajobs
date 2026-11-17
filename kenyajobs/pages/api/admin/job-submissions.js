@@ -13,7 +13,7 @@ export default requireAdmin(async function handler(req,res){
    const existingJob=await query("SELECT * FROM manual_jobs WHERE source_submission_id=$1 LIMIT 1",[id]);
    if(existingJob.rows[0]){
     const existing=existingJob.rows[0];
-    await query("UPDATE manual_jobs SET package_code=$2,package_price=$3,package_started_at=COALESCE(package_started_at,now()),package_expires_at=COALESCE(package_expires_at,now()+($4 * interval '1 day')),featured_until=CASE WHEN $5>0 THEN COALESCE(featured_until,now()+($5 * interval '1 day')) ELSE NULL END,renewal_status='active' WHERE id=$1",[existing.id,p.code,p.price,p.durationDays,p.limits.featuredDays]);
+    await query("UPDATE manual_jobs SET package_code=$2,package_price=$3,package_started_at=COALESCE(package_started_at,now()),package_expires_at=COALESCE(package_expires_at,now()+($4 * interval '1 day')),featured_until=CASE WHEN $5>0 THEN COALESCE(featured_until,now()+($5 * interval '1 day')) ELSE NULL END,renewal_status='active',url=$8,application_method=$6,application_email=$7 WHERE id=$1",[existing.id,p.code,p.price,p.durationDays,p.limits.featuredDays,s.application_method,s.application_email,s.application_url]);
     await query("UPDATE job_submissions SET status='approved',payment_status='confirmed',reviewed_at=now(),job_id=$2 WHERE id=$1 AND status='pending'",[id,existing.id]);
     return res.status(200).json({ok:true,job:existing,recovered:true});
    }
