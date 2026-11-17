@@ -806,3 +806,40 @@ html body .home-event-action * {
 @media(max-width:640px) {
   html body .home-event-action { width:100%; min-height:50px; }
 }
+
+
+/* JOBS HUB KENYA — green, white and warm-yellow brand palette + CTA contrast */
+:root { --primary:#16834A; --primary-hover:#116B3C; --primary-light:#E8F5EC; --primary-dark:#0E5932; --navy:#145B38; --navy-light:#1C7549; --accent:#D6A51D; --success:#16834A; --border-focus:#16834A; }
+body { background:#F7FAF7 !important; }
+.home-hero { background:linear-gradient(115deg,#0D4B2E 0%,#16834A 72%,#247A49 100%) !important; }
+.home-hero .kicker,.home-hero .text-text-secondary { color:#E8F5EC !important; }
+.home-hero .job-search-input { background:#FFFFFF !important; color:#173B28 !important; border-color:#D8E8DC !important; }
+.home-hero button.bg-primary,.home-hero button[class*="bg-primary"] { background:#16834A !important; color:#FFFFFF !important; }
+.home-hero button.bg-primary:hover,.home-hero button[class*="bg-primary"]:hover { background:#116B3C !important; }
+#jobs-section .flex.gap-2.flex-wrap button.bg-primary { background:#16834A !important; box-shadow:0 6px 15px rgba(22,131,74,.18) !important; }
+#jobs-section .job-card:before { background:#16834A !important; }
+#jobs-section .job-card:hover { border-color:#A9D6B7 !important; }
+#jobs-section .job-card-arrow { background:#E8F5EC !important; color:#16834A !important; }
+#jobs-section .job-card:hover .job-card-arrow { background:#16834A !important; color:#FFFFFF !important; }
+#jobs-section .job-card-meta .job-type,.job-translated { color:#12633A !important; background:#E8F5EC !important; }
+#jobs-section .job-view { color:#16834A !important; }
+.apply-button,.button-primary,button.bg-primary,a.bg-primary,button[class*="bg-primary"],a[class*="bg-primary"] { background:#16834A !important; color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; }
+.apply-button:hover,.button-primary:hover,button.bg-primary:hover,a.bg-primary:hover { background:#116B3C !important; }
+:where([class*="bg-blue-"]) { background-color:#E8F5EC !important; }
+:where([class*="text-blue-"]) { color:#16834A !important; }
+:where([class*="border-blue-"]) { border-color:#B8DCC3 !important; }
+:where([class*="ring-blue-"]) { --tw-ring-color:#B8DCC3 !important; }
+:where([class*="from-blue-"]) { --tw-gradient-from:#145B38 var(--tw-gradient-from-position) !important; }
+:where([class*="to-blue-"]) { --tw-gradient-to:#16834A var(--tw-gradient-to-position) !important; }
+.events-page { background:#F7FAF7 !important; }
+.events-page [class*="bg-[#071b55]"] { background:#145B38 !important; }
+.events-page [class*="from-[#0a246b]"] { --tw-gradient-from:#145B38 var(--tw-gradient-from-position) !important; }
+.events-page [class*="to-[#3a74de]"] { --tw-gradient-to:#16834A var(--tw-gradient-to-position) !important; }
+.events-page .event-action-primary,.events-page a.event-action-primary,.events-page button.event-action-primary,html body a.event-action-primary,html body button.event-action-primary { background:#16834A !important; background-image:none !important; border-color:#16834A !important; color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; }
+.events-page .event-action-primary:hover,html body a.event-action-primary:hover,html body button.event-action-primary:hover { background:#116B3C !important; border-color:#116B3C !important; color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; }
+.events-page .event-action-secondary,.events-page a.event-action-secondary { background:#F4C542 !important; border-color:#E0B32E !important; color:#243528 !important; -webkit-text-fill-color:#243528 !important; }
+.events-page .event-action-secondary:hover,.events-page a.event-action-secondary:hover { background:#E8B82E !important; border-color:#D6A51D !important; color:#243528 !important; -webkit-text-fill-color:#243528 !important; }
+html body .home-event-action-primary { background:#16834A !important; border-color:#16834A !important; color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; }
+html body .home-event-action-primary:hover { background:#116B3C !important; border-color:#116B3C !important; color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important; }
+html body .home-event-action-secondary { background:#F4C542 !important; border-color:#E0B32E !important; color:#243528 !important; -webkit-text-fill-color:#243528 !important; }
+html body .home-event-action-secondary:hover { background:#E8B82E !important; border-color:#D6A51D !important; color:#243528 !important; -webkit-text-fill-color:#243528 !important; }
