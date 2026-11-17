@@ -1,5 +1,6 @@
 import { listPublishedJobs } from "@/lib/manualJobs";
 import { isDatabaseConfigured } from "@/lib/db";
+import { filterEmploymentVacancies } from "@/lib/jobValidation";
 
 export default async function handler(req, res) {
   if (!isDatabaseConfigured()) {
@@ -17,7 +18,7 @@ export default async function handler(req, res) {
       category: category || undefined,
       search: search || undefined,
     });
-    res.status(200).json(jobs);
+    res.status(200).json(filterEmploymentVacancies(jobs));
   } catch (err) {
     console.error("manual-jobs error:", err.message);
     res.status(200).json([]);
