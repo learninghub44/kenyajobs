@@ -47,17 +47,17 @@ export default function AdminLayout({ children, active }) {
     <>
       <Head><meta name="robots" content="noindex,nofollow" /><meta name="referrer" content="no-referrer" /></Head>
       <div className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-5 sm:py-6 lg:px-8">
-        <header className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm sm:mb-6">
+        <header className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-[#dce8e1] bg-white px-4 py-3 shadow-[0_8px_30px_rgba(6,63,52,0.06)] sm:mb-6">
           <Link href="/admin/overview" className="flex min-w-0 items-center gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-green-700 text-sm font-bold text-white">J</span>
-            <span className="min-w-0"><span className="block text-base font-bold leading-tight text-gray-900 sm:text-lg">JOBS HUB KENYA</span><span className="block text-[11px] text-gray-500">Administration workspace</span></span>
+            <img src="/zetubiz-logo.svg" alt="ZetuBiz Business Solutions" className="h-11 w-[100px] shrink-0 object-contain object-left sm:h-12 sm:w-[118px]"/>
+            <span className="min-w-0 border-l border-gray-200 pl-3"><span className="block text-sm font-bold leading-tight text-gray-900 sm:text-base">JOBS HUB KENYA</span><span className="block text-[11px] text-gray-500">Administration workspace</span></span>
           </Link>
           <div className="flex shrink-0 items-center gap-2">
             <button type="button" aria-expanded={mobileNavOpen} aria-controls="admin-mobile-navigation" onClick={() => setMobileNavOpen(v => !v)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 md:hidden">{mobileNavOpen ? <X size={16}/> : <Menu size={16}/>}<span>Menu</span></button>
             <button onClick={handleLogout} className="inline-flex items-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold text-gray-500 hover:bg-red-50 hover:text-red-600 sm:px-3 sm:text-sm"><LogOut size={14}/><span className="hidden sm:inline">Log Out</span></button>
           </div>
         </header>
-        <nav aria-label="Admin navigation" className="mb-6 hidden gap-1.5 overflow-x-auto rounded-xl border border-gray-200 bg-white p-2 shadow-sm md:flex">
+        <nav aria-label="Admin navigation" className="mb-6 hidden gap-1.5 overflow-x-auto rounded-xl border border-[#e2e9e4] bg-white p-2 shadow-[0_4px_20px_rgba(6,63,52,0.04)] md:flex">
           {links.map(({id,href,label,Icon}) => (
             <Link key={id} href={href} aria-current={active===id ? "page" : undefined} className={"inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors " + (active===id ? "bg-green-700 text-white" : "text-gray-600 hover:bg-green-50 hover:text-green-800")}>
               <Icon size={15}/>{label}
