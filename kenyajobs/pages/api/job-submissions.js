@@ -88,6 +88,8 @@ export default async function handler(req, res) {
     benefits: clip(body.benefits, 5000),
     applicationDeadline: clip(body.applicationDeadline, 30),
     url: clip(body.url, 2048),
+    applicationMethod: clip(body.applicationMethod, 30) || "website",
+    applicationEmail: clip(body.applicationEmail, 254).toLowerCase(),
     applicationInstructions: clip(body.applicationInstructions, 5000),
     companyWebsite: clip(body.companyWebsite, 2048),
     companyLogo: clip(body.companyLogo, 2048),
@@ -107,7 +109,11 @@ export default async function handler(req, res) {
   const selectedPackage = getPackage("jobs", fields.packageCode);
   if (!selectedPackage) return res.status(400).json({ error: "Choose a valid job promotion package." });
   if (String(body.title||"").length > selectedPackage.limits.title || String(body.description||"").length > selectedPackage.limits.description) return res.status(400).json({ error: "The job title or description exceeds the selected package limits." });
-  if (!validApplicationDestination(fields.url) || (fields.companyWebsite && !validUrl(fields.companyWebsite))) {
+  const inferredMethod = /^mailto:/i.test(fields.url) ? "email" : /^https:\/\/(?:forms\.gle\/|docs\.google\.com\/forms\/)/i.test(fields.url) ? "google_form" : "website";
+  fields.applicationMethod = ["website","google_form","email"].includes(fields.applicationMethod) ? fields.applicationMethod : inferredMethod;
+  if (fields.applicationMethod === "email" && !/^mailto:/i.test(fields.url)) fields.url = "mailto:" + fields.applicationEmail;
+  if (fields.applicationMethod === "email") fields.applicationEmail = fields.url.replace(/^mailto:/i, "").split("?")[0].toLowerCase();
+  if (!validApplicationDestination(fields.url) || (fields.companyWebsite && !validUrl(fields.companyWebsite)) || (fields.applicationMethod === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.applicationEmail))) {
     return res.status(400).json({ error: "Use a valid application website, Google Forms link, or mailto application email. Company website must be a valid http or https link." });
   }
   // A company logo is optional. Ignore an invalid optional logo rather than
@@ -158,9 +164,9 @@ export default async function handler(req, res) {
       `INSERT INTO job_submissions(
         title,company,contact_name,email,location,type,salary,description,requirements,responsibilities,
         qualifications,experience,education,benefits,application_deadline,application_url,application_instructions,
-        company_website,company_logo,categories,status,posting_link_id,ip_hash,submission_key,phone,package_code,package_price,package_duration_days
+        company_website,company_logo,categories,status,posting_link_id,ip_hash,submission_key,phone,package_code,package_price,package_duration_days,application_method,application_email
       ) VALUES(
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending',$21,$22,$23,$24,$25,$26,$27
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending',$21,$22,$23,$24,$25,$26,$27,$28,$29
       ) ON CONFLICT(submission_key) WHERE submission_key IS NOT NULL DO NOTHING RETURNING id,status,job_id`,
       [
         fields.title, fields.company, fields.contactName, fields.email, fields.location, fields.type,
@@ -168,7 +174,7 @@ export default async function handler(req, res) {
         fields.qualifications, fields.experience, fields.education, fields.benefits,
         fields.applicationDeadline || null, fields.url, fields.applicationInstructions,
         fields.companyWebsite || null, fields.companyLogo || null, fields.categories,
-        link?.id || null, ipHash, submissionKey, fields.phone, selectedPackage.code, selectedPackage.price, selectedPackage.durationDays,
+        link?.id || null, ipHash, submissionKey, fields.phone, selectedPackage.code, selectedPackage.price, selectedPackage.durationDays, fields.applicationMethod, fields.applicationMethod === "email" ? fields.applicationEmail : null,
       ]
     );
 
