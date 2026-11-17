@@ -18,9 +18,10 @@ SET dedupe_key = md5(
 )
 WHERE dedupe_key IS NULL OR dedupe_key = '';
 
--- Keep the most useful record when earlier scans already created duplicates.
+-- Preserve queue history. Keep one canonical record per vacancy/channel;
+-- mark extra unposted rows failed and give all extras unique audit fingerprints.
 WITH ranked AS (
-  SELECT id, ROW_NUMBER() OVER (
+  SELECT id, status, ROW_NUMBER() OVER (
     PARTITION BY channel, dedupe_key
     ORDER BY CASE status WHEN 'posted' THEN 0 WHEN 'ready' THEN 1 WHEN 'pending_approval' THEN 2 ELSE 3 END,
              COALESCE(posted_at, updated_at, created_at) DESC, id DESC
@@ -28,8 +29,12 @@ WITH ranked AS (
   FROM public.job_distribution_queue
   WHERE dedupe_key IS NOT NULL
 )
-DELETE FROM public.job_distribution_queue q
-USING ranked r
+UPDATE public.job_distribution_queue q
+SET dedupe_key = md5('legacy-duplicate:' || q.id::text),
+    status = CASE WHEN r.status = 'posted' THEN 'posted' ELSE 'failed' END,
+    error = CASE WHEN r.status = 'posted' THEN q.error ELSE 'Duplicate vacancy detected during deduplication; retained for audit and blocked from publication.' END,
+    updated_at = now()
+FROM ranked r
 WHERE q.id = r.id AND r.rn > 1;
 
 ALTER TABLE public.job_distribution_queue
