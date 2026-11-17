@@ -13,7 +13,8 @@ export default requireAdmin(async function handler(req, res) {
       }
       res.status(200).json(job);
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      console.error("admin/jobs item GET error:", err.message);
+      res.status(500).json({ error: "Could not load this job. Please try again." });
     }
     return;
   }
@@ -32,7 +33,8 @@ export default requireAdmin(async function handler(req, res) {
       }
       res.status(200).json(job);
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      console.error("admin/jobs item PUT error:", err.message);
+      res.status(500).json({ error: "Could not update this job. Please try again." });
     }
     return;
   }
@@ -42,7 +44,8 @@ export default requireAdmin(async function handler(req, res) {
       await deleteJob(id);
       res.status(200).json({ ok: true });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      console.error("admin/jobs item DELETE error:", err.message);
+      res.status(500).json({ error: "Could not delete this job. Please try again." });
     }
     return;
   }
