@@ -16,12 +16,13 @@ export default async function handler(req,res){
     if(!response.ok)throw new Error(`HTTP ${response.status}`);
     const data=await response.json();
     const distribution=await enqueueJobs(Array.isArray(data)?data:[],route);
-    return {route,count:Array.isArray(data)?data.length:0,queued:distribution.queued||0};
+    return {route,count:Array.isArray(data)?data.length:0,...distribution};
   }));
   const sources=results.map((result,index)=>result.status==="fulfilled"?{...result.value,status:"ok"}:{route:SOURCE_ROUTES[index],status:"error",error:result.reason?.message||"Source refresh failed"});
   const totalJobs=sources.reduce((sum,source)=>sum+(source.count||0),0);
   const queued=sources.reduce((sum,source)=>sum+(source.queued||0),0);
+  const rejected=sources.reduce((sum,source)=>sum+(source.rejected||0),0);
   const durationMs=Date.now()-startedAt;
   console.log(`[cron/refresh] ${totalJobs} jobs, ${queued} distribution items in ${durationMs}ms`);
-  return res.status(200).json({ok:sources.some(s=>s.status==="ok"),durationMs,totalJobs,queued,sources,timestamp:new Date().toISOString()});
+  return res.status(200).json({ok:sources.some(s=>s.status==="ok"),durationMs,totalJobs,queued,rejected,sources,timestamp:new Date().toISOString()});
 }
