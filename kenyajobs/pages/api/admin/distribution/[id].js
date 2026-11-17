@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/adminAuth";
 import { query } from "@/lib/db";
-import { updateDistributionItem, sendTelegramMessage } from "@/lib/distribution";
+import { updateDistributionItem, sendTelegramMessage, isEmploymentVacancy } from "@/lib/distribution";
 
 export default requireAdmin(async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -21,8 +21,9 @@ export default requireAdmin(async function handler(req, res) {
       return item ? res.status(200).json({item}) : res.status(409).json({error:"Only failed items can be retried."});
     }
     if (action === "send_telegram") {
-      const {rows} = await query("SELECT message,status FROM job_distribution_queue WHERE id=$1 AND channel='telegram'",[id]);
+      const {rows} = await query("SELECT message,status,payload FROM job_distribution_queue WHERE id=$1 AND channel='telegram'",[id]);
       if (!rows[0]) return res.status(404).json({error:"Telegram queue item not found."});
+      if (!isEmploymentVacancy(rows[0].payload || {})) return res.status(409).json({error:"This item failed vacancy validation and is quarantined. It cannot be sent."});
       if (rows[0].status !== "ready") return res.status(409).json({error:"Approve this announcement before sending it."});
       const sent = await sendTelegramMessage(rows[0].message);
       const item = await updateDistributionItem(id,"posted",null,["ready"],"sent_to_telegram");
