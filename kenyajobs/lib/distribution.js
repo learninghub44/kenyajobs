@@ -232,12 +232,21 @@ export async function enqueueJobs(jobs, route = "") {
 
 export async function listDistributionQueue({ limit = 100 } = {}) {
   const { rows } = await query("SELECT id, job_id, channel, category, payload, message, status, error, created_at, updated_at, posted_at FROM job_distribution_queue ORDER BY created_at DESC LIMIT $1",[Math.min(Math.max(Number(limit)||100,1),200)]);
-  return rows;
+  return rows.map((row) => {
+    const quarantineReason = getEmploymentRejectionReason(row.payload || {});
+    return quarantineReason ? { ...row, original_status: row.status, status: "quarantined", quarantined: true, quarantineReason } : row;
+  });
 }
 
 export async function updateDistributionItem(id, status, error = null, expectedStatuses = null, action = "status_changed") {
   const allowed = ["pending_approval","ready","posted","failed"];
   if (!allowed.includes(status)) throw new Error("Invalid distribution status.");
+  if (["ready", "posted"].includes(status)) {
+    const current = await query("SELECT payload FROM job_distribution_queue WHERE id=$1", [Number(id)]);
+    if (!current.rows[0] || !isEmploymentVacancy(current.rows[0].payload || {})) {
+      throw new Error("This item failed vacancy validation and is quarantined. It cannot be approved or marked as published.");
+    }
+  }
   const { rows } = await query(
     `UPDATE job_distribution_queue SET status=$2,error=$3,
        posted_at=CASE WHEN $2='posted' THEN now() ELSE posted_at END,updated_at=now()
