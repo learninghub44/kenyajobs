@@ -32,6 +32,6 @@ export default requireAdmin(async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   } catch (error) {
     console.error("admin/distribution error:", error.message);
-    return res.status(500).json({ error: error.message || "Distribution request failed" });
+    return res.status(500).json({ error: "Distribution service is temporarily unavailable. Please try again." });
   }
 });
