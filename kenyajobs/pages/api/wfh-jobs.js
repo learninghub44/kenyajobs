@@ -1,3 +1,4 @@
+import { filterEmploymentVacancies } from "@/lib/jobValidation";
 // WFH-specific sources — deliberately different from /api/remote-jobs
 // Remote = broad global remote roles (Remotive general, Jobicy global, Arbeitnow)
 // WFH    = roles explicitly tagged work-from-home or in categories suited to home-based work
@@ -104,8 +105,9 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
   const { page = 1 } = req.query;
 
-  const jobs = await cachedFetch(`wfh-jobs:${page}`, () => fetchAll(page));
+  const fetchedJobs = await cachedFetch(`wfh-jobs:${page}`, () => fetchAll(page));
 
+  const jobs = filterEmploymentVacancies(fetchedJobs);
   cacheJobs(jobs);
   res.status(200).json(jobs);
 }
