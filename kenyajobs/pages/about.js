@@ -274,9 +274,9 @@ export default function About() {
               </div>
             ))}
           </div>
-          <a href="mailto:hello@onlinejobs.christech.co.ke"
+          <a href="mailto:support@christech.co.ke"
             className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
-            <Mail size={14} /> Get in touch — hello@onlinejobs.christech.co.ke
+            <Mail size={14} /> Get in touch — support@christech.co.ke
           </a>
         </section>
 
@@ -292,9 +292,9 @@ export default function About() {
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
               <Mail size={14} /> Contact Us
             </Link>
-            <a href="mailto:hello@onlinejobs.christech.co.ke"
+            <a href="mailto:support@christech.co.ke"
               className="inline-flex items-center gap-2 border border-gray-200 hover:border-gray-300 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-colors text-sm">
-              hello@onlinejobs.christech.co.ke
+              support@christech.co.ke
             </a>
           </div>
           <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-400">
