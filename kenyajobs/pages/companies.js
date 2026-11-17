@@ -11,12 +11,11 @@ function companySlug(name = "") {
     .replace(/\s+/g, "-");
 }
 
-// Logo fetched via Google's S2 favicon service (reliable, no API key, works for any domain)
-// Falls back to coloured initials avatar if the logo fails to load.
+// Use Google's public favicon endpoint directly; no API token or logo URL is required.
+// If the employer has no discoverable icon, show a consistent initials avatar.
 function CompanyLogo({ domain, name, color, initials, size = 48 }) {
-  const [failed, setFailed] = useState(false);
-  const logoUrl = `https://logo.dev/img/${domain}?size=128&format=png`;
-  const fallbackUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  const [failed, setFailed] = useState(!domain);
+  const logoUrl = domain ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128` : null;
 
   if (failed) {
     return (
@@ -38,14 +37,7 @@ function CompanyLogo({ domain, name, color, initials, size = 48 }) {
       height={size}
       className="rounded-xl object-contain border border-gray-100 bg-white p-1 flex-shrink-0"
       style={{ width: size, height: size }}
-      onError={(e) => {
-        // Try Google favicon as first fallback
-        if (e.currentTarget.src !== fallbackUrl) {
-          e.currentTarget.src = fallbackUrl;
-        } else {
-          setFailed(true);
-        }
-      }}
+      onError={() => setFailed(true)}
     />
   );
 }
