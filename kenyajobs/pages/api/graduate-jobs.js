@@ -1,3 +1,4 @@
+import { filterEmploymentVacancies } from "@/lib/jobValidation";
 // Providers: JSearch (if key) + The Muse (free) + Jobicy (free)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
@@ -91,8 +92,9 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
   const { page = 1 } = req.query;
 
-  const jobs = await cachedFetch(`graduate-jobs:${page}`, () => fetchAll(page));
+  const fetchedJobs = await cachedFetch(`graduate-jobs:${page}`, () => fetchAll(page));
 
+  const jobs = filterEmploymentVacancies(fetchedJobs);
   cacheJobs(jobs);
   res.status(200).json(jobs);
 }
