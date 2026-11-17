@@ -1,15 +1,17 @@
 import {useEffect,useMemo,useState} from "react";
 import Head from "next/head";
+import {useRouter} from "next/router";
 import AdminLayout from "@/components/admin/AdminLayout";
 import {Plus,Printer,Send,CheckCircle2,FileText,Receipt,Search,Trash2} from "lucide-react";
 const blank=()=>({description:"",quantity:1,unitPrice:0});
 const input="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600";
 const money=(n,c="KES")=>new Intl.NumberFormat("en-KE",{style:"currency",currency:c,maximumFractionDigits:2}).format(Number(n||0));
 export default function Invoices(){
+ const router=useRouter();
  const [rows,setRows]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState(""),[busy,setBusy]=useState(false),[selected,setSelected]=useState(null),[search,setSearch]=useState(""),[listings,setListings]=useState({jobs:[],events:[]}),[shareUrl,setShareUrl]=useState(""),[notice,setNotice]=useState("");
  const [form,setForm]=useState({customerName:"",customerCompany:"",customerEmail:"",customerPhone:"",customerAddress:"",currency:"KES",dueDate:"",taxRate:0,discount:0,amountPaid:0,paymentMethod:"M-Pesa",paymentReference:"",paymentInstructions:"Pay via M-Pesa and use the invoice number as the account reference.",notes:"",terms:"Payment is due by the date shown above. Please quote the invoice number when making payment.",items:[blank()],relatedType:"",relatedId:""});
  async function load(){setLoading(true);try{const r=await fetch("/api/admin/invoices");const d=await r.json();if(!r.ok)throw Error(d.error||"Could not load invoices");setRows(d);}catch(e){setError(e.message)}finally{setLoading(false)}}
- useEffect(()=>{load();fetch("/api/admin/invoiceable-items").then(r=>r.json()).then(d=>setListings({jobs:Array.isArray(d.jobs)?d.jobs:[],events:Array.isArray(d.events)?d.events:[]})).catch(()=>{});},[]);
+ useEffect(()=>{load();fetch("/api/admin/invoiceable-items").then(r=>r.json()).then(d=>{const next={jobs:Array.isArray(d.jobs)?d.jobs:[],events:Array.isArray(d.events)?d.events:[]};setListings(next);const type=router.query.type,id=String(router.query.id||"");if((type==="job"||type==="event")&&id){const item=(type==="job"?next.jobs:next.events).find(x=>String(x.id)===id);if(item){setForm(s=>({...s,relatedType:type,relatedId:id,items:[{description:(type==="job"?"Job listing promotion: ":"Event promotion: ")+item.title,quantity:1,unitPrice:0}]}));}}}).catch(()=>{});},[router.isReady,router.query.type,router.query.id]);
  const totals=useMemo(()=>{const subtotal=form.items.reduce((s,x)=>s+Number(x.quantity||0)*Number(x.unitPrice||0),0),tax=subtotal*Number(form.taxRate||0)/100;return {subtotal,tax,total:Math.max(0,subtotal+tax-Number(form.discount||0))}},[form]);
  function set(k,v){setForm(s=>({...s,[k]:v}))}
  function item(i,k,v){set("items",form.items.map((x,n)=>n===i?{...x,[k]:v}:x))}
