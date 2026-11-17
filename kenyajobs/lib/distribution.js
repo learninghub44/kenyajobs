@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { query, rawQuery } from "@/lib/db";
 
 // The social_channel_settings table is created by supabase/migrations; this only
@@ -133,6 +134,35 @@ export function formatJobAnnouncement(job = {}, category = "kenya") {
   ];
   return parts.filter(Boolean).join("\n").slice(0, 3900);
 }
+function normalizedIdentity(value) {
+  return String(value || "").normalize("NFKC").toLowerCase().replace(/<[^>]*>/g, " ")
+    .replace(/&amp;/g, "&").replace(/[^\\p{L}\\p{N}]+/gu, " ").trim().replace(/\\s+/g, " ");
+}
+
+export function jobDedupeKey(job = {}) {
+  const applyUrl = String(job.url || job.job_url || job.apply_url || job.application_url || job.redirect_url || "").trim();
+  let identity;
+  if (applyUrl) {
+    try {
+      const parsed = new URL(applyUrl);
+      parsed.hash = "";
+      for (const key of [...parsed.searchParams.keys()]) {
+        if (/^(utm_|ref$|source$|campaign$)/i.test(key)) parsed.searchParams.delete(key);
+      }
+      identity = "url:" + parsed.toString().replace(/\\/$/, "").toLowerCase();
+    } catch {
+      identity = "url:" + applyUrl.split("#")[0].split("?")[0].replace(/\\/$/, "").toLowerCase();
+    }
+  } else {
+    identity = [
+      normalizedIdentity(job.title || job.job_title),
+      normalizedIdentity(job.company || job.company_name || job.employer_name),
+      normalizedIdentity(job.location || job.candidate_required_location || job.job_city),
+    ].join("|");
+  }
+  return createHash("md5").update(identity).digest("hex");
+}
+
 export async function enqueueJobs(jobs, route = "") {
   if (!Array.isArray(jobs) || jobs.length === 0) return { queued: 0 };
   const settings = await getSocialSettings();
