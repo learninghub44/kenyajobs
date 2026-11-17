@@ -10,9 +10,9 @@ SET dedupe_key = md5(
     WHEN COALESCE(NULLIF(BTRIM(payload->>'url'),''), NULLIF(BTRIM(payload->>'job_url'),''), NULLIF(BTRIM(payload->>'apply_url'),''), NULLIF(BTRIM(payload->>'application_url'),''), NULLIF(BTRIM(payload->>'redirect_url'),'')) IS NOT NULL
     THEN 'url:' || LOWER(REGEXP_REPLACE(REGEXP_REPLACE(COALESCE(NULLIF(BTRIM(payload->>'url'),''), NULLIF(BTRIM(payload->>'job_url'),''), NULLIF(BTRIM(payload->>'apply_url'),''), NULLIF(BTRIM(payload->>'application_url'),''), NULLIF(BTRIM(payload->>'redirect_url'),'')), '/+$', ''), '[?#].*$', ''))
     ELSE LOWER(REGEXP_REPLACE(CONCAT_WS('|',
-      REGEXP_REPLACE(COALESCE(payload->>'title',payload->>'job_title',''),'[^[:alnum:]]+',' ','g'),
-      REGEXP_REPLACE(COALESCE(payload->>'company',payload->>'company_name',payload->>'employer_name',''),'[^[:alnum:]]+',' ','g'),
-      REGEXP_REPLACE(COALESCE(payload->>'location',payload->>'candidate_required_location',payload->>'job_city',''),'[^[:alnum:]]+',' ','g')
+      BTRIM(REGEXP_REPLACE(COALESCE(payload->>'title',payload->>'job_title',''),'[^[:alnum:]]+',' ','g')),
+      BTRIM(REGEXP_REPLACE(COALESCE(payload->>'company',payload->>'company_name',payload->>'employer_name',''),'[^[:alnum:]]+',' ','g')),
+      BTRIM(REGEXP_REPLACE(COALESCE(payload->>'location',payload->>'candidate_required_location',payload->>'job_city',''),'[^[:alnum:]]+',' ','g'))
     ), '\\s+', ' ', 'g'))
   END
 )
