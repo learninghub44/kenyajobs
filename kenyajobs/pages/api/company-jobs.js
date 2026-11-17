@@ -1,3 +1,4 @@
+import { filterEmploymentVacancies } from "@/lib/jobValidation";
 // pages/api/company-jobs.js
 // Aggregates all live jobs for a single employer across all job sources.
 // Used by the /company/[slug] profile pages.
@@ -129,7 +130,7 @@ export default async function handler(req, res) {
 
   // Merge, deduplicate by id
   const seen = new Set();
-  const all = [...liveJobs, ...cachedJobs].filter(j => {
+  const all = filterEmploymentVacancies([...liveJobs, ...cachedJobs]).filter(j => {
     if (!j?.id || seen.has(j.id)) return false;
     seen.add(j.id);
     return true;
