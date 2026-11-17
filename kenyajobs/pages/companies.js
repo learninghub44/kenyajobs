@@ -150,7 +150,7 @@ export default function Companies() {
             Get your open roles in front of thousands of active Kenyan job seekers. No middlemen — your listing goes straight into our feed.
           </p>
           <a
-            href="mailto:hello@onlinejobs.christech.co.ke?subject=Post a Job"
+            href="mailto:support@christech.co.ke?subject=Post a Job"
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors"
           >
             Get Listed — Email Us
