@@ -88,7 +88,7 @@ export default async function handler(req, res) {
     benefits: clip(body.benefits, 5000),
     applicationDeadline: clip(body.applicationDeadline, 30),
     url: clip(body.url, 2048),
-    applicationMethod: clip(body.applicationMethod, 30) || "website",
+    applicationMethod: clip(body.applicationMethod, 30),
     applicationEmail: clip(body.applicationEmail, 254).toLowerCase(),
     applicationInstructions: clip(body.applicationInstructions, 5000),
     companyWebsite: clip(body.companyWebsite, 2048),
