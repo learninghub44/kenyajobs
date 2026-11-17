@@ -124,7 +124,7 @@ export default function Advertise() {
                   ))}
                 </ul>
                 <a
-                  href={`mailto:hello@onlinejobs.christech.co.ke?subject=${encodeURIComponent(`Advertise - ${pkg.name} Package`)}`}
+                  href={`mailto:support@christech.co.ke?subject=${encodeURIComponent(`Advertise - ${pkg.name} Package`)}`}
                   className="text-center font-semibold text-sm py-2.5 px-4 rounded-xl transition-colors border border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   {pkg.cta}
@@ -211,8 +211,8 @@ export default function Advertise() {
           <Mail size={16} className="text-gray-400 flex-shrink-0" />
           <p className="text-sm text-gray-500">
             Prefer email? Reach us directly at{" "}
-            <a href="mailto:hello@onlinejobs.christech.co.ke" className="text-blue-600 hover:underline font-medium">
-              hello@onlinejobs.christech.co.ke
+            <a href="mailto:support@christech.co.ke" className="text-blue-600 hover:underline font-medium">
+              support@christech.co.ke
             </a>{" "}
             and we'll respond within 1 business day.
           </p>
