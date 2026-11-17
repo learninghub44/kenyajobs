@@ -1,0 +1,12 @@
+BEGIN;
+ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS share_token_hash TEXT;
+ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS shared_at TIMESTAMPTZ;
+ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS related_type TEXT;
+ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS related_id TEXT;
+ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS related_title TEXT;
+ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS related_url TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS invoices_share_token_hash_idx ON public.invoices(share_token_hash) WHERE share_token_hash IS NOT NULL;
+CREATE INDEX IF NOT EXISTS invoices_related_idx ON public.invoices(related_type,related_id) WHERE related_id IS NOT NULL;
+ALTER TABLE public.invoices DROP CONSTRAINT IF EXISTS invoices_related_type_check;
+ALTER TABLE public.invoices ADD CONSTRAINT invoices_related_type_check CHECK (related_type IS NULL OR related_type IN ('job','event'));
+COMMIT;
