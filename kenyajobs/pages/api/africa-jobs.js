@@ -27,8 +27,6 @@ const RSS_FEEDS = [
   { url: "https://kenyanlife.com/feed/",                          source: "Kenyan Life Jobs",   location: "Kenya" },
   { url: "https://www.jobsbeba.com/feed/",                        source: "JobsBeba",           location: "Kenya" },
   { url: "https://www.unjobs.org/rss/kenya",                      source: "UN Jobs Kenya",      location: "Kenya" },
-  { url: "https://opportunitydesk.org/feed/",                     source: "Opportunity Desk",   location: "Africa" },
-  { url: "https://www.youthopportunitieshub.com/feed/",           source: "Youth Opportunities Hub", location: "Africa" },
   // East Africa
   { url: "https://www.brightermonday.co.ug/listings.rss",         source: "BrighterMonday UG",  location: "Uganda" },
   { url: "https://www.brightermonday.co.tz/listings.rss",         source: "BrighterMonday TZ",  location: "Tanzania" },
