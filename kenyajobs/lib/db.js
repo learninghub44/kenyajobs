@@ -8,18 +8,22 @@ import { readConnectionString, parseConnection, buildClientConfig, isDirectSupab
 
 function poolMax() {
   const n = Number.parseInt(process.env.DATABASE_POOL_MAX || "", 10);
-  // Small by design: each serverless instance keeps its own pool, and Supabase's
-  // Session pooler holds one backend connection per client connection.
-  return Number.isInteger(n) && n >= 1 && n <= 10 ? n : 3;
+  // Supabase's Session Pooler has a small per-user client cap (15 on this
+  // project). Vercel creates separate serverless instances, each with its own
+  // pg Pool, so a multi-connection pool per instance exhausts that cap quickly.
+  // Default to one connection per warm instance; allow an explicit maximum of
+  // two only for deployments using a higher-capacity Transaction Pooler.
+  return Number.isInteger(n) && n >= 1 && n <= 2 ? n : 1;
 }
 
 function buildPoolConfig(url) {
   return {
     ...buildClientConfig(url),
     max: poolMax(),
-    idleTimeoutMillis: 10_000,      // give connections back quickly when serverless goes idle
-    connectionTimeoutMillis: 5_000, // fail fast instead of hanging until the function times out
+    idleTimeoutMillis: 5_000,       // release scarce Session Pooler clients quickly
+    connectionTimeoutMillis: 4_000, // fail fast when the pooler has no free client
     allowExitOnIdle: true,
+    maxUses: 750, // recycle clients periodically instead of holding scarce sessions indefinitely
   };
 }
 
