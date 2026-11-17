@@ -9,7 +9,7 @@ function rowToJob(row) {
   return {
     id: row.id, title: row.title, company: row.company, location: row.location || "Worldwide",
     type: row.type || "Full-time", date: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
-    url: row.url, description: row.description || "", requirements: row.requirements || "",
+    url: row.url, applicationMethod: row.application_method || "website", applicationEmail: row.application_email || "", description: row.description || "", requirements: row.requirements || "",
     responsibilities: row.responsibilities || "", qualifications: row.qualifications || "",
     experience: row.experience || "", education: row.education || "", benefits: row.benefits || "",
     applicationInstructions: row.application_instructions || "", applicationDeadline: row.application_deadline || "",
@@ -33,7 +33,7 @@ const values = (d) => [d.title, d.company, d.location || "Worldwide", d.type || 
   d.description || "", d.url, d.companyLogo || null, d.companyWebsite || null, sanitizeCategories(d.categories),
   Boolean(d.featured), d.published !== false, "Online Jobs", d.requirements || "", d.responsibilities || "",
   d.qualifications || "", d.experience || "", d.education || "", d.benefits || "",
-  d.applicationInstructions || "", d.applicationDeadline || null];
+  d.applicationInstructions || "", d.applicationDeadline || null, d.applicationMethod || (/^mailto:/i.test(d.url || "") ? "email" : /^https:\/\/(?:forms\.gle\/|docs\.google\.com\/forms\/)/i.test(d.url || "") ? "google_form" : "website"), d.applicationEmail || (/^mailto:/i.test(d.url || "") ? d.url.replace(/^mailto:/i, "").split("?")[0] : null)];
 export async function createJob(data) {
   const id = newManualJobId(), v = values(data);
   const { rows } = await query(`INSERT INTO manual_jobs
@@ -43,7 +43,7 @@ export async function createJob(data) {
 }
 export async function updateJob(id, data) {
   const v = values(data);
-  const { rows } = await query(`UPDATE manual_jobs SET title=$2,company=$3,location=$4,type=$5,salary=$6,description=$7,url=$8,company_logo=$9,company_website=$10,categories=$11,featured=$12,published=$13,source=$14,requirements=$15,responsibilities=$16,qualifications=$17,experience=$18,education=$19,benefits=$20,application_instructions=$21,application_deadline=$22,updated_at=now() WHERE id=$1 RETURNING *`, [id,...v]);
+  const { rows } = await query(`UPDATE manual_jobs SET title=$2,company=$3,location=$4,type=$5,salary=$6,description=$7,url=$8,company_logo=$9,company_website=$10,categories=$11,featured=$12,published=$13,source=$14,requirements=$15,responsibilities=$16,qualifications=$17,experience=$18,education=$19,benefits=$20,application_instructions=$21,application_deadline=$22,application_method=$23,application_email=$24,updated_at=now() WHERE id=$1 RETURNING *`, [id,...v]);
   const job = rows[0] ? rowToJob(rows[0]) : null; if (job?.published) await enqueueJobs([job], "manual"); return job;
 }
 export async function deleteJob(id) { await query("DELETE FROM manual_jobs WHERE id=$1", [id]); }
