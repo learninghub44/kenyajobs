@@ -16,7 +16,9 @@ export default function AdminDistribution() {
   const [busyId,setBusyId] = useState(null);
   const [error,setError] = useState("");
   const [notice,setNotice] = useState("");
-  const [filter,setFilter] = useState("all");\n  const [channelFilter,setChannelFilter] = useState("all");\n  const [searchTerm,setSearchTerm] = useState("");
+  const [filter,setFilter] = useState("all");
+  const [channelFilter,setChannelFilter] = useState("all");
+  const [searchTerm,setSearchTerm] = useState("");
 
   async function load() {
     setLoading(true); setError("");
