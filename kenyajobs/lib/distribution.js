@@ -89,12 +89,17 @@ function isExpired(job = {}) {
 }
 
 function cleanText(value, max = 420) {
-  const text = Array.isArray(value) ? value.filter(Boolean).join(", ") : String(value || "");
-  return text.replace(/<[^>]*>/g, " ").replace(/&nbsp;|&#160;/gi, " ")
-    .replace(/&amp;/gi, "&").replace(/&quot;/gi, '"')
-    .replace(/\s+/g, " ").trim().slice(0, max);
+  const input = Array.isArray(value) ? value.filter(Boolean).join(", ") : String(value || "");
+  return input.replace(/<script[\\s\\S]*?<\\/script>/gi, " ")
+    .replace(/<style[\\s\\S]*?<\\/style>/gi, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&#(\\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&nbsp;|&#160;/gi, " ").replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"').replace(/&#0?39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<").replace(/&gt;/gi, ">")
+    .replace(/\\s+/g, " ").trim().slice(0, max);
 }
-
 function jobDetailUrl(job) {
   const id = String(job.id || job.job_id || "").trim();
   if (!id) return "";
@@ -103,37 +108,31 @@ function jobDetailUrl(job) {
 }
 
 export function formatJobAnnouncement(job = {}, category = "kenya") {
-  const title = cleanText(job.title || job.job_title || "Job opportunity", 140);
-  const company = cleanText(job.company || job.company_name || job.employer_name || "Company", 100);
-  const location = cleanText(job.location || job.candidate_required_location || job.job_city || "Not specified", 80);
-  const type = cleanText(job.type || job.job_type || job.employment_type || "Not specified", 60);
-  const jobId = String(job.id || job.job_id || "Not assigned");
-  const base = (process.env.SITE_URL || "https://onlinejobs.christech.co.ke").replace(/\/$/, "");
+  const title = cleanText(job.title || job.job_title || "Job opportunity", 120);
+  const company = cleanText(job.company || job.company_name || job.employer_name || "Employer not specified", 90);
+  const location = cleanText(job.location || job.candidate_required_location || job.job_city || "Not specified", 70);
+  const type = cleanText(job.type || job.job_type || job.employment_type || "Not specified", 45);
+  const base = (process.env.SITE_URL || "https://onlinejobs.christech.co.ke").replace(/\\/$/, "");
   const detailUrl = jobDetailUrl(job) || base;
-  const label = category === "remote" ? "WORLDWIDE REMOTE OPPORTUNITY" : category === "africa" ? "AFRICA JOB OPPORTUNITY" : "KENYA JOB OPPORTUNITY";
+  const label = category === "remote" ? "REMOTE JOB" : category === "africa" ? "AFRICA JOB" : "KENYA JOB";
+  const description = cleanText(job.description || job.job_description || "", 360);
+  const salary = job.salary && !/^salary not disclosed$/i.test(String(job.salary)) ? cleanText(job.salary, 70) : "";
+  const instructions = cleanText(job.applicationInstructions || job.application_instructions || "", 180);
   const parts = [
     "📢 " + label, "",
     "💼 " + title,
     "🏢 Employer: " + company,
     "📍 Location: " + location,
-    "🕒 Employment: " + type,
-    "🆔 Job ID: " + jobId,
-    job.salary ? "💰 Salary: " + cleanText(job.salary, 90) : "",
-    job.experience ? "🎓 Experience: " + cleanText(job.experience, 90) : "",
-    job.education ? "📚 Education: " + cleanText(job.education, 120) : "",
-    job.applicationDeadline || job.application_deadline ? "📅 Deadline: " + cleanText(job.applicationDeadline || job.application_deadline, 60) : "",
-    job.description ? "\nABOUT THE ROLE\n" + cleanText(job.description, 450) : "",
-    job.responsibilities ? "\nKEY RESPONSIBILITIES\n" + cleanText(job.responsibilities, 450) : "",
-    job.requirements ? "\nKEY REQUIREMENTS\n" + cleanText(job.requirements, 450) : "",
-    job.qualifications ? "\nQUALIFICATIONS\n" + cleanText(job.qualifications, 250) : "",
-    job.benefits ? "\nBENEFITS\n" + cleanText(job.benefits, 220) : "",
-    job.applicationInstructions || job.application_instructions ? "\nHOW TO APPLY\n" + cleanText(job.applicationInstructions || job.application_instructions, 260) : "",
-    "\n🔗 FULL JOB DETAILS & APPLY: " + detailUrl,
-    "🌐 Browse more opportunities: " + base,
-    "", "Check the full listing for complete details and application instructions.",
-    "Follow JOBS HUB KENYA for more opportunities."
-  ];
-  return parts.filter(Boolean).join("\n").slice(0, 3900);
+    "🕒 Type: " + type,
+    salary ? "💰 Salary: " + salary : "",
+    description ? "\\n" + description : "",
+    instructions ? "\\nHOW TO APPLY\\n" + instructions : "",
+    "",
+    "🔗 VIEW JOB & APPLY: " + detailUrl,
+    "JOBS HUB KENYA"
+  ].filter(Boolean);
+  // Keep messages compact and always retain the application link.
+  return parts.join("\\n").slice(0, 1100);
 }
 function normalizedIdentity(value) {
   return String(value || "").normalize("NFKC").toLowerCase().replace(/<[^>]*>/g, " ")
