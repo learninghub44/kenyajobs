@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
+import Link from "next/link";
+import {Receipt} from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import JobForm from "@/components/admin/JobForm";
 import { Plus, Pencil, Trash2, Star, Eye, EyeOff } from "lucide-react";
@@ -117,7 +119,7 @@ export default function AdminJobs() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <div className="flex flex-wrap items-center gap-1.5 flex-shrink-0">{job.published&&<Link href={"/admin/invoices?type=job&id="+encodeURIComponent(job.id)} title="Generate invoice" className="inline-flex items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-2.5 py-2 text-xs font-bold text-green-800 hover:bg-green-100"><Receipt size={14}/><span className="hidden sm:inline">Invoice</span></Link>}
                     <button onClick={() => togglePublished(job)} title={job.published ? "Unpublish" : "Publish"}
                       className="p-2 rounded-lg border border-gray-200 hover:border-blue-300 text-gray-500 hover:text-blue-600 transition-all">
                       {job.published ? <EyeOff size={15} /> : <Eye size={15} />}
