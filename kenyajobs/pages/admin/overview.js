@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Activity, Briefcase, CalendarDays, ClipboardList, FileText, Inbox, Link2, Megaphone, Radio, ArrowUpRight, ShieldCheck } from "lucide-react";
+import { Activity, Briefcase, CalendarDays, ClipboardList, FileText, Inbox, Link2, Megaphone, Radio, ArrowUpRight, ShieldCheck, Receipt } from "lucide-react";
 
 const sections = [
   { href: "/admin/jobs", title: "Jobs", description: "Create, edit, publish, unpublish and remove manually managed vacancies.", Icon: Briefcase, group: "Content" },
@@ -9,6 +9,7 @@ const sections = [
   { href: "/admin/event-submissions", title: "Event requests", description: "Review submitted events and manage their publication.", Icon: CalendarDays, group: "Moderation" },
   { href: "/admin/listings", title: "Listing lifecycle", description: "Monitor expiry, renewals and active or expiring paid listings.", Icon: ClipboardList, group: "Operations" },
   { href: "/admin/posting-links", title: "Employer links", description: "Create, monitor and revoke controlled employer submission links.", Icon: Link2, group: "Operations" },
+  { href: "/admin/invoices", title: "Invoices & payments", description: "Create professional invoices, print or save as PDF, record payments and track balances.", Icon: Receipt, group: "Operations" },
   { href: "/admin/distribution", title: "Distribution centre", description: "Review duplicate-safe WhatsApp and Telegram announcements, approve posts and track publication.", Icon: Radio, group: "Audience" },
   { href: "/admin/ads", title: "Sponsored ads", description: "Manage sponsored placements, visibility and campaign priorities.", Icon: Megaphone, group: "Growth" },
   { href: "/admin/blog", title: "Blog & articles", description: "Draft, edit and publish career resources and editorial content.", Icon: FileText, group: "Content" },
