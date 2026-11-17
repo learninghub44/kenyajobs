@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     }
     try {
       const { rows } = await query(
-        "SELECT label,auto_publish,max_uses,uses FROM job_posting_links WHERE token_hash=$1 AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>now()) AND uses<max_uses",
+        "SELECT label,auto_publish,max_uses,uses FROM job_posting_links WHERE token_hash=$1 AND submission_type='job' AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>now()) AND uses<max_uses",
         [hash(token)]
       );
       if (!rows[0]) return res.status(404).json({ error: "This posting link is invalid, expired, or has reached its usage limit." });
@@ -149,7 +149,7 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: "This posting link is invalid or expired." });
       }
       const reserved = await query(
-        "UPDATE job_posting_links SET uses=uses+1 WHERE token_hash=$1 AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>now()) AND uses<max_uses RETURNING id,label,auto_publish",
+        "UPDATE job_posting_links SET uses=uses+1 WHERE token_hash=$1 AND submission_type='job' AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>now()) AND uses<max_uses RETURNING id,label,auto_publish",
         [hash(token)]
       );
       if (!reserved.rows[0]) {
