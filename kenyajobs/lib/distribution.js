@@ -136,7 +136,7 @@ export function formatJobAnnouncement(job = {}, category = "kenya") {
 }
 function normalizedIdentity(value) {
   return String(value || "").normalize("NFKC").toLowerCase().replace(/<[^>]*>/g, " ")
-    .replace(/&amp;/g, "&").replace(/[^\\p{L}\\p{N}]+/gu, " ").trim().replace(/\\s+/g, " ");
+    .replace(/&amp;/g, "&").replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/\s+/g, " ");
 }
 
 export function jobDedupeKey(job = {}) {
@@ -146,12 +146,10 @@ export function jobDedupeKey(job = {}) {
     try {
       const parsed = new URL(applyUrl);
       parsed.hash = "";
-      for (const key of [...parsed.searchParams.keys()]) {
-        if (/^(utm_|ref$|source$|campaign$)/i.test(key)) parsed.searchParams.delete(key);
-      }
-      identity = "url:" + parsed.toString().replace(/\\/$/, "").toLowerCase();
+      parsed.search = "";
+      identity = "url:" + parsed.toString().replace(/\/$/, "").toLowerCase();
     } catch {
-      identity = "url:" + applyUrl.split("#")[0].split("?")[0].replace(/\\/$/, "").toLowerCase();
+      identity = "url:" + applyUrl.split("#")[0].split("?")[0].replace(/\/$/, "").toLowerCase();
     }
   } else {
     identity = [
