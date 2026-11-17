@@ -54,7 +54,7 @@ function parseRSS(xml, source, defaultLocation) {
     const block = match[1];
     const get = (tag) => {
       const m = block.match(new RegExp(
-        `<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`
+        `<${tag}[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/${tag}>|<${tag}[^>]*>([\s\S]*?)<\/${tag}>`
       ));
       return m ? (m[1] || m[2] || "").trim() : "";
     };
@@ -73,7 +73,7 @@ function parseRSS(xml, source, defaultLocation) {
     if (title && link) {
       items.push({
         id: `rss-${hashId(source + link)}`,
-        title: title.replace(/&#(\\d+);/g, (_, n) => String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16))).replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#039;|&#39;/g, "'"),
+        title: title.replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16))).replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#039;|&#39;/g, "'"),
         company: company.replace(/&amp;/g, "&"),
         location,
         type: "Full-time",
