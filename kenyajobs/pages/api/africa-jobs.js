@@ -68,12 +68,12 @@ function parseRSS(xml, source, defaultLocation) {
     const fullContent = get("content:encoded");
     const shortDescription = get("description");
     const description = fullContent.length > shortDescription.length ? fullContent : shortDescription;
-    const company = get("author") || get("dc:creator") || source;
+    const company = get("company") || get("employer") || "Employer not specified";
     const location = get("location") || defaultLocation || "Africa";
     if (title && link) {
       items.push({
         id: `rss-${hashId(source + link)}`,
-        title: title.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#039;/g, "'"),
+        title: title.replace(/&#(\\d+);/g, (_, n) => String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16))).replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#039;|&#39;/g, "'"),
         company: company.replace(/&amp;/g, "&"),
         location,
         type: "Full-time",
