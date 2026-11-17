@@ -63,7 +63,11 @@ export default function AdminDistribution() {
     catch{setError("Clipboard access was blocked by your browser.");}
   }
   const counts=useMemo(()=>({pending:queue.filter(x=>x.status==="pending_approval").length,ready:queue.filter(x=>x.status==="ready").length,posted:queue.filter(x=>x.status==="posted").length,failed:queue.filter(x=>x.status==="failed").length}),[queue]);
-  const visible=queue.filter(item =>\n    (filter==="all" || item.status===filter) &&\n    (channelFilter==="all" || item.channel===channelFilter) &&\n    (!searchTerm.trim() || [item.payload?.title,item.payload?.job_title,item.payload?.company,item.payload?.company_name,item.payload?.location,item.job_id].some(value => String(value||"").toLowerCase().includes(searchTerm.trim().toLowerCase())))\n  );
+  const visible=queue.filter(item =>
+    (filter==="all" || item.status===filter) &&
+    (channelFilter==="all" || item.channel===channelFilter) &&
+    (!searchTerm.trim() || [item.payload?.title,item.payload?.job_title,item.payload?.company,item.payload?.company_name,item.payload?.location,item.job_id].some(value => String(value||"").toLowerCase().includes(searchTerm.trim().toLowerCase())))
+  );
 
   return (
     <AdminLayout active="distribution">
