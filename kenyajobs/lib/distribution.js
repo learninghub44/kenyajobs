@@ -92,7 +92,7 @@ function isExpired(job = {}) {
 const NON_JOB_TITLE = /\\b(scholarships?|bursar(?:y|ies)|fellowships?|grants?|funding|competitions?|awards?|prizes?|conferences?|webinars?|summits?|workshops?|events?|bootcamps?|training|courses?|mentorship|exchange programmes?|calls for proposals|tenders?|rfp|rfq|procurement|hackathons?|essay contests?|travel grants?|internship fair|career fair)\\b/i;
 const NON_JOB_CONTEXT = /\\b(scholarship|bursar(?:y|ies)|fellowship|grant|funding opportunity|competition|award|prize|conference|webinar|summit|workshop|bootcamp|training programme|training program|online course|mentorship programme|mentorship program|exchange programme|exchange program|call for proposals|tender|procurement notice|hackathon|essay contest|travel grant)\\b/i;
 const CLEAR_HIRING = /\\b(job vacancy|vacanc(?:y|ies)|now hiring|we are hiring|we're hiring|recruit(?:ing|ment)|employment opportunity|job opportunity|apply for (?:the )?(?:position|role|job)|submit (?:your )?application|applications are (?:open|invited)|full[- ]time|part[- ]time|permanent position|contract position|employment type|job description|key responsibilities|job requirements|salary range|remuneration)\\b/i;
-const ROLE_TITLE = /\\b(accountant|administrator|analyst|architect|assistant|associate|auditor|barista|chef|clerk|consultant|coordinator|counsell?or|customer service|developer|driver|editor|electrician|engineer|executive|finance officer|guard|hr officer|human resource|inspector|lecturer|lawyer|legal officer|manager|mechanic|nurse|officer|operator|pharmacist|photographer|plumber|procurement officer|professor|receptionist|researcher|sales (?:representative|executive|officer)|scientist|secretary|security officer|social worker|supervisor|technician|therapist|tutor|veterinarian|waiter|waitress|writer|intern|trainee)\\b/i;
+const ROLE_TITLE = /\\b(accountant|administrator|analyst|architect|assistant|associate|auditor|barista|chef|clerk|consultant|coordinator|counsell?or|customer service|developer|driver|editor|electrician|engineer|executive|finance officer|guard|hr officer|human resource|inspector|lecturer|lawyer|legal officer|manager|mechanic|nurse|officer|operator|pharmacist|photographer|plumber|procurement officer|professor|receptionist|researcher|sales (?:representative|executive|officer)|scientist|secretary|security officer|social worker|supervisor|technician|therapist|tutor|teacher|doctor|dentist|midwife|veterinarian|waiter|waitress|writer|intern|trainee)\\b/i;
 const ROLE_DETAIL = /\\b(responsibilit(?:y|ies)|qualifications?|requirements?|experience required|experience in|report(?:s|ing)? to|salary|remuneration|employment type|apply (?:here|now)|application deadline|how to apply)\\b/i;
 
 export function getEmploymentRejectionReason(job = {}) {
@@ -106,7 +106,7 @@ export function getEmploymentRejectionReason(job = {}) {
   // in the headline and hiring/application evidence in the actual listing.
   const roleInTitle = ROLE_TITLE.test(title);
   const hiringEvidence = CLEAR_HIRING.test(title) || (CLEAR_HIRING.test(description) && ROLE_DETAIL.test(description));
-  if (!roleInTitle && !CLEAR_HIRING.test(title)) return "no_job_role_or_hiring_signal";
+  if (!roleInTitle) return "no_job_role_in_title";
   if (!hiringEvidence) return "no_hiring_or_application_evidence";
   return "";
 }
