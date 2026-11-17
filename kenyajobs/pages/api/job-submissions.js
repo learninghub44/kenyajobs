@@ -14,6 +14,14 @@ function validUrl(value) {
     return false;
   }
 }
+function validApplicationDestination(value) {
+  const input = String(value || "").trim();
+  if (/^mailto:/i.test(input)) {
+    const email = input.slice(7).split("?")[0];
+    return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+  }
+  return validUrl(input);
+}
 
 function responseForSubmission(row) {
   return {
@@ -99,8 +107,8 @@ export default async function handler(req, res) {
   const selectedPackage = getPackage("jobs", fields.packageCode);
   if (!selectedPackage) return res.status(400).json({ error: "Choose a valid job promotion package." });
   if (String(body.title||"").length > selectedPackage.limits.title || String(body.description||"").length > selectedPackage.limits.description) return res.status(400).json({ error: "The job title or description exceeds the selected package limits." });
-  if (!validUrl(fields.url) || (fields.companyWebsite && !validUrl(fields.companyWebsite))) {
-    return res.status(400).json({ error: "Use valid http or https links for the application URL and company website." });
+  if (!validApplicationDestination(fields.url) || (fields.companyWebsite && !validUrl(fields.companyWebsite))) {
+    return res.status(400).json({ error: "Use a valid application website, Google Forms link, or mailto application email. Company website must be a valid http or https link." });
   }
   // A company logo is optional. Ignore an invalid optional logo rather than
   // rejecting an otherwise valid job submission.
