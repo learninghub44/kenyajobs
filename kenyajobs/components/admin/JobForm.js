@@ -47,7 +47,8 @@ export default function JobForm({ initial, onSubmit, onCancel, submitting }) {
           <Field label="Employment type"><select value={form.type} onChange={(e) => set("type", e.target.value)} className={inputCls}>{TYPE_OPTIONS.map((t) => <option key={t}>{t}</option>)}</select></Field>
           {field("Salary / compensation", "salary", "e.g. KES 80,000–120,000 or Not disclosed")}
           {field("Application deadline", "applicationDeadline", "YYYY-MM-DD")}
-          {field("Application URL", "url", "https://", true)}
+          {field("Application URL or email", "url", "https://forms.gle/... or mailto:careers@company.com", true)}
+          <p className="text-xs text-gray-500 sm:col-span-2">Accepts direct website links, Google Forms responder links, or mailto:email@company.com. The company website field remains optional.</p>
           {field("Company website", "companyWebsite", "https://")}
           {field("Company logo URL", "companyLogo", "https://")}
           {field("Experience level", "experience", "e.g. 2–4 years")}
