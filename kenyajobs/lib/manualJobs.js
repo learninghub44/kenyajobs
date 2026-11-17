@@ -37,8 +37,8 @@ const values = (d) => [d.title, d.company, d.location || "Worldwide", d.type || 
 export async function createJob(data) {
   const id = newManualJobId(), v = values(data);
   const { rows } = await query(`INSERT INTO manual_jobs
-    (id,title,company,location,type,salary,description,url,company_logo,company_website,categories,featured,published,source,requirements,responsibilities,qualifications,experience,education,benefits,application_instructions,application_deadline,source_submission_id)
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23) RETURNING *`, [id,...v,data.sourceSubmissionId||null]);
+    (id,title,company,location,type,salary,description,url,company_logo,company_website,categories,featured,published,source,requirements,responsibilities,qualifications,experience,education,benefits,application_instructions,application_deadline,application_method,application_email,source_submission_id)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25) RETURNING *`, [id,...v,data.sourceSubmissionId||null]);
   const job = rowToJob(rows[0]); if (job.published) await enqueueJobs([job], "manual"); return job;
 }
 export async function updateJob(id, data) {
