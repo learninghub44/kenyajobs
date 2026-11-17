@@ -87,6 +87,22 @@ function isExpired(job = {}) {
   return false;
 }
 
+// Only employment vacancies may enter social distribution. Mixed feeds often include
+// scholarships, grants, events and training; reject those before queue insertion.
+const NON_JOB_CONTENT = /\\b(scholarships?|bursar(?:y|ies)|fellowships?|grants?|funding opportunities|research funding|competitions?|awards?|prizes?|conferences?|webinars?|summits?|workshops?|events?|bootcamps?|training programmes?|training programs?|courses?|mentorship programmes?|mentorship programs?|exchange programmes?|exchange programs?|calls for proposals|tenders?|rfp|rfq|procurement notices|hackathons?|essay contests?|travel grants?)\\b/i;
+const EMPLOYMENT_SIGNALS = /\\b(job|jobs|vacanc(?:y|ies)|position|positions|employment|employer|recruit(?:ing|ment)|hiring|apply now|how to apply|responsibilit(?:y|ies)|qualifications?|requirements?|salary|remuneration|full[- ]time|part[- ]time|contract role|permanent role|internship|interns?|trainee|graduate trainee|work experience)\\b/i;
+const ROLE_WORDS = /\\b(accountant|administrator|analyst|architect|assistant|associate|auditor|barista|chef|clerk|consultant|coordinator|counsell?or|customer service|developer|driver|editor|electrician|engineer|executive|finance officer|guard|hr officer|human resource|inspector|lecturer|lawyer|legal officer|manager|mechanic|nurse|officer|operator|pharmacist|photographer|plumber|procurement officer|professor| receptionist|researcher|sales|scientist|secretary|security officer|social worker|supervisor|technician|therapist|tutor|veterinarian|waiter|waitress|writer)\\b/i;
+
+export function isEmploymentVacancy(job = {}) {
+  const title = String(job.title || job.job_title || "").replace(/<[^>]*>/g, " ").trim();
+  const description = String(job.description || job.job_description || job.contents || "").replace(/<[^>]*>/g, " ").trim();
+  const combined = `${title} ${description}`;
+  if (!title || NON_JOB_CONTENT.test(combined)) return false;
+  // A role title or clear hiring language is required; a generic "opportunity"
+  // headline with no employment evidence is not enough.
+  return ROLE_WORDS.test(title) || EMPLOYMENT_SIGNALS.test(combined);
+}
+
 function cleanText(value, max = 420) {
   const text = Array.isArray(value) ? value.filter(Boolean).join(", ") : String(value || "");
   return text.replace(/<[^>]*>/g, " ").replace(/&nbsp;|&#160;/gi, " ")
@@ -173,7 +189,7 @@ export async function enqueueJobs(jobs, route = "") {
   let queued = 0;
   const seenInBatch = new Set();
   for (const job of jobs) {
-    if (!job || !(job.id || job.job_id) || isExpired(job)) continue;
+    if (!job || !(job.id || job.job_id) || isExpired(job) || !isEmploymentVacancy(job)) continue;
     const category = classifyJob(job, route);
     if (!category || !settings[category + "_enabled"]) continue;
     const jobId = String(job.id || job.job_id);
