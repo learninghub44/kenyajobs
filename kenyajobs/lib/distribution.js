@@ -87,20 +87,32 @@ function isExpired(job = {}) {
   return false;
 }
 
-// Only employment vacancies may enter social distribution. Mixed feeds often include
-// scholarships, grants, events and training; reject those before queue insertion.
-const NON_JOB_CONTENT = /\\b(scholarships?|bursar(?:y|ies)|fellowships?|grants?|funding opportunities|research funding|competitions?|awards?|prizes?|conferences?|webinars?|summits?|workshops?|events?|bootcamps?|training programmes?|training programs?|courses?|mentorship programmes?|mentorship programs?|exchange programmes?|exchange programs?|calls for proposals|tenders?|rfp|rfq|procurement notices|hackathons?|essay contests?|travel grants?)\\b/i;
-const EMPLOYMENT_SIGNALS = /\\b(job|jobs|vacanc(?:y|ies)|position|positions|employment|employer|recruit(?:ing|ment)|hiring|apply now|how to apply|responsibilit(?:y|ies)|qualifications?|requirements?|salary|remuneration|full[- ]time|part[- ]time|contract role|permanent role|internship|interns?|trainee|graduate trainee|work experience)\\b/i;
-const ROLE_WORDS = /\\b(accountant|administrator|analyst|architect|assistant|associate|auditor|barista|chef|clerk|consultant|coordinator|counsell?or|customer service|developer|driver|editor|electrician|engineer|executive|finance officer|guard|hr officer|human resource|inspector|lecturer|lawyer|legal officer|manager|mechanic|nurse|officer|operator|pharmacist|photographer|plumber|procurement officer|professor| receptionist|researcher|sales|scientist|secretary|security officer|social worker|supervisor|technician|therapist|tutor|veterinarian|waiter|waitress|writer)\\b/i;
+// Strict social-publishing gate. Mixed opportunity feeds contain scholarships,
+// events, calls and training; only clear employment vacancies may reach channels.
+const NON_JOB_TITLE = /\\b(scholarships?|bursar(?:y|ies)|fellowships?|grants?|funding|competitions?|awards?|prizes?|conferences?|webinars?|summits?|workshops?|events?|bootcamps?|training|courses?|mentorship|exchange programmes?|calls for proposals|tenders?|rfp|rfq|procurement|hackathons?|essay contests?|travel grants?|internship fair|career fair)\\b/i;
+const NON_JOB_CONTEXT = /\\b(scholarship|bursar(?:y|ies)|fellowship|grant|funding opportunity|competition|award|prize|conference|webinar|summit|workshop|bootcamp|training programme|training program|online course|mentorship programme|mentorship program|exchange programme|exchange program|call for proposals|tender|procurement notice|hackathon|essay contest|travel grant)\\b/i;
+const CLEAR_HIRING = /\\b(job vacancy|vacanc(?:y|ies)|now hiring|we are hiring|we're hiring|recruit(?:ing|ment)|employment opportunity|job opportunity|apply for (?:the )?(?:position|role|job)|submit (?:your )?application|applications are (?:open|invited)|full[- ]time|part[- ]time|permanent position|contract position|employment type|job description|key responsibilities|job requirements|salary range|remuneration)\\b/i;
+const ROLE_TITLE = /\\b(accountant|administrator|analyst|architect|assistant|associate|auditor|barista|chef|clerk|consultant|coordinator|counsell?or|customer service|developer|driver|editor|electrician|engineer|executive|finance officer|guard|hr officer|human resource|inspector|lecturer|lawyer|legal officer|manager|mechanic|nurse|officer|operator|pharmacist|photographer|plumber|procurement officer|professor|receptionist|researcher|sales (?:representative|executive|officer)|scientist|secretary|security officer|social worker|supervisor|technician|therapist|tutor|veterinarian|waiter|waitress|writer|intern|trainee)\\b/i;
+const ROLE_DETAIL = /\\b(responsibilit(?:y|ies)|qualifications?|requirements?|experience required|experience in|report(?:s|ing)? to|salary|remuneration|employment type|apply (?:here|now)|application deadline|how to apply)\\b/i;
+
+export function getEmploymentRejectionReason(job = {}) {
+  const title = String(job.title || job.job_title || job.name || "").replace(/<[^>]*>/g, " ").replace(/&nbsp;/gi, " ").trim();
+  const description = String(job.description || job.job_description || job.contents || job.content || "").replace(/<[^>]*>/g, " ").replace(/&nbsp;/gi, " ").trim();
+  const combined = `${title} ${description}`;
+  if (!title) return "missing_title";
+  if (NON_JOB_TITLE.test(title)) return "non_job_title";
+  if (NON_JOB_CONTEXT.test(combined) && !CLEAR_HIRING.test(title)) return "non_job_content";
+  // Reject generic announcements and vague "opportunities". Require both a role
+  // in the headline and hiring/application evidence in the actual listing.
+  const roleInTitle = ROLE_TITLE.test(title);
+  const hiringEvidence = CLEAR_HIRING.test(title) || (CLEAR_HIRING.test(description) && ROLE_DETAIL.test(description));
+  if (!roleInTitle && !CLEAR_HIRING.test(title)) return "no_job_role_or_hiring_signal";
+  if (!hiringEvidence) return "no_hiring_or_application_evidence";
+  return "";
+}
 
 export function isEmploymentVacancy(job = {}) {
-  const title = String(job.title || job.job_title || "").replace(/<[^>]*>/g, " ").trim();
-  const description = String(job.description || job.job_description || job.contents || "").replace(/<[^>]*>/g, " ").trim();
-  const combined = `${title} ${description}`;
-  if (!title || NON_JOB_CONTENT.test(combined)) return false;
-  // A role title or clear hiring language is required; a generic "opportunity"
-  // headline with no employment evidence is not enough.
-  return ROLE_WORDS.test(title) || EMPLOYMENT_SIGNALS.test(combined);
+  return !getEmploymentRejectionReason(job);
 }
 
 function cleanText(value, max = 420) {
@@ -187,14 +199,19 @@ export async function enqueueJobs(jobs, route = "") {
   ];
   if (!channels.length) return { queued: 0 };
   let queued = 0;
+  const stats = { seen: jobs.length, queued: 0, rejected: 0, expired: 0, unclassified: 0, duplicateInBatch: 0 };
+  const rejectedReasons = {};
   const seenInBatch = new Set();
   for (const job of jobs) {
-    if (!job || !(job.id || job.job_id) || isExpired(job) || !isEmploymentVacancy(job)) continue;
+    if (!job || !(job.id || job.job_id)) { stats.rejected++; rejectedReasons.missing_id = (rejectedReasons.missing_id || 0) + 1; continue; }
+    const rejectionReason = getEmploymentRejectionReason(job);
+    if (rejectionReason) { stats.rejected++; rejectedReasons[rejectionReason] = (rejectedReasons[rejectionReason] || 0) + 1; continue; }
+    if (isExpired(job)) { stats.expired++; continue; }
     const category = classifyJob(job, route);
-    if (!category || !settings[category + "_enabled"]) continue;
+    if (!category || !settings[category + "_enabled"]) { stats.unclassified++; continue; }
     const jobId = String(job.id || job.job_id);
     const dedupeKey = jobDedupeKey(job);
-    if (seenInBatch.has(dedupeKey)) continue;
+    if (seenInBatch.has(dedupeKey)) { stats.duplicateInBatch++; continue; }
     seenInBatch.add(dedupeKey);
     for (const channel of channels) {
       const result = await query(
@@ -209,7 +226,8 @@ export async function enqueueJobs(jobs, route = "") {
       }
     }
   }
-  return { queued };
+  stats.queued = queued;
+  return { ...stats, rejectedReasons };
 }
 
 export async function listDistributionQueue({ limit = 100 } = {}) {
