@@ -99,13 +99,12 @@ export default async function handler(req, res) {
   const selectedPackage = getPackage("jobs", fields.packageCode);
   if (!selectedPackage) return res.status(400).json({ error: "Choose a valid job promotion package." });
   if (String(body.title||"").length > selectedPackage.limits.title || String(body.description||"").length > selectedPackage.limits.description) return res.status(400).json({ error: "The job title or description exceeds the selected package limits." });
-  if (
-    !validUrl(fields.url) ||
-    (fields.companyWebsite && !validUrl(fields.companyWebsite)) ||
-    (fields.companyLogo && !validUrl(fields.companyLogo))
-  ) {
-    return res.status(400).json({ error: "Use valid http or https links for application, company website and logo." });
+  if (!validUrl(fields.url) || (fields.companyWebsite && !validUrl(fields.companyWebsite))) {
+    return res.status(400).json({ error: "Use valid http or https links for the application URL and company website." });
   }
+  // A company logo is optional. Ignore an invalid optional logo rather than
+  // rejecting an otherwise valid job submission.
+  if (fields.companyLogo && !validUrl(fields.companyLogo)) fields.companyLogo = "";
   if (fields.applicationDeadline && !/^\d{4}-\d{2}-\d{2}$/.test(fields.applicationDeadline)) {
     return res.status(400).json({ error: "Application deadline must use YYYY-MM-DD." });
   }
