@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
-import { LogOut, Briefcase, Megaphone, Activity, Radio, FileText, Inbox, Link2, CalendarDays, ClipboardList } from "lucide-react";
+import { LogOut, Briefcase, Megaphone, Activity, Radio, FileText, Inbox, Link2, CalendarDays, ClipboardList, Menu, X, LayoutDashboard } from "lucide-react";
 
 export default function AdminLayout({ children, active }) {
   const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(false);\n  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
