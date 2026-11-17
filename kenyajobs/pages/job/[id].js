@@ -438,7 +438,7 @@ export default function JobDetail() {
             <div className="job-detail-main">
               <header className="job-detail-header">
                 <div className="job-company-mark">
-                  {logo ? <img src={logo} alt="" onError={(e) => { e.currentTarget.style.display = "none"; }} /> : <span>{initials(company)}</span>}
+                  {logo && <img src={logo} alt="" onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextElementSibling.style.display = "flex"; }} />}<span style={{ display: logo ? "none" : "flex" }}>{initials(company)}</span>
                 </div>
                 <div className="job-detail-title-wrap">
                   <div className="job-eyebrow">{source}</div>
