@@ -1,26 +1,14 @@
 import { query, rawQuery } from "@/lib/db";
 
-let socialSchemaReady;
+// The social_channel_settings table is created by supabase/migrations; this only
+// makes sure the singleton settings row exists (plain DML, no schema changes).
+let socialSettingsRowReady;
 async function ensureSocialSettingsTable() {
-  if (!socialSchemaReady) {
-    socialSchemaReady = (async () => {
-      await rawQuery(`CREATE TABLE IF NOT EXISTS social_channel_settings (
-        id INTEGER PRIMARY KEY CHECK (id = 1),
-        whatsapp_channel_url TEXT NOT NULL DEFAULT 'https://whatsapp.com/channel/0029Vb9ItcdJf05hVwnE3w2C',
-        telegram_channel_url TEXT NOT NULL DEFAULT 'https://t.me/+JN0rNZmNbGlkN2I0',
-        whatsapp_enabled BOOLEAN NOT NULL DEFAULT true,
-        telegram_enabled BOOLEAN NOT NULL DEFAULT true,
-        auto_queue BOOLEAN NOT NULL DEFAULT true,
-        approval_required BOOLEAN NOT NULL DEFAULT true,
-        kenya_enabled BOOLEAN NOT NULL DEFAULT true,
-        africa_enabled BOOLEAN NOT NULL DEFAULT true,
-        remote_enabled BOOLEAN NOT NULL DEFAULT true,
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-      )`);
-      await rawQuery("INSERT INTO social_channel_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING");
-    })().catch((error) => { socialSchemaReady = null; throw error; });
+  if (!socialSettingsRowReady) {
+    socialSettingsRowReady = rawQuery("INSERT INTO social_channel_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING")
+      .catch((error) => { socialSettingsRowReady = null; throw error; });
   }
-  return socialSchemaReady;
+  return socialSettingsRowReady;
 }
 
 export const DEFAULT_SOCIAL_SETTINGS = {

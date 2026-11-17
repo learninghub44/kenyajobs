@@ -2,6 +2,7 @@ import {requireAdmin} from "@/lib/adminAuth";
 import {query} from "@/lib/db";
 import {createJob} from "@/lib/manualJobs";
 import {getPackage} from "@/lib/packages";
+import { sendApiError } from "@/lib/dbErrors";
 export default requireAdmin(async function handler(req,res){
  try{
   if(req.method==="GET"){const {rows}=await query("SELECT * FROM job_submissions ORDER BY created_at DESC LIMIT 200");return res.status(200).json(rows);}
@@ -20,7 +21,7 @@ export default requireAdmin(async function handler(req,res){
    await query("UPDATE manual_jobs SET package_code=$2,package_price=$3,package_started_at=now(),package_expires_at=now()+($4 * interval '1 day'),featured_until=CASE WHEN $5>0 THEN now()+($5 * interval '1 day') ELSE NULL END,renewal_status='active',source_submission_id=$6 WHERE id=$1",[job.id,p.code,p.price,p.durationDays,p.limits.featuredDays,id]);
    await query("UPDATE job_submissions SET status='approved',payment_status='confirmed',reviewed_at=now(),job_id=$2 WHERE id=$1 AND status='pending'",[id,job.id]);return res.status(200).json({ok:true,job});
   }
-  if(req.method==="DELETE"){const id=Number((req.body||{}).id);await query("UPDATE job_submissions SET status='rejected',reviewed_at=now() WHERE id=$1 AND status='pending'",[id]);return res.status(200).json({ok:true});}
+  if(req.method==="DELETE"){const id=Number((req.body||{}).id);if(!Number.isInteger(id)||id<1)return res.status(400).json({error:"Valid submission ID required."});await query("UPDATE job_submissions SET status='rejected',reviewed_at=now() WHERE id=$1 AND status='pending'",[id]);return res.status(200).json({ok:true});}
   return res.status(405).json({error:"Method not allowed"});
- }catch(e){console.error("admin job submissions:",e.message);return res.status(500).json({error:"Could not process submission."});}
+ }catch(e){return sendApiError(res,"admin/job-submissions "+req.method,e,"Could not process submission.");}
 });

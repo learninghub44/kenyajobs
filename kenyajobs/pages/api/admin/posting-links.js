@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { requireAdmin } from "@/lib/adminAuth";
 import { query } from "@/lib/db";
+import { sendApiError } from "@/lib/dbErrors";
 const hash = (value) => crypto.createHash("sha256").update(value).digest("hex");
 const baseUrl = () => (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || "https://onlinejobs.christech.co.ke").replace(/\/$/, "");
 export default requireAdmin(async function handler(req,res) {
@@ -25,5 +26,5 @@ export default requireAdmin(async function handler(req,res) {
       return res.status(200).json({ok:true});
     }
     return res.status(405).json({error:"Method not allowed"});
-  }catch(error){console.error("posting links admin:",error.message);return res.status(500).json({error:"Could not manage posting links."});}
+  }catch(error){return sendApiError(res,"admin/posting-links "+req.method,error,"Could not manage posting links.");}
 });

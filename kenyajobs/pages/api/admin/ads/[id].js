@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/adminAuth";
 import { getAdById, updateAd, deleteAd } from "@/lib/ads";
+import { sendApiError } from "@/lib/dbErrors";
 
 export default requireAdmin(async function handler(req, res) {
   const { id } = req.query;
@@ -13,7 +14,7 @@ export default requireAdmin(async function handler(req, res) {
       }
       res.status(200).json(ad);
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      return sendApiError(res, "admin/ads item GET", err, "Could not load this ad.");
     }
     return;
   }
@@ -32,7 +33,7 @@ export default requireAdmin(async function handler(req, res) {
       }
       res.status(200).json(ad);
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      return sendApiError(res, "admin/ads item PUT", err, "Could not update this ad.");
     }
     return;
   }
@@ -42,7 +43,7 @@ export default requireAdmin(async function handler(req, res) {
       await deleteAd(id);
       res.status(200).json({ ok: true });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      return sendApiError(res, "admin/ads item DELETE", err, "Could not delete this ad.");
     }
     return;
   }

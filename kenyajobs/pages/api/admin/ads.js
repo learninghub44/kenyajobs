@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/adminAuth";
 import { listAllAds, createAd } from "@/lib/ads";
+import { sendApiError } from "@/lib/dbErrors";
 
 export default requireAdmin(async function handler(req, res) {
   if (req.method === "GET") {
@@ -7,8 +8,7 @@ export default requireAdmin(async function handler(req, res) {
       const ads = await listAllAds();
       res.status(200).json(ads);
     } catch (err) {
-      console.error("admin/ads GET error:", err.message);
-      res.status(500).json({ error: err.message });
+      return sendApiError(res, "admin/ads GET", err, "Could not load ads.");
     }
     return;
   }
@@ -23,8 +23,7 @@ export default requireAdmin(async function handler(req, res) {
       const ad = await createAd(req.body);
       res.status(201).json(ad);
     } catch (err) {
-      console.error("admin/ads POST error:", err.message);
-      res.status(500).json({ error: err.message });
+      return sendApiError(res, "admin/ads POST", err, "Could not save the ad.");
     }
     return;
   }

@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/adminAuth";
 import { getSocialSettings, saveSocialSettings, listDistributionQueue, enqueueJobs } from "@/lib/distribution";
+import { sendApiError } from "@/lib/dbErrors";
 
 const SOURCE_ROUTES = ["/api/africa-jobs", "/api/remote-jobs", "/api/entry-level-jobs", "/api/graduate-jobs", "/api/wfh-jobs"];
 
@@ -31,7 +32,6 @@ export default requireAdmin(async function handler(req, res) {
     }
     return res.status(405).json({ error: "Method not allowed" });
   } catch (error) {
-    console.error("admin/distribution error:", error.message);
-    return res.status(500).json({ error: "Distribution service is temporarily unavailable. Please try again." });
+    return sendApiError(res, "admin/distribution " + req.method, error, "Distribution service is temporarily unavailable. Please try again.");
   }
 });

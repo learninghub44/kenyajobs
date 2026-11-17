@@ -1,6 +1,7 @@
 import {requireAdmin} from "@/lib/adminAuth";
 import {query} from "@/lib/db";
 import {getPackage} from "@/lib/packages";
+import { sendApiError } from "@/lib/dbErrors";
 export default requireAdmin(async function handler(req,res){
  try{
   if(req.method==="GET"){
@@ -22,5 +23,5 @@ export default requireAdmin(async function handler(req,res){
    return res.status(200).json({ok:true});
   }
   return res.status(405).json({error:"Method not allowed"});
- }catch(e){console.error("listing lifecycle:",e.message);return res.status(500).json({error:"Could not update listing lifecycle."});}
+ }catch(e){return sendApiError(res,"admin/listings "+req.method,e,"Could not update listing lifecycle.");}
 });

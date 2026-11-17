@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/adminAuth";
 import { query } from "@/lib/db";
+import { sendApiError } from "@/lib/dbErrors";
 function slugify(value) { return String(value || "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 100); }
 export default requireAdmin(async function handler(req, res) {
   try {
@@ -37,7 +38,6 @@ export default requireAdmin(async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   } catch (error) {
     if (error.code === "23505") return res.status(409).json({ error: "That article URL already exists. Change the slug." });
-    console.error("admin blog API:", error.message);
-    return res.status(500).json({ error: "Could not save the article." });
+    return sendApiError(res, "admin/blog " + req.method, error, "Could not save the article.");
   }
 });

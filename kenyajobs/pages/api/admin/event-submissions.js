@@ -2,6 +2,7 @@ import crypto from "crypto";
 import {requireAdmin} from "@/lib/adminAuth";
 import {query} from "@/lib/db";
 import {getPackage} from "@/lib/packages";
+import { sendApiError } from "@/lib/dbErrors";
 const slugify=s=>String(s||"event").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,70)||"event";
 export default requireAdmin(async function handler(req,res){
  try{
@@ -29,5 +30,5 @@ export default requireAdmin(async function handler(req,res){
   if(req.method==="PATCH"){const b=req.body||{},id=Number(b.id);if(!Number.isInteger(id)||id<1)return res.status(400).json({error:"Valid request ID required."});await query("UPDATE event_submissions SET admin_notes=$2,payment_status=$3 WHERE id=$1",[id,String(b.adminNotes||"").trim().slice(0,2000),b.paymentStatus==="confirmed"?"confirmed":"awaiting_confirmation"]);return res.status(200).json({ok:true});}
   if(req.method==="DELETE"){const id=Number(req.body?.id);if(!Number.isInteger(id)||id<1)return res.status(400).json({error:"Valid request ID required."});const r=await query("SELECT group_key FROM event_submissions WHERE id=$1",[id]);if(r.rows[0]?.group_key)await query("UPDATE event_submissions SET status='rejected',reviewed_at=now() WHERE group_key=$1 AND status='pending'",[r.rows[0].group_key]);else await query("UPDATE event_submissions SET status='rejected',reviewed_at=now() WHERE id=$1 AND status='pending'",[id]);return res.status(200).json({ok:true});}
   return res.status(405).json({error:"Method not allowed"});
- }catch(e){console.error("admin event submissions:",e.message);return res.status(500).json({error:"Could not process event bundle."});}
+ }catch(e){return sendApiError(res,"admin/event-submissions "+req.method,e,"Could not process event bundle.");}
 });

@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/adminAuth";
 import { listAllJobs, createJob } from "@/lib/manualJobs";
+import { sendApiError } from "@/lib/dbErrors";
 
 export default requireAdmin(async function handler(req, res) {
   if (req.method === "GET") {
@@ -7,8 +8,7 @@ export default requireAdmin(async function handler(req, res) {
       const jobs = await listAllJobs();
       res.status(200).json(jobs);
     } catch (err) {
-      console.error("admin/jobs GET error:", err.message);
-      res.status(500).json({ error: "Could not load jobs. Please try again." });
+      return sendApiError(res, "admin/jobs GET", err, "Could not load jobs. Please try again.");
     }
     return;
   }
@@ -23,8 +23,7 @@ export default requireAdmin(async function handler(req, res) {
       const job = await createJob(req.body);
       res.status(201).json(job);
     } catch (err) {
-      console.error("admin/jobs POST error:", err.message);
-      res.status(500).json({ error: "Could not save the job. Please try again." });
+      return sendApiError(res, "admin/jobs POST", err, "Could not save the job. Please try again.");
     }
     return;
   }

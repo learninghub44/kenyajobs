@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/adminAuth";
 import { getJobById, updateJob, deleteJob } from "@/lib/manualJobs";
+import { sendApiError } from "@/lib/dbErrors";
 
 export default requireAdmin(async function handler(req, res) {
   const { id } = req.query;
@@ -13,8 +14,7 @@ export default requireAdmin(async function handler(req, res) {
       }
       res.status(200).json(job);
     } catch (err) {
-      console.error("admin/jobs item GET error:", err.message);
-      res.status(500).json({ error: "Could not load this job. Please try again." });
+      return sendApiError(res, "admin/jobs item GET", err, "Could not load this job. Please try again.");
     }
     return;
   }
@@ -33,8 +33,7 @@ export default requireAdmin(async function handler(req, res) {
       }
       res.status(200).json(job);
     } catch (err) {
-      console.error("admin/jobs item PUT error:", err.message);
-      res.status(500).json({ error: "Could not update this job. Please try again." });
+      return sendApiError(res, "admin/jobs item PUT", err, "Could not update this job. Please try again.");
     }
     return;
   }
@@ -44,8 +43,7 @@ export default requireAdmin(async function handler(req, res) {
       await deleteJob(id);
       res.status(200).json({ ok: true });
     } catch (err) {
-      console.error("admin/jobs item DELETE error:", err.message);
-      res.status(500).json({ error: "Could not delete this job. Please try again." });
+      return sendApiError(res, "admin/jobs item DELETE", err, "Could not delete this job. Please try again.");
     }
     return;
   }
