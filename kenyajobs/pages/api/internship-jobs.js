@@ -2,6 +2,7 @@ import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
 import { cacheJobs } from "@/lib/liveJobCache";
 import { cachedFetch } from "@/lib/apiResponseCache";
 import { attachSalaries } from "@/utils/extractSalary";
+import { filterEmploymentVacancies } from "@/lib/jobValidation";
 
 async function fetchAll(page) {
   const sources = [
@@ -76,8 +77,9 @@ export default async function handler(req, res) {
 
   res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=3600");
 
-  const jobs = await cachedFetch(`internship-jobs:${page}`, () => fetchAll(page));
+  const fetchedJobs = await cachedFetch(`internship-jobs:${page}`, () => fetchAll(page));
 
+  const jobs = filterEmploymentVacancies(fetchedJobs);
   cacheJobs(jobs);
   res.status(200).json(jobs);
 }
