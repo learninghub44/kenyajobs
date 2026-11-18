@@ -1,6 +1,7 @@
 import { MapPin, Clock, ArrowUpRight, Wifi, Banknote, Building2 } from "lucide-react";
 import Link from "next/link";
 import { saveJob } from "@/utils/jobCache";
+import { toPlainJobText } from "@/lib/jobDescription";
 
 function companySlug(name = "") {
   return name.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
@@ -29,7 +30,7 @@ function formatSalary(job) {
 }
 
 function cleanText(value, max = 150) {
-  return String(value || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+  return toPlainJobText(value).replace(/\s+/g, " ").trim().slice(0, max);
 }
 
 export default function JobCard({ job }) {
