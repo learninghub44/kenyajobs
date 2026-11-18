@@ -54,7 +54,7 @@ export function toPlainJobText(value) {
     .replace(/\u00a0/g, " ")
     .replace(/[\t\f\v ]+/g, " ")
     .replace(/ *\n */g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
+    .replace(/\n{2,}/g, "\n")
     .replace(/(?:\n)?\s*•\s*(?:\n)?/g, "\n• ")
     .trim();
 
