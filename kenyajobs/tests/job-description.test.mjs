@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { decodeJobEntities, toPlainJobText } from "../lib/jobDescription.js";
 
 test("normalizes escaped Word-style HTML and entities", () => {
-  const input = String.raw\`\\<p>\\<strong>\\<span data-contrast="auto">Mission Brief\\</span>\\</strong>\\</p> \\<p>You &amp; your team&nbsp;will lead.</p>\`;
+  const input = "\\<p>\\<strong>\\<span data-contrast=\"auto\">Mission Brief\\</span>\\</strong>\\</p> \\<p>You &amp; your team&nbsp;will lead.</p>";
   assert.equal(toPlainJobText(input), "Mission Brief\nYou & your team will lead.");
 });
 
