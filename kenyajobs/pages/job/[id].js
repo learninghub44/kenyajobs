@@ -2,8 +2,8 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import DOMPurify from "dompurify";
 import { loadJob, saveJob } from "@/utils/jobCache";
+import { toPlainJobText, decodeJobEntities } from "@/lib/jobDescription";
 import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2, CalendarDays } from "lucide-react";
 
 
@@ -33,7 +33,7 @@ function buildJobPostingSchema(job, { title, description, company, location, typ
     "@context": "https://schema.org",
     "@type": "JobPosting",
     title,
-    description: String(description).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim(),
+    description: toPlainJobText(description).replace(/\s+/g, " ").trim(),
     url: `https://onlinejobs.christech.co.ke/job/${encodeURIComponent(job.id || job.job_id || "")}`,
     hiringOrganization: {
       "@type": "Organization",
@@ -117,39 +117,11 @@ function timeAgo(dateStr) {
 }
 
 function decodeEntities(value) {
-  return String(value || "")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;|&apos;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">");
+  return decodeJobEntities(value);
 }
 
 function cleanSectionText(value) {
-  if (!value) return "";
-  let text = Array.isArray(value) ? value.filter(Boolean).map(String).join("\n") : String(value);
-
-  text = text
-    .replace(/<br\s*\/?\s*>/gi, "\n")
-    .replace(/<\/(?:p|div|li|h[1-6]|section|article|tr)>/gi, "\n")
-    .replace(/<li\b[^>]*>/gi, "• ")
-    .replace(/<[^>]+>/g, "")
-    .replace(/\*\*(.+?)\*\*/g, "$1")
-    .replace(/__([^_]+?)__/g, "$1");
-
-  text = decodeEntities(text)
-    .replace(/\u00a0/g, " ")
-    .replace(/[ \t]+/g, " ")
-    .replace(/\n[ \t]+/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-
-  // Many job feeds put a section label and its content on the same line.
-  const labels = "about(?: the)? (?:role|job|company)|job description|role overview|position summary|key responsibilities|responsibilities|what you.?ll do|what you.?ll need|what we.?re looking for|minimum qualifications|preferred qualifications|job requirements|requirements|qualifications|skills(?: required)?|experience|education|benefits(?: and perks)?|perks|what we offer|compensation|salary|how to apply|application instructions|application process|work schedule|location";
-  text = text.replace(new RegExp("(^|[\\n.!?])\\s*(" + labels + ")\\s*:?\\s*(?=\\S)", "gi"), "$1\\n$2\\n");
-
-  return text.replace(/\n{3,}/g, "\n\n").trim();
+  return toPlainJobText(value);
 }
 
 function splitSectionItems(value) {
@@ -251,8 +223,7 @@ function SectionContent({ items }) {
 }
 
 function shortJobSummary(value, maxLength = 280) {
-  const plain = decodeEntities(String(value || "").replace(/<br[^>]*>/gi, " ").replace(/<[^>]+>/g, " "))
-    .replace(/\s+/g, " ").trim();
+  const plain = toPlainJobText(value).replace(/\s+/g, " ").trim();
   if (!plain) return "";
   if (plain.length <= maxLength) return plain;
   const shortened = plain.slice(0, maxLength);
@@ -391,10 +362,6 @@ export default function JobDetail() {
   const jobPostingSchema = buildJobPostingSchema(job, {
     title, description, company, location, type, remote, logo, applyUrl, salary
   });
-
-  const safeDescription = typeof window !== "undefined"
-    ? DOMPurify.sanitize(description, { ALLOWED_TAGS: ["p","br","ul","ol","li","strong","em","b","i","h2","h3","h4","a"], ALLOWED_ATTR: ["href","target","rel"] })
-    : String(description).replace(/<script[\s\\S]*?<\/script>/gi, "");
 
   const copyLink = async () => {
     try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch {}
