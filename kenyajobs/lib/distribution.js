@@ -88,17 +88,39 @@ function isExpired(job = {}) {
   return false;
 }
 
+function decodeHtmlEntities(value) {
+  const named = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+  return String(value || "").replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (entity, code) => {
+    if (code[0] !== "#") return named[code.toLowerCase()] ?? entity;
+    const number = code[1].toLowerCase() === "x" ? parseInt(code.slice(2), 16) : Number(code.slice(1));
+    try { return Number.isFinite(number) && number >= 0 && number <= 0x10ffff ? String.fromCodePoint(number) : " "; }
+    catch { return " "; }
+  });
+}
+
 function cleanText(value, max = 420) {
-  const input = Array.isArray(value) ? value.filter(Boolean).join(", ") : String(value || "");
-  return input.replace(/<script[\s\S]*?<\/script>/gi, " ")
+  let input = Array.isArray(value) ? value.filter(Boolean).join(", ") : String(value || "");
+  // Decode escaped source HTML BEFORE removing tags, or entities leak into posts.
+  for (let pass = 0; pass < 2; pass += 1) {
+    const decoded = decodeHtmlEntities(input);
+    if (decoded === input) break;
+    input = decoded;
+  }
+  input = input
+    .replace(/\\</g, "<").replace(/\\>/g, ">")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
-    .replace(/&nbsp;|&#160;/gi, " ").replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"').replace(/&#0?39;|&apos;/gi, "'")
-    .replace(/&lt;/gi, "<").replace(/&gt;/gi, ">")
-    .replace(/\s+/g, " ").trim().slice(0, max);
+    .replace(/<\/(p|div|section|article|h[1-6]|li|tr|blockquote)>/gi, "\n")
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/<li\b[^>]*>/gi, "• ")
+    .replace(/<hr\b[^>]*>/gi, "\n")
+    .replace(/<[^>]*>/g, " ");
+  return input.split(/\r?\n/)
+    .map((line) => line.replace(/[ \t]+/g, " ").trim())
+    .filter(Boolean)
+    .join("\n")
+    .slice(0, max)
+    .trim();
 }
 function jobDetailUrl(job) {
   const id = String(job.id || job.job_id || "").trim();
