@@ -6,13 +6,12 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { loadJob, saveJob } from "@/utils/jobCache";
 import { toPlainJobText, decodeJobEntities } from "@/lib/jobDescription";
+import { parseJobDate, normalizeJobDate } from "@/lib/jobDate";
 import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2, CalendarDays, Hash } from "lucide-react";
 
 
 function normalizeDate(value) {
-  if (!value) return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  return normalizeJobDate(value);
 }
 
 function schemaEmploymentType(type = "") {
@@ -112,8 +111,8 @@ function detectForeignLanguage(title = "", description = "", explicit = "") {
 
 function timeAgo(dateStr) {
   if (!dateStr) return "Recently posted";
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return "Recently posted";
+  const d = parseJobDate(dateStr);
+  if (!d) return "Recently posted";
   // Use a fixed UTC date instead of Date.now()/browser-local time so SSR and hydration match.
   return `Posted ${d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}`;
 }
