@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, UploadCloud, AlertCircle, ShieldCheck } from "lucide-react";
+import { CheckCircle2, UploadCloud, AlertCircle } from "lucide-react";
 import { HOW_HEARD_OPTIONS } from "@/lib/jobOptions";
 
 const MAX_BYTES = 3 * 1024 * 1024;
@@ -98,10 +98,6 @@ export default function ApplyForm({ job }) {
   return (
     <article id="apply" className="job-description-panel">
       <div className="job-section-heading"><span /><h2>Apply for this job</h2></div>
-      <div className="mb-5 flex gap-3 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-900">
-        <ShieldCheck size={18} className="mt-0.5 shrink-0" />
-        <p><strong>Applying is always free.</strong> {job.company} and JOBS HUB KENYA will never ask you to pay to apply, be interviewed or be hired. If anyone asks you for money for this job, do not pay.</p>
-      </div>
       <form onSubmit={submit} className="space-y-4" noValidate={false}>
         <div className="flex justify-end"><button type="button" onClick={clear} className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">Clear form</button></div>
         <div className="grid gap-4 sm:grid-cols-2">

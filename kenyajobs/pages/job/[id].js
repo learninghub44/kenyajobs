@@ -1,5 +1,5 @@
 import Head from "next/head";
-import ApplyForm from "@/components/ApplyForm";
+import JobDetailLayout from "@/components/JobDetailLayout";
 import { EXPERIENCE_LEVELS, WORK_MODES, DOCUMENT_TYPES, isDeadlinePassed, parseDeadline } from "@/lib/jobOptions";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -415,143 +415,31 @@ export default function JobDetail() {
         />
       </Head>
 
-      <main className="job-detail-page">
-        <div className="job-detail-shell">
-          <Link href="/" className="job-back"><ArrowLeft size={15} /> Back to jobs</Link>
-
-          <div className="job-detail-layout">
-            <div className="job-detail-main">
-              <header className="job-detail-header">
-                <div className="job-company-mark">
-                  {logo && <img src={logo} alt="" onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextElementSibling.style.display = "flex"; }} />}<span style={{ display: logo ? "none" : "flex" }}>{initials(company)}</span>
-                </div>
-                <div className="job-detail-title-wrap">
-                  <div className="job-eyebrow">{source}{job.jobRef ? <> · <span title="Job reference number">Job No. {job.jobRef}</span></> : null}</div>
-                  <h1>{title}</h1>
-                  <Link href={`/company/${company.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-")}?name=${encodeURIComponent(company)}`} className="job-company-link">
-                    <Building2 size={15} /> {company}
-                  </Link>
-                  <div className="job-meta-line">
-                    <span><MapPin size={15} />{location}</span>
-                    <span><BriefcaseBusiness size={15} />{type}</span>
-                    {remote && !modeLabel(job.workMode) && <span><Globe2 size={15} />Remote</span>}
-                    {modeLabel(job.workMode) && <span><Globe2 size={15} />{modeLabel(job.workMode)}</span>}
-                    {job.industry && <span><Building2 size={15} />{job.industry}</span>}
-                    {levelLabel(job.experienceLevel) && <span><BriefcaseBusiness size={15} />{levelLabel(job.experienceLevel)}</span>}
-                  </div>
-                </div>
-              </header>
-
-              {translatedJob && (
-                <div className="translation-note">
-                  <CheckCircle2 size={16} />
-                  <span>Translated to English from {job.language || job.lang || "the original language"}.</span>
-                </div>
-              )}
-              {translationLoading && !translatedJob && (
-                <div className="translation-note muted">Preparing the English version of this listing…</div>
-              )}
-
-              <section className="job-key-facts" aria-label="Job overview">
-                {[
-                  ["Salary", salary || "Not disclosed"],
-                  ["Employment type", type],
-                  ["Experience", experienceText || "Not specified"],
-                  ["Education", job.education || job.education_requirements || "Not specified"],
-                  ["Deadline", deadlineLabel || "Not specified"]
-                ].map(([label, value]) => (
-                  <div className="job-key-fact" key={label}>
-                    <span>{label}</span>
-                    <strong>{value}</strong>
-                  </div>
-                ))}
-              </section>
-
-              {shortJobSummary(description) && (
-                <section className="job-description-panel job-quick-summary">
-                  <div className="job-section-heading"><span /><h2>Job at a glance</h2></div>
-                  <p>{shortJobSummary(description)}</p>
-                </section>
-              )}
-
-              {buildJobSections(job, description).map((section, index) => (
-                <article className="job-description-panel" key={section.title + index}>
-                  <div className="job-section-heading"><span /> <h2>{section.title}</h2></div>
-                  <SectionContent items={section.items} />
-                </article>
-              ))}
-
-              {skillList.length > 0 && (
-                <section className="job-description-panel">
-                  <div className="job-section-heading"><span /><h2>Skills & tags</h2></div>
-                  <div className="job-tags">{skillList.slice(0, 20).map((tag, i) => <span key={i}>{tag}</span>)}</div>
-                </section>
-              )}
-
-              {onPlatform && neededDocs.length > 0 && (
-                <section className="job-description-panel">
-                  <div className="job-section-heading"><span /><h2>Required documents</h2></div>
-                  <ul className="space-y-1.5 text-sm text-gray-700">{neededDocs.map((d) => <li key={d} className="flex items-center gap-2"><CheckCircle2 size={15} className="text-teal-600" /> {d} <span className="text-xs font-semibold text-red-600">Required</span></li>)}</ul>
-                </section>
-              )}
-
-              {onPlatform && !deadlinePassed && <ApplyForm job={job} />}
-              {onPlatform && deadlinePassed && (
-                <section className="job-description-panel"><div className="job-section-heading"><span /><h2>Applications closed</h2></div><p>The application deadline for this job was {deadlineLabel}. Applications are no longer being accepted.</p></section>
-              )}
-
-              {!onPlatform && <div className="job-source-note">
-                <Globe2 size={16} />
-                <div><strong>Application source</strong><p>This listing is provided by {source}. You will complete your application on the original source.</p></div>
-              </div>}
-            </div>
-
-            <aside className="job-detail-sidebar">
-              <div className="apply-panel">
-                <div>
-                  <p className="apply-kicker">Ready to apply?</p>
-                  <h2>{title}</h2>
-                </div>
-                {onPlatform ? (
-                  deadlinePassed
-                    ? <p className="text-sm font-semibold text-red-600">Applications closed {deadlineLabel}</p>
-                    : <a href="#apply" className="apply-button">Apply for this position</a>
-                ) : (
-                <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="apply-button">
-                  Apply on {source} <ExternalLink size={16} />
-                </a>
-                )}
-                <button onClick={copyLink} className="share-button"><Share2 size={15} />{copied ? "Link copied" : "Share job"}</button>
-              </div>
-
-              <div className="summary-panel">
-                <h2>Job summary</h2>
-                {meta.map(([Icon, label, value]) => (
-                  <div className="summary-row" key={label}>
-                    <Icon size={17} />
-                    <div><span>{label}</span><strong>{value}</strong></div>
-                  </div>
-                ))}
-                <div className="summary-row"><Globe2 size={17} /><div><span>Source</span><strong>{source}</strong></div></div>
-              </div>
-            </aside>
-          </div>
-
-          {related.length > 0 && (
-            <section className="related-jobs">
-              <div className="related-heading"><div><p className="job-eyebrow">Keep looking</p><h2>More opportunities</h2></div><Link href="/">View all jobs</Link></div>
-              <div className="related-list">
-                {related.map((item, index) => (
-                  <Link key={item.id || index} href={`/job/${item.id || item.job_id}`} onClick={() => saveJob(item.id || item.job_id, item)} className="related-job">
-                    <div><strong>{item.title || item.job_title}</strong><span>{item.company || item.company_name || "Company"} · {item.location || "Worldwide"}</span></div>
-                    <ExternalLink size={16} />
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
-        </div>
-      </main>
+      <JobDetailLayout
+        job={job}
+        translatedJob={translatedJob}
+        translationLoading={translationLoading}
+        copied={copied}
+        onCopy={copyLink}
+        related={related}
+        onRelatedClick={(item) => saveJob(item.id || item.job_id, item)}
+        view={{
+          title, company, location, type, logo, source, onPlatform, applyUrl, salary, deadlineLabel, deadlinePassed,
+          initials: initials(company),
+          companySlug: company.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-"),
+          summary: shortJobSummary(description, 150),
+          modeLabel: modeLabel(job.workMode), levelLabel: levelLabel(job.experienceLevel), industry: job.industry || "",
+          education: String(job.education || job.education_requirements || "").slice(0, 48),
+          sections: buildJobSections(job, description), skillList, neededDocs,
+          facts: [
+            ...(job.jobRef ? [["Job number", job.jobRef]] : []),
+            ["Posted", timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc)],
+            ["Employment type", type],
+            ...(experienceText ? [["Experience", experienceText]] : []),
+            ["Source", source],
+          ],
+        }}
+      />
     </>
   );
 }
