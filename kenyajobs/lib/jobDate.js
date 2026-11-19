@@ -4,7 +4,7 @@ export function parseJobDate(value) {
   if (value === null || value === undefined || value === "") return null;
 
   let date;
-  if (typeof value === "number" || (typeof value === "string" && /^\\d{9,13}(?:\\.\\d+)?$/.test(value.trim()))) {
+  if (typeof value === "number" || (typeof value === "string" && /^[0-9]{9,13}(?:[.][0-9]+)?$/.test(value.trim()))) {
     let timestamp = Number(value);
     if (!Number.isFinite(timestamp)) return null;
     if (Math.abs(timestamp) < 1e12) timestamp *= 1000;
