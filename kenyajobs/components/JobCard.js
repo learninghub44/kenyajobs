@@ -2,6 +2,7 @@ import { MapPin, Clock, ArrowUpRight, Wifi, Banknote, Building2 } from "lucide-r
 import Link from "next/link";
 import { saveJob } from "@/utils/jobCache";
 import { toPlainJobText } from "@/lib/jobDescription";
+import { parseJobDate } from "@/lib/jobDate";
 
 function companySlug(name = "") {
   return name.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
@@ -9,8 +10,8 @@ function companySlug(name = "") {
 
 function timeAgo(dateStr) {
   if (!dateStr) return "Recently posted";
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return "Recently posted";
+  const d = parseJobDate(dateStr);
+  if (!d) return "Recently posted";
   // Render a stable UTC date on both server and browser to avoid hydration text mismatches.
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 }
