@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { sanitizeJobDetails } from "@/lib/jobOptions";
 import { query } from "@/lib/db";
 import { getPackage } from "@/lib/packages";
 
@@ -98,7 +99,10 @@ export default async function handler(req, res) {
       : [],
   };
 
-  for (const key of ["title", "company", "contactName", "email", "phone", "description", "url", "packageCode"]) {
+  // Jobs candidates apply for on this site have no external link to require.
+  const required = ["title", "company", "contactName", "email", "phone", "description", "packageCode"];
+  if (fields.applicationMethod !== "platform") required.push("url");
+  for (const key of required) {
     if (!fields[key]) return res.status(400).json({ error: key + " is required." });
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
@@ -110,10 +114,13 @@ export default async function handler(req, res) {
   if (!selectedPackage) return res.status(400).json({ error: "Choose a valid job promotion package." });
   if (String(body.title||"").length > selectedPackage.limits.title || String(body.description||"").length > selectedPackage.limits.description) return res.status(400).json({ error: "The job title or description exceeds the selected package limits." });
   const inferredMethod = /^mailto:/i.test(fields.url) ? "email" : /^https:\/\/(?:forms\.gle\/|docs\.google\.com\/forms\/)/i.test(fields.url) ? "google_form" : "website";
-  fields.applicationMethod = ["website","google_form","email"].includes(fields.applicationMethod) ? fields.applicationMethod : inferredMethod;
+  fields.applicationMethod = ["website","google_form","email","platform"].includes(fields.applicationMethod) ? fields.applicationMethod : inferredMethod;
+  if (fields.applicationMethod === "platform") { fields.url = "platform:internal"; fields.applicationEmail = ""; }
+  let details;
+  try { details = sanitizeJobDetails(body); } catch (e) { return res.status(400).json({ error: e.message }); }
   if (fields.applicationMethod === "email" && !/^mailto:/i.test(fields.url)) fields.url = "mailto:" + fields.applicationEmail;
   if (fields.applicationMethod === "email") fields.applicationEmail = fields.url.replace(/^mailto:/i, "").split("?")[0].toLowerCase();
-  if (!validApplicationDestination(fields.url) || (fields.companyWebsite && !validUrl(fields.companyWebsite)) || (fields.applicationMethod === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.applicationEmail))) {
+  if ((fields.applicationMethod !== "platform" && !validApplicationDestination(fields.url)) || (fields.companyWebsite && !validUrl(fields.companyWebsite)) || (fields.applicationMethod === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.applicationEmail))) {
     return res.status(400).json({ error: "Use a valid application website, Google Forms link, or mailto application email. Company website must be a valid http or https link." });
   }
   // A company logo is optional. Ignore an invalid optional logo rather than
@@ -164,9 +171,9 @@ export default async function handler(req, res) {
       `INSERT INTO job_submissions(
         title,company,contact_name,email,location,type,salary,description,requirements,responsibilities,
         qualifications,experience,education,benefits,application_deadline,application_url,application_instructions,
-        company_website,company_logo,categories,status,posting_link_id,ip_hash,submission_key,phone,package_code,package_price,package_duration_days,application_method,application_email
+        company_website,company_logo,categories,status,posting_link_id,ip_hash,submission_key,phone,package_code,package_price,package_duration_days,application_method,application_email,details
       ) VALUES(
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending',$21,$22,$23,$24,$25,$26,$27,$28,$29
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pending',$21,$22,$23,$24,$25,$26,$27,$28,$29,$30::jsonb
       ) ON CONFLICT(submission_key) WHERE submission_key IS NOT NULL DO NOTHING RETURNING id,status,job_id`,
       [
         fields.title, fields.company, fields.contactName, fields.email, fields.location, fields.type,
@@ -174,7 +181,7 @@ export default async function handler(req, res) {
         fields.qualifications, fields.experience, fields.education, fields.benefits,
         fields.applicationDeadline || null, fields.url, fields.applicationInstructions,
         fields.companyWebsite || null, fields.companyLogo || null, fields.categories,
-        link?.id || null, ipHash, submissionKey, fields.phone, selectedPackage.code, selectedPackage.price, selectedPackage.durationDays, fields.applicationMethod, fields.applicationMethod === "email" ? fields.applicationEmail : null,
+        link?.id || null, ipHash, submissionKey, fields.phone, selectedPackage.code, selectedPackage.price, selectedPackage.durationDays, fields.applicationMethod, fields.applicationMethod === "email" ? fields.applicationEmail : null, JSON.stringify(details),
       ]
     );
 

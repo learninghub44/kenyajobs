@@ -1,10 +1,12 @@
 import Head from "next/head";
+import ApplyForm from "@/components/ApplyForm";
+import { EXPERIENCE_LEVELS, WORK_MODES, DOCUMENT_TYPES, isDeadlinePassed, parseDeadline } from "@/lib/jobOptions";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { loadJob, saveJob } from "@/utils/jobCache";
 import { toPlainJobText, decodeJobEntities } from "@/lib/jobDescription";
-import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2, CalendarDays } from "lucide-react";
+import { MapPin, BriefcaseBusiness, Clock3, Building2, ExternalLink, Share2, ArrowLeft, Globe2, Banknote, CheckCircle2, CalendarDays, Hash } from "lucide-react";
 
 
 function normalizeDate(value) {
@@ -254,6 +256,15 @@ async function findRelated(found) {
     .slice(0, 3);
 }
 
+const levelLabel = (v) => EXPERIENCE_LEVELS.find((o) => o.value === v)?.label || "";
+const modeLabel = (v) => WORK_MODES.find((o) => o.value === v)?.label || "";
+// Explicit locale + zone so server and browser always print the same text.
+function formatDeadline(text) {
+  const d = parseDeadline(text);
+  if (!d) return String(text || "");
+  return new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Nairobi", weekday: "short", day: "numeric", month: "short", year: "numeric" }).format(d);
+}
+
 export default function JobDetail() {
   const router = useRouter();
   const { id } = router.query;
@@ -354,8 +365,15 @@ export default function JobDetail() {
   const location = String(job.location || job.candidate_required_location || job.job_city || "Worldwide");
   const type = String(job.type || job.job_type || job.employment_type || "Full-time");
   const source = String(job.source || "Original source");
-  const applyUrl = job.url || job.job_apply_link || job.redirect_url || "#";
+  const applyUrl = job.applicationMethod === "platform" ? `https://onlinejobs.christech.co.ke/job/${encodeURIComponent(id)}#apply` : (job.url || job.job_apply_link || job.redirect_url || "#");
   const salary = formatSalary(job);
+  const onPlatform = job.applicationMethod === "platform";
+  const deadlineText = job.applicationDeadline || job.application_deadline || "";
+  const deadlineLabel = deadlineText ? formatDeadline(deadlineText) : "";
+  const deadlinePassed = isDeadlinePassed(deadlineText);
+  const experienceText = levelLabel(job.experienceLevel) ? [levelLabel(job.experienceLevel), job.experience].filter(Boolean).join(" · ") : (job.experience || job.experience_level || "");
+  const skillList = [...new Set([...(Array.isArray(job.skills) ? job.skills : []), ...(Array.isArray(job.tags) ? job.tags : [])])];
+  const neededDocs = onPlatform ? (job.requiredDocuments || ["resume"]).map((d) => DOCUMENT_TYPES.find((o) => o.value === d)?.label).filter(Boolean) : [];
   const remote = location.toLowerCase().includes("remote") || type.toLowerCase().includes("remote");
   const logo = job.companyLogo || job.company_logo || job.employer_logo;
   const canonicalUrl = `https://onlinejobs.christech.co.ke/job/${encodeURIComponent(id)}`;
@@ -370,10 +388,13 @@ export default function JobDetail() {
   const meta = [
     [MapPin, "Location", location],
     [BriefcaseBusiness, "Job type", type],
+    ...(job.jobRef ? [[Hash, "Job number", job.jobRef]] : []),
+    ...(modeLabel(job.workMode) ? [[Globe2, "Work mode", modeLabel(job.workMode)]] : []),
+    ...(job.industry ? [[Building2, "Industry", job.industry]] : []),
     [Clock3, "Posted", timeAgo(job.date || job.publication_date || job.job_posted_at_datetime_utc)],
     ...(salary ? [[Banknote, "Salary", salary]] : []),
-    ...(job.applicationDeadline || job.application_deadline ? [[CalendarDays, "Application deadline", job.applicationDeadline || job.application_deadline]] : []),
-    ...(job.experience ? [[BriefcaseBusiness, "Experience", job.experience]] : []),
+    ...(deadlineLabel ? [[CalendarDays, "Application deadline", deadlineLabel]] : []),
+    ...(experienceText ? [[BriefcaseBusiness, "Experience", experienceText]] : []),
   ];
 
   return (
@@ -405,7 +426,7 @@ export default function JobDetail() {
                   {logo && <img src={logo} alt="" onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextElementSibling.style.display = "flex"; }} />}<span style={{ display: logo ? "none" : "flex" }}>{initials(company)}</span>
                 </div>
                 <div className="job-detail-title-wrap">
-                  <div className="job-eyebrow">{source}</div>
+                  <div className="job-eyebrow">{source}{job.jobRef ? <> · <span title="Job reference number">Job No. {job.jobRef}</span></> : null}</div>
                   <h1>{title}</h1>
                   <Link href={`/company/${company.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-")}?name=${encodeURIComponent(company)}`} className="job-company-link">
                     <Building2 size={15} /> {company}
@@ -413,7 +434,10 @@ export default function JobDetail() {
                   <div className="job-meta-line">
                     <span><MapPin size={15} />{location}</span>
                     <span><BriefcaseBusiness size={15} />{type}</span>
-                    {remote && <span><Globe2 size={15} />Remote</span>}
+                    {remote && !modeLabel(job.workMode) && <span><Globe2 size={15} />Remote</span>}
+                    {modeLabel(job.workMode) && <span><Globe2 size={15} />{modeLabel(job.workMode)}</span>}
+                    {job.industry && <span><Building2 size={15} />{job.industry}</span>}
+                    {levelLabel(job.experienceLevel) && <span><BriefcaseBusiness size={15} />{levelLabel(job.experienceLevel)}</span>}
                   </div>
                 </div>
               </header>
@@ -432,9 +456,9 @@ export default function JobDetail() {
                 {[
                   ["Salary", salary || "Not disclosed"],
                   ["Employment type", type],
-                  ["Experience", job.experience || job.experience_level || "Not specified"],
+                  ["Experience", experienceText || "Not specified"],
                   ["Education", job.education || job.education_requirements || "Not specified"],
-                  ["Deadline", job.applicationDeadline || job.application_deadline || "Not specified"]
+                  ["Deadline", deadlineLabel || "Not specified"]
                 ].map(([label, value]) => (
                   <div className="job-key-fact" key={label}>
                     <span>{label}</span>
@@ -457,17 +481,29 @@ export default function JobDetail() {
                 </article>
               ))}
 
-              {Array.isArray(job.tags) && job.tags.length > 0 && (
+              {skillList.length > 0 && (
                 <section className="job-description-panel">
                   <div className="job-section-heading"><span /><h2>Skills & tags</h2></div>
-                  <div className="job-tags">{job.tags.slice(0, 12).map((tag, i) => <span key={i}>{tag}</span>)}</div>
+                  <div className="job-tags">{skillList.slice(0, 20).map((tag, i) => <span key={i}>{tag}</span>)}</div>
                 </section>
               )}
 
-              <div className="job-source-note">
+              {onPlatform && neededDocs.length > 0 && (
+                <section className="job-description-panel">
+                  <div className="job-section-heading"><span /><h2>Required documents</h2></div>
+                  <ul className="space-y-1.5 text-sm text-gray-700">{neededDocs.map((d) => <li key={d} className="flex items-center gap-2"><CheckCircle2 size={15} className="text-teal-600" /> {d} <span className="text-xs font-semibold text-red-600">Required</span></li>)}</ul>
+                </section>
+              )}
+
+              {onPlatform && !deadlinePassed && <ApplyForm job={job} />}
+              {onPlatform && deadlinePassed && (
+                <section className="job-description-panel"><div className="job-section-heading"><span /><h2>Applications closed</h2></div><p>The application deadline for this job was {deadlineLabel}. Applications are no longer being accepted.</p></section>
+              )}
+
+              {!onPlatform && <div className="job-source-note">
                 <Globe2 size={16} />
                 <div><strong>Application source</strong><p>This listing is provided by {source}. You will complete your application on the original source.</p></div>
-              </div>
+              </div>}
             </div>
 
             <aside className="job-detail-sidebar">
@@ -476,9 +512,15 @@ export default function JobDetail() {
                   <p className="apply-kicker">Ready to apply?</p>
                   <h2>{title}</h2>
                 </div>
+                {onPlatform ? (
+                  deadlinePassed
+                    ? <p className="text-sm font-semibold text-red-600">Applications closed {deadlineLabel}</p>
+                    : <a href="#apply" className="apply-button">Apply for this position</a>
+                ) : (
                 <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="apply-button">
                   Apply on {source} <ExternalLink size={16} />
                 </a>
+                )}
                 <button onClick={copyLink} className="share-button"><Share2 size={15} />{copied ? "Link copied" : "Share job"}</button>
               </div>
 
