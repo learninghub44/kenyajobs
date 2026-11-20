@@ -148,3 +148,31 @@ test("employer submission with platform apply + details carries through approval
   assert.deepEqual(made.requiredDocuments, ["resume", "linkedin"]);
   assert.match(made.jobRef, /^JH-\d+$/);
 });
+
+test("admin jobs are queued for Telegram and WhatsApp with a link to apply on the site", { skip }, async () => {
+  const queueFor = async (jobId) => (await (await admin("GET", "/api/admin/distribution")).json()).queue.filter((q) => q.job_id === jobId);
+  const base = { ...platformJob, requiredDocuments: [] };
+
+  // A town that is not in the auto-import location list must still be shared.
+  const kericho = await (await admin("POST", "/api/admin/jobs", { ...base, title: "Field Officer", location: "Kericho" })).json();
+  const items = await queueFor(kericho.id);
+  assert.deepEqual(items.map((q) => q.channel).sort(), ["telegram", "whatsapp"]);
+  const msg = items[0].message;
+  assert.ok(msg.includes(`/job/${kericho.id}`), "links to the job page on the site");
+  assert.ok(msg.includes("APPLY DIRECTLY ON JOBS HUB KENYA"), "says candidates can apply on the site");
+  assert.ok(msg.includes(kericho.jobRef), "includes the job number");
+  assert.match(msg, /Deadline: .*2099/);
+  assert.match(msg, /KES 40,000 - 50,000/);
+  assert.ok(msg.startsWith("📢 KENYA JOB"));
+
+  // An external-apply job is shared too, but does not claim on-site applications.
+  const ext = await (await admin("POST", "/api/admin/jobs", { title: "Sales Executive", company: "Acme", description: "We are seeking a sales executive. Apply now.", url: "https://acme.co.ke/apply-sales-" + Math.random().toString(36).slice(2, 8), location: "Mombasa", categories: ["general"] })).json();
+  const extItems = await queueFor(ext.id);
+  assert.equal(extItems.length, 2); assert.ok(!extItems[0].message.includes("APPLY DIRECTLY"));
+
+  // The owner can opt a job out of sharing; closed jobs are never shared.
+  const quiet = await (await admin("POST", "/api/admin/jobs", { ...base, title: "Quiet Accountant", shareToChannels: false })).json();
+  assert.equal((await queueFor(quiet.id)).length, 0);
+  const closed = await (await admin("POST", "/api/admin/jobs", { ...base, title: "Closed Accountant", applicationDeadline: "2020-01-01" })).json();
+  assert.equal((await queueFor(closed.id)).length, 0);
+});

@@ -12,7 +12,7 @@ const EMPTY_JOB = {
   description: "", requirements: "", responsibilities: "", qualifications: "",
   experience: "", education: "", benefits: "", applicationInstructions: "",
   applicationDeadline: "", url: "", companyLogo: "", companyWebsite: "",
-  categories: [], featured: false, published: true,
+  categories: [], featured: false, published: true, shareToChannels: true,
   applicationMethod: "", workMode: "", industry: "", experienceLevel: "",
   salaryMin: "", salaryMax: "", salaryCurrency: "KES", salaryPeriod: "month", requiredDocuments: ["resume"],
 };
@@ -101,6 +101,7 @@ export default function JobForm({ initial, onSubmit, onCancel, submitting }) {
         <div className="flex flex-wrap gap-6 mt-4">
           <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={Boolean(form.featured)} onChange={(e) => set("featured", e.target.checked)} /> Featured listing</label>
           <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.published !== false} onChange={(e) => set("published", e.target.checked)} /> Publish immediately</label>
+          <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.shareToChannels !== false} onChange={(e) => set("shareToChannels", e.target.checked)} /> Share to Telegram &amp; WhatsApp channels</label>
         </div>
       </section>
       {error && <p role="alert" className="text-red-600 text-sm">{error}</p>}

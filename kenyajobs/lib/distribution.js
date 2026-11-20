@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { query, rawQuery } from "@/lib/db";
+import { isDeadlinePassed, formatJobRef, WORK_MODES } from "@/lib/jobOptions";
 import { isEmploymentVacancy, getEmploymentRejectionReason } from "@/lib/jobValidation";
 
 // The social_channel_settings table is created by supabase/migrations; this only
@@ -75,6 +76,7 @@ export function classifyJob(job = {}, route = "") {
 }
 
 function isExpired(job = {}) {
+  if (isDeadlinePassed(job.applicationDeadline)) return true;
   const expiry = job.expiryDate || job.expiry_date || job.application_deadline || job.deadline;
   if (expiry) {
     const date = new Date(expiry);
@@ -140,17 +142,27 @@ export function formatJobAnnouncement(job = {}, category = "kenya") {
   const description = cleanText(job.description || job.job_description || "", 360);
   const salary = job.salary && !/^salary not disclosed$/i.test(String(job.salary)) ? cleanText(job.salary, 70) : "";
   const instructions = cleanText(job.applicationInstructions || job.application_instructions || "", 180);
+  const onPlatform = job.applicationMethod === "platform";
+  const ref = job.jobRef || formatJobRef(job.jobNumber);
+  const mode = WORK_MODES.find((m) => m.value === job.workMode)?.label || "";
+  let deadline = "";
+  if (job.applicationDeadline) {
+    const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(job.applicationDeadline)) ? `${job.applicationDeadline}T12:00:00+03:00` : job.applicationDeadline);
+    if (!Number.isNaN(d.getTime())) deadline = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Nairobi", weekday: "short", day: "numeric", month: "short", year: "numeric" }).format(d);
+  }
   const parts = [
     "📢 " + label, "",
     "💼 " + title,
     "🏢 Employer: " + company,
     "📍 Location: " + location,
-    "🕒 Type: " + type,
+    "🕒 Type: " + type + (mode ? " · " + mode : ""),
     salary ? "💰 Salary: " + salary : "",
+    deadline ? "⏳ Deadline: " + deadline : "",
+    ref ? "🔢 Job No: " + ref : "",
     description ? "\n" + description : "",
     instructions ? "\nHOW TO APPLY\n" + instructions : "",
     "",
-    "🔗 VIEW JOB & APPLY: " + detailUrl,
+    (onPlatform ? "✅ APPLY DIRECTLY ON JOBS HUB KENYA (free, no external forms): " : "🔗 VIEW JOB & APPLY: ") + detailUrl,
     "JOBS HUB KENYA"
   ].filter(Boolean);
   // Keep messages compact and always retain the application link.
@@ -195,14 +207,17 @@ export async function enqueueJobs(jobs, route = "") {
   let queued = 0;
   const stats = { seen: jobs.length, queued: 0, rejected: 0, expired: 0, unclassified: 0, duplicateInBatch: 0 };
   const rejectedReasons = {};
+  const items = [];
   const seenInBatch = new Set();
   for (const job of jobs) {
     if (!job || !(job.id || job.job_id)) { stats.rejected++; rejectedReasons.missing_id = (rejectedReasons.missing_id || 0) + 1; continue; }
     const rejectionReason = getEmploymentRejectionReason(job);
     if (rejectionReason) { stats.rejected++; rejectedReasons[rejectionReason] = (rejectedReasons[rejectionReason] || 0) + 1; continue; }
     if (isExpired(job)) { stats.expired++; continue; }
-    const category = classifyJob(job, route);
-    if (!category || !settings[category + "_enabled"]) { stats.unclassified++; continue; }
+    // Jobs the owner posts from the admin are always shared; the location-based
+    // categories only decide where automatically imported jobs may go.
+    const category = classifyJob(job, route) || (route === "manual" ? "kenya" : "");
+    if (!category || (route !== "manual" && !settings[category + "_enabled"])) { stats.unclassified++; continue; }
     const jobId = String(job.id || job.job_id);
     const dedupeKey = jobDedupeKey(job);
     if (seenInBatch.has(dedupeKey)) { stats.duplicateInBatch++; continue; }
@@ -216,12 +231,13 @@ export async function enqueueJobs(jobs, route = "") {
       );
       if (result.rowCount) {
         queued += 1;
+        items.push({ id: result.rows[0].id, channel, message: formatJobAnnouncement(job, category), status: settings.approval_required ? "pending_approval" : "ready" });
         await query("INSERT INTO job_distribution_logs (queue_id,action,status,detail) VALUES ($1,'queued',$2,$3)", [result.rows[0].id, settings.approval_required ? "pending_approval" : "ready", `Auto-queued from ${route || "manual job entry"}`]);
       }
     }
   }
   stats.queued = queued;
-  return { ...stats, rejectedReasons };
+  return { ...stats, rejectedReasons, items };
 }
 
 export async function listDistributionQueue({ limit = 100 } = {}) {
@@ -261,4 +277,25 @@ export async function sendTelegramMessage(message) {
   const data = await response.json().catch(() => ({}));
   if (!response.ok || !data.ok) throw new Error(data.description || `Telegram API returned HTTP ${response.status}`);
   return data.result;
+}
+
+// Telegram can be posted automatically; WhatsApp channels have no posting API,
+// so those items stay "ready" for the admin to copy from Admin > Distribution.
+// Only items that are already approved (approval_required off) are sent, and a
+// failure here never affects the job that triggered it.
+export async function autoSendTelegram(items = []) {
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) return { sent: 0 };
+  let sent = 0;
+  for (const item of items) {
+    if (item.channel !== "telegram" || item.status !== "ready") continue;
+    try {
+      await sendTelegramMessage(item.message);
+      await updateDistributionItem(item.id, "posted", null, ["ready"], "auto_sent_to_telegram");
+      sent += 1;
+    } catch (error) {
+      await updateDistributionItem(item.id, "failed", error.message, ["ready"], "send_failed").catch(() => {});
+      console.error("auto telegram send failed:", error.message);
+    }
+  }
+  return { sent };
 }

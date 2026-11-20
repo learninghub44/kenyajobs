@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { query } from "@/lib/db";
-import { enqueueJobs } from "@/lib/distribution";
+import { enqueueJobs, autoSendTelegram } from "@/lib/distribution";
 import { filterEmploymentVacancies } from "@/lib/jobValidation";
 import { sanitizeJobDetails, composeSalary, formatJobRef } from "@/lib/jobOptions";
 
@@ -47,6 +47,15 @@ function prepareJobData(data, ex, id) {
   if (!String(out.salary || "").trim() && (ex.salaryMin != null || ex.salaryMax != null)) out.salary = composeSalary(ex);
   return out;
 }
+// Queue the job for Telegram/WhatsApp (and send to Telegram when approvals are
+// off). Sharing problems are logged but never fail the save.
+async function shareJob(job, rawData = {}) {
+  if (!job.published || rawData.shareToChannels === false) return;
+  try {
+    const result = await enqueueJobs([job], "manual");
+    if (result.items?.length) await autoSendTelegram(result.items);
+  } catch (error) { console.error("share job to channels:", error.message); }
+}
 const DETAIL_COLUMNS = { workMode: "work_mode", industry: "industry", experienceLevel: "experience_level", salaryMin: "salary_min", salaryMax: "salary_max", salaryCurrency: "salary_currency", salaryPeriod: "salary_period", skills: "skills", requiredDocuments: "required_documents" };
 async function saveJobDetails(id, ex, row) {
   const keys = Object.keys(ex).filter((k) => DETAIL_COLUMNS[k]);
@@ -64,12 +73,12 @@ export async function createJob(rawData) {
   const { rows } = await query(`INSERT INTO manual_jobs
     (id,title,company,location,type,salary,description,url,company_logo,company_website,categories,featured,published,source,requirements,responsibilities,qualifications,experience,education,benefits,application_instructions,application_deadline,application_method,application_email,source_submission_id)
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25) RETURNING *`, [id,...v,data.sourceSubmissionId||null]);
-  const job = rowToJob(await saveJobDetails(id, ex, rows[0])); if (job.published) await enqueueJobs([job], "manual"); return job;
+  const job = rowToJob(await saveJobDetails(id, ex, rows[0])); await shareJob(job, rawData); return job;
 }
 export async function updateJob(id, rawData) {
   const ex = sanitizeJobDetails(rawData), data = prepareJobData(rawData, ex, id), v = values(data);
   const { rows } = await query(`UPDATE manual_jobs SET title=$2,company=$3,location=$4,type=$5,salary=$6,description=$7,url=$8,company_logo=$9,company_website=$10,categories=$11,featured=$12,published=$13,source=$14,requirements=$15,responsibilities=$16,qualifications=$17,experience=$18,education=$19,benefits=$20,application_instructions=$21,application_deadline=$22,application_method=$23,application_email=$24,updated_at=now() WHERE id=$1 RETURNING *`, [id,...v]);
-  const job = rows[0] ? rowToJob(await saveJobDetails(id, ex, rows[0])) : null; if (job?.published) await enqueueJobs([job], "manual"); return job;
+  const job = rows[0] ? rowToJob(await saveJobDetails(id, ex, rows[0])) : null; if (job) await shareJob(job, rawData); return job;
 }
 export async function deleteJob(id) { await query("DELETE FROM manual_jobs WHERE id=$1", [id]); }
 export { VALID_CATEGORIES };
