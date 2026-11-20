@@ -7,6 +7,7 @@
 // request, between when a job was first seen and when its detail page is opened).
 import { query } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db";
+import { resolveFreshJobs } from "@/lib/jobFreshness";
 
 const MAX_BATCH = 200;
 
@@ -29,6 +30,25 @@ export async function cacheJobs(jobs) {
   } catch (err) {
     console.error("liveJobCache.cacheJobs error:", err.message);
   }
+}
+
+// Drop expired jobs and give every job a trustworthy posted date (see
+// lib/jobFreshness.js for the rules). If the first-seen lookup is unavailable
+// (database down, migration not applied yet) the rules still run on the dates
+// the sources reported, so listings never fail because of it.
+export async function applyFreshness(jobs) {
+  const list = Array.isArray(jobs) ? jobs : [];
+  const firstSeen = new Map();
+  if (list.length && isDatabaseConfigured()) {
+    try {
+      const ids = [...new Set(list.map((j) => String(j?.id ?? j?.job_id ?? "")).filter(Boolean))].slice(0, 2000);
+      const { rows } = await query("SELECT id, first_seen_at FROM live_job_cache WHERE id = ANY($1::text[])", [ids]);
+      for (const row of rows) firstSeen.set(row.id, row.first_seen_at);
+    } catch (err) {
+      console.error("liveJobCache.applyFreshness lookup:", err.message);
+    }
+  }
+  return resolveFreshJobs(list, firstSeen);
 }
 
 export async function getCachedJob(id) {

@@ -2,7 +2,8 @@ import crypto from "crypto";
 import { query } from "@/lib/db";
 import { enqueueJobs, autoSendTelegram } from "@/lib/distribution";
 import { filterEmploymentVacancies } from "@/lib/jobValidation";
-import { sanitizeJobDetails, composeSalary, formatJobRef } from "@/lib/jobOptions";
+import { sanitizeJobDetails, composeSalary, formatJobRef, isDeadlinePassed } from "@/lib/jobOptions";
+import { getMaxAgeDays } from "@/lib/jobFreshness";
 
 const VALID_CATEGORIES = ["remote", "entry", "graduate", "wfh", "general"];
 function sanitizeCategories(categories) { return Array.isArray(categories) ? categories.filter((c) => VALID_CATEGORIES.includes(c)) : []; }
@@ -23,14 +24,18 @@ function rowToJob(row) {
   };
 }
 export function newManualJobId() { return `manual-${crypto.randomUUID()}`; }
+// A job is live until its package ends; with no package it lasts JOB_MAX_AGE_DAYS
+// (default 30) from the day it was created. The number comes from our own
+// configuration (validated to an integer), never from a request.
+const manualJobExpirySql = () => `COALESCE(package_expires_at, created_at + interval '${getMaxAgeDays()} days') > now()`;
 export async function listPublishedJobs({ category, search } = {}) {
-  const conditions = ["published = true", "(package_expires_at IS NULL OR package_expires_at > now())"], params = [];
+  const conditions = ["published = true", manualJobExpirySql()], params = [];
   if (category) { params.push(category); conditions.push(`$${params.length} = ANY(categories)`); }
   if (search) { params.push(`%${search}%`); conditions.push(`(title ILIKE $${params.length} OR company ILIKE $${params.length})`); }
   const { rows } = await query(`SELECT * FROM manual_jobs WHERE ${conditions.join(" AND ")} ORDER BY featured DESC, created_at DESC`, params);
-  return filterEmploymentVacancies(rows.map(rowToJob));
+  return filterEmploymentVacancies(rows.map(rowToJob)).filter((job) => !isDeadlinePassed(job.applicationDeadline));
 }
-export async function getPublishedJobById(id) { const { rows } = await query("SELECT * FROM manual_jobs WHERE id=$1 AND published=true AND (package_expires_at IS NULL OR package_expires_at>now())", [id]); const job = rows[0] ? rowToJob(rows[0]) : null; return job && filterEmploymentVacancies([job]).length ? job : null; }
+export async function getPublishedJobById(id) { const { rows } = await query(`SELECT * FROM manual_jobs WHERE id=$1 AND published=true AND ${manualJobExpirySql()}`, [id]); const job = rows[0] ? rowToJob(rows[0]) : null; return job && filterEmploymentVacancies([job]).length ? job : null; }
 export async function listAllJobs() { const { rows } = await query("SELECT * FROM manual_jobs ORDER BY created_at DESC"); return rows.map(rowToJob); }
 export async function getJobById(id) { const { rows } = await query("SELECT * FROM manual_jobs WHERE id=$1", [id]); return rows[0] ? rowToJob(rows[0]) : null; }
 const values = (d) => [d.title, d.company, d.location || "Worldwide", d.type || "Full-time", d.salary || null,
@@ -65,7 +70,7 @@ async function saveJobDetails(id, ex, row) {
   return rows[0] || row;
 }
 export async function getPublishedJobByNumber(number) {
-  const { rows } = await query("SELECT * FROM manual_jobs WHERE job_number=$1 AND published=true AND (package_expires_at IS NULL OR package_expires_at>now())", [number]);
+  const { rows } = await query(`SELECT * FROM manual_jobs WHERE job_number=$1 AND published=true AND ${manualJobExpirySql()}`, [number]);
   return rows[0] ? rowToJob(rows[0]) : null;
 }
 export async function createJob(rawData) {

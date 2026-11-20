@@ -4,7 +4,7 @@ import { filterEmploymentVacancies } from "@/lib/jobValidation";
 // WFH    = roles explicitly tagged work-from-home or in categories suited to home-based work
 //          Sources used here must NOT duplicate /api/remote-jobs fetch calls
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
-import { cacheJobs } from "@/lib/liveJobCache";
+import { cacheJobs, applyFreshness } from "@/lib/liveJobCache";
 import { cachedFetch } from "@/lib/apiResponseCache";
 import { attachSalaries } from "@/utils/extractSalary";
 
@@ -108,6 +108,7 @@ export default async function handler(req, res) {
   const fetchedJobs = await cachedFetch(`wfh-jobs:${page}`, () => fetchAll(page));
 
   const jobs = filterEmploymentVacancies(fetchedJobs);
-  cacheJobs(jobs);
-  res.status(200).json(jobs);
+  const freshJobs = await applyFreshness(jobs);
+  cacheJobs(freshJobs);
+  res.status(200).json(freshJobs);
 }

@@ -176,3 +176,28 @@ test("admin jobs are queued for Telegram and WhatsApp with a link to apply on th
   const closed = await (await admin("POST", "/api/admin/jobs", { ...base, title: "Closed Accountant", applicationDeadline: "2020-01-01" })).json();
   assert.equal((await queueFor(closed.id)).length, 0);
 });
+
+test("admin-posted jobs expire: 30 days by default, package length if set, closed deadlines hidden", { skip }, async () => {
+  const { default: pg } = await import("pg");
+  const db = new pg.Client({ connectionString: DB, ssl: false }); await db.connect();
+  try {
+    const make = async (title, over = {}) => (await (await admin("POST", "/api/admin/jobs", { ...platformJob, title, requiredDocuments: [], applicationDeadline: "", ...over })).json());
+    const listed = async () => (await (await fetch(`${base}/api/manual-jobs`)).json()).map((j) => j.title);
+    const fresh = await make("Fresh Accountant");
+    const old = await make("Stale Accountant");
+    const packaged = await make("Packaged Accountant");
+    const closed = await make("Closing Accountant", { applicationDeadline: "2020-01-01" });
+    await db.query("UPDATE manual_jobs SET package_expires_at=NULL, created_at=now() - interval '10 days' WHERE id=$1", [fresh.id]);
+    await db.query("UPDATE manual_jobs SET package_expires_at=NULL, created_at=now() - interval '40 days' WHERE id=$1", [old.id]);
+    await db.query("UPDATE manual_jobs SET package_expires_at=now() + interval '10 days', created_at=now() - interval '40 days' WHERE id=$1", [packaged.id]);
+    const titles = await listed();
+    assert.ok(titles.includes("Fresh Accountant"), "10 days old, no package: live");
+    assert.ok(!titles.includes("Stale Accountant"), "40 days old, no package: expired");
+    assert.ok(titles.includes("Packaged Accountant"), "an active package keeps it live");
+    assert.ok(!titles.includes("Closing Accountant"), "closed deadline is hidden from the list");
+    assert.equal((await fetch(`${base}/api/job-lookup/${old.id}`)).status, 404, "expired job page is gone");
+    assert.equal((await fetch(`${base}/api/job-lookup/${closed.id}`)).status, 200, "a closed job's direct link still shows 'applications closed'");
+    const adminTitles = (await (await admin("GET", "/api/admin/jobs")).json()).map((j) => j.title);
+    assert.ok(adminTitles.includes("Stale Accountant"), "admins still see expired jobs");
+  } finally { await db.end(); }
+});

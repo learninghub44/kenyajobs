@@ -1,7 +1,7 @@
 import { filterEmploymentVacancies } from "@/lib/jobValidation";
 // Search: The Muse + Remotive + Jobicy + JSearch (if key)
 import { fetchWithTimeout } from "@/utils/fetchWithTimeout";
-import { cacheJobs } from "@/lib/liveJobCache";
+import { cacheJobs, applyFreshness } from "@/lib/liveJobCache";
 import { attachSalaries } from "@/utils/extractSalary";
 
 export default async function handler(req, res) {
@@ -106,6 +106,7 @@ export default async function handler(req, res) {
       .flatMap(r => r.value)
   ));
 
-  cacheJobs(jobs);
-  res.status(200).json(jobs);
+  const freshJobs = await applyFreshness(jobs);
+  cacheJobs(freshJobs);
+  res.status(200).json(freshJobs);
 }

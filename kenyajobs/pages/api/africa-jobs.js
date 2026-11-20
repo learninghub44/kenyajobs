@@ -3,6 +3,7 @@ import { cachedFetch } from "@/lib/apiResponseCache";
 import { attachSalaries } from "@/utils/extractSalary";
 import crypto from "crypto";
 import { filterEmploymentVacancies } from "@/lib/jobValidation";
+import { applyFreshness } from "@/lib/liveJobCache";
 
 function hashId(input) {
   return crypto.createHash("sha1").update(String(input)).digest("hex").slice(0, 16);
@@ -414,5 +415,5 @@ export default async function handler(req, res) {
     minLength: 150, // below this, treat as a degraded/partial fetch and retry sooner
   });
 
-  res.status(200).json(filterEmploymentVacancies(fetched));
+  res.status(200).json(await applyFreshness(filterEmploymentVacancies(fetched)));
 }

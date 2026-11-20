@@ -16,7 +16,8 @@ export function parseJobDate(value) {
   if (Number.isNaN(date.getTime())) return null;
   // A job board should not display Unix epoch/obviously corrupt dates as real postings.
   const year = date.getUTCFullYear();
-  if (year < 2000 || year > new Date().getUTCFullYear() + 1) return null;
+  // new Date("0") is the year 2000, so the floor is well above the epoch-era values.
+  if (year < 2015 || year > new Date().getUTCFullYear() + 1) return null;
   return date;
 }
 
